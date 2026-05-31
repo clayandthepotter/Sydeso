@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum WorkflowState {
+  backlog
+  design
+  design_approval
+  development
+  automated_qa
+  manual_review
+  ready
+  released
+  escalated
+}
+
+enum ActorType {
+  user
+  agent
+  system
+  runner
+}
+
+enum JobStatus {
+  queued
+  assigned
+  running
+  succeeded
+  failed
+  cancelled
+}
+
+enum ArtifactType {
+  feature_request
+  prd
+  research_report
+  design_package
+  implementation_package
+  qa_report
+  review_report
+  release_candidate
+  skill_file
+  workflow_template
+  policy_definition
+}
+
+enum RunnerType {
+  self_hosted
+  managed
+}
+
+enum RunnerStatus {
+  online
+  offline
+  busy
+  disabled
+}
+
+model Organization {
+  id         String      @id @default(uuid())
+  name       String
+  slug       String      @unique
+  plan       String      @default("builder")
+  workspaces Workspace[]
+  projects   Project[]
+  runners    Runner[]
+  artifacts  Artifact[]
+  auditLogs  AuditLog[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Workspace {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  slug           String
+  projects       Project[]
+  createdAt      DateTime     @default(now())
+
+  @@unique([organizationId, slug])
+}
+
+model Project {
+  id                         String       @id @default(uuid())
+  organizationId             String
+  workspaceId                String
+  organization               Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workspace                  Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name                       String
+  repositoryUrl              String?
+  defaultBranch              String       @default("main")
+  maxRemediationIterations   Int          @default(3)
+  features                   Feature[]
+  artifacts                  Artifact[]
+  createdAt                  DateTime     @default(now())
+}
+
+model Feature {
+  id             String        @id @default(uuid())
+  organizationId String
+  projectId      String
+  project        Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title          String
+  description    String
+  status         WorkflowState @default(backlog)
+  workflowRuns   WorkflowRun[]
+  artifacts      Artifact[]
+  createdAt      DateTime      @default(now())
+}
+
+model WorkflowRun {
+  id                String        @id @default(uuid())
+  organizationId    String
+  featureId         String
+  feature           Feature       @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  currentState      WorkflowState @default(backlog)
+  status            String        @default("active")
+  remediationCount  Int           @default(0)
+  jobs              Job[]
+  transitions       WorkflowTransition[]
+  artifacts         Artifact[]
+  startedAt         DateTime      @default(now())
+  completedAt       DateTime?
+}
+
+model WorkflowTransition {
+  id                String        @id @default(uuid())
+  organizationId    String
+  workflowRunId     String
+  workflowRun       WorkflowRun   @relation(fields: [workflowRunId], references: [id], onDelete: Cascade)
+  fromState         WorkflowState?
+  toState           WorkflowState
+  triggeredByType   ActorType
+  triggeredById     String?
+  reason            String?
+  metadata          Json          @default("{}")
+  createdAt         DateTime      @default(now())
+}
+
+model Job {
+  id                    String        @id @default(uuid())
+  organizationId        String
+  workflowRunId         String
+  workflowRun           WorkflowRun   @relation(fields: [workflowRunId], references: [id], onDelete: Cascade)
+  state                 WorkflowState
+  agentType             String
+  requiredCapabilities  String[]      @default([])
+  status                JobStatus     @default(queued)
+  runnerId              String?
+  runner                Runner?       @relation(fields: [runnerId], references: [id])
+  inputArtifactIds      String[]      @default([])
+  outputArtifactIds     String[]      @default([])
+  attempt               Int           @default(1)
+  error                 Json?
+  startedAt             DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime      @default(now())
+
+  @@index([organizationId, status])
+  @@index([runnerId])
+}
+
+model Artifact {
+  id              String        @id @default(uuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId       String
+  project         Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  featureId       String?
+  feature         Feature?      @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  workflowRunId   String?
+  workflowRun     WorkflowRun?  @relation(fields: [workflowRunId], references: [id], onDelete: Cascade)
+  type            ArtifactType
+  version         Int
+  title           String
+  content         Json?
+  storageKey      String?
+  checksum        String
+  createdByType   ActorType
+  createdById     String?
+  createdAt       DateTime      @default(now())
+
+  @@unique([featureId, type, version])
+  @@index([workflowRunId, type])
+  @@index([projectId, createdAt])
+}
+
+model Runner {
+  id              String        @id @default(uuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name            String
+  type            RunnerType
+  status          RunnerStatus  @default(offline)
+  version         String
+  capabilities    String[]      @default([])
+  tokenHash       String        @unique
+  healthMetrics   Json          @default("{}")
+  lastSeenAt      DateTime?
+  jobs            Job[]
+  createdAt       DateTime      @default(now())
+
+  @@index([organizationId, status])
+}
+
+model AuditLog {
+  id              String        @id @default(uuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actorType       ActorType
+  actorId         String?
+  action          String
+  entityType      String
+  entityId        String?
+  before          Json?
+  after           Json?
+  metadata        Json          @default("{}")
+  createdAt       DateTime      @default(now())
+
+  @@index([organizationId, createdAt])
+}

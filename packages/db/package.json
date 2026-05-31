@@ -1,0 +1,19 @@
+{
+  "name": "@sydeso/db",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev",
+    "build": "prisma generate",
+    "typecheck": "cross-env DATABASE_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso prisma validate",
+    "lint": "cross-env DATABASE_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso prisma validate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.1.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "prisma": "^6.1.0"
+  }
+}
