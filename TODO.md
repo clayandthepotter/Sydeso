@@ -12,6 +12,7 @@ This todo tracks progress against `docs/Sydeso Master Specification v1.md` and t
 - [x] Add initial Prisma schema.
 - [x] Configure Prisma datasource for Supabase pooler and direct migration URLs.
 - [x] Add ignored local Supabase database environment file.
+- [x] Add package-local Prisma env example for db CLI commands.
 - [x] Fix API TypeScript build configuration for workspace package imports.
 - [x] Add local Postgres, Redis, and MinIO Docker compose stack.
 - [x] Verify scaffold with `pnpm typecheck`.

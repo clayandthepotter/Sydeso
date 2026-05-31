@@ -6,8 +6,8 @@
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
     "build": "prisma generate",
-    "typecheck": "cross-env DATABASE_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso prisma validate",
-    "lint": "cross-env DATABASE_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso prisma validate"
+    "typecheck": "cross-env DATABASE_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso DIRECT_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso prisma validate",
+    "lint": "cross-env DATABASE_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso DIRECT_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso prisma validate"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0"
