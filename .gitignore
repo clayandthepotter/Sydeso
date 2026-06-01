@@ -4,6 +4,7 @@ dist/
 coverage/
 .turbo/
 .kilo/
+.vscode/
 .env
 .env.*
 !.env.example
