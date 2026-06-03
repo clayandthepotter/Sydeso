@@ -1,0 +1,155 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic "Sydeso marketing navigation" [ref=e4]:
+      - link "Sydeso home" [ref=e5] [cursor=pointer]:
+        - /url: "#top"
+        - text: Sydeso
+      - navigation "Page sections" [ref=e7]:
+        - link "Workflow" [ref=e8] [cursor=pointer]:
+          - /url: "#workflow"
+        - link "Design lock" [ref=e9] [cursor=pointer]:
+          - /url: "#design-lock"
+        - link "Waitlist" [ref=e10] [cursor=pointer]:
+          - /url: "#waitlist"
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]: Design lock in motion
+        - heading "Notion clarity. Linear precision. Built into Sydeso." [level=1] [ref=e15]
+        - paragraph [ref=e16]: Sydeso turns natural language requests into design-locked guidance, implementation-ready artifacts, and verified delivery loops. The same visual system governs the marketing site and the product UI.
+        - generic [ref=e17]:
+          - link "Join the waitlist" [ref=e18] [cursor=pointer]:
+            - /url: "#waitlist"
+          - link "See the design lock" [ref=e19] [cursor=pointer]:
+            - /url: "#design-lock"
+        - generic "Sydeso design lock metrics" [ref=e20]:
+          - generic [ref=e21]:
+            - strong [ref=e22]: "1"
+            - generic [ref=e23]: locked guide per project
+          - generic [ref=e24]:
+            - strong [ref=e25]: "3"
+            - generic [ref=e26]: layers in the generated system
+          - generic [ref=e27]:
+            - strong [ref=e28]: 100%
+            - generic [ref=e29]: UI work checked against the guide
+      - generic "Sydeso design lock preview" [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e32]: Design lock artifact
+          - strong [ref=e33]: Project Aurora
+        - generic [ref=e34]:
+          - generic [ref=e35]: Generated guide
+          - heading "Calm interface, editorial rhythm, precise workflow states." [level=3] [ref=e36]
+          - paragraph [ref=e37]: Neutral surfaces, crisp borders, and compact spacing keep the system readable at every step.
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - generic [ref=e40]: Surface
+            - strong [ref=e41]: Paper + soft white
+          - generic [ref=e42]:
+            - generic [ref=e43]: Type
+            - strong [ref=e44]: Inter with tight hierarchy
+          - generic [ref=e45]:
+            - generic [ref=e46]: Motion
+            - strong [ref=e47]: 160ms and understated
+          - generic [ref=e48]:
+            - generic [ref=e49]: States
+            - strong [ref=e50]: Clear focus and status colors
+        - paragraph [ref=e51]: Each project gets a versioned design lock artifact that developers and QA reference.
+    - region "A locked visual guide is part of the workflow, not an afterthought." [ref=e52]:
+      - generic [ref=e53]:
+        - generic [ref=e54]: Core loop
+        - heading "A locked visual guide is part of the workflow, not an afterthought." [level=2] [ref=e55]
+      - generic "Sydeso core workflow" [ref=e56]:
+        - article [ref=e57]:
+          - generic [ref=e58]: "01"
+          - strong [ref=e59]: Brief
+          - paragraph [ref=e60]: Capture the request, audience, and product constraints.
+        - article [ref=e61]:
+          - generic [ref=e62]: "02"
+          - strong [ref=e63]: Design lock
+          - paragraph [ref=e64]: Generate the visual guide that defines the project UI system.
+        - article [ref=e65]:
+          - generic [ref=e66]: "03"
+          - strong [ref=e67]: Build
+          - paragraph [ref=e68]: Turn the locked guide into implementation-ready work.
+        - article [ref=e69]:
+          - generic [ref=e70]: "04"
+          - strong [ref=e71]: Verify
+          - paragraph [ref=e72]: Check behavior, accessibility, and design compliance.
+        - article [ref=e73]:
+          - generic [ref=e74]: "05"
+          - strong [ref=e75]: Review
+          - paragraph [ref=e76]: Let humans approve the work and the design direction.
+        - article [ref=e77]:
+          - generic [ref=e78]: "06"
+          - strong [ref=e79]: Ready
+          - paragraph [ref=e80]: Ship only after the artifact trail is complete.
+    - region "Every project gets a visual contract before development starts." [ref=e81]:
+      - generic [ref=e82]:
+        - generic [ref=e83]: Design lock
+        - heading "Every project gets a visual contract before development starts." [level=2] [ref=e84]
+      - generic [ref=e85]:
+        - article [ref=e86]:
+          - generic [ref=e87]: Foundation
+          - heading "Visual rules stay explicit." [level=3] [ref=e88]
+          - paragraph [ref=e89]: Neutral surfaces, compact rhythm, and a single accent color keep the product calm, readable, and high trust.
+          - list [ref=e90]:
+            - listitem [ref=e91]: Color tokens
+            - listitem [ref=e92]: Typography scale
+            - listitem [ref=e93]: Spacing rhythm
+        - article [ref=e94]:
+          - generic [ref=e95]: Generation
+          - heading "Every project gets a locked guide." [level=3] [ref=e96]
+          - paragraph [ref=e97]: Sydeso turns a brief into a versioned design system guide that captures page patterns, components, and states.
+          - list [ref=e98]:
+            - listitem [ref=e99]: Design lock artifact
+            - listitem [ref=e100]: Page templates
+            - listitem [ref=e101]: Component rules
+        - article [ref=e102]:
+          - generic [ref=e103]: Governance
+          - heading "The guide drives development." [level=3] [ref=e104]
+          - paragraph [ref=e105]: Design approval, implementation, and QA all reference the same artifact so visual drift is caught early.
+          - list [ref=e106]:
+            - listitem [ref=e107]: Approval gate
+            - listitem [ref=e108]: Developer context
+            - listitem [ref=e109]: QA compliance checks
+    - region "Join the teams defining Sydeso's design standard." [ref=e110]:
+      - generic [ref=e111]:
+        - generic [ref=e112]: Private beta
+        - heading "Join the teams defining Sydeso's design standard." [level=2] [ref=e113]
+        - paragraph [ref=e114]: We are inviting solo founders, agencies, and AI-native engineering teams who want software delivery to be traceable from request to verified implementation.
+        - generic "Sydeso product principles" [ref=e115]:
+          - generic [ref=e116]:
+            - strong [ref=e117]: "1"
+            - generic [ref=e118]: design lock artifact per project
+          - generic [ref=e119]:
+            - strong [ref=e120]: "3"
+            - generic [ref=e121]: core layers in the generated guide
+          - generic [ref=e122]:
+            - strong [ref=e123]: 100%
+            - generic [ref=e124]: UI work checked against the lock
+      - form "Join the Sydeso waitlist" [ref=e125]:
+        - generic [ref=e126]:
+          - generic [ref=e127]: Early access
+          - strong [ref=e128]: Reserve your spot
+        - generic [ref=e129]:
+          - text: Work email
+          - textbox "Work email" [ref=e130]:
+            - /placeholder: you@company.com
+        - generic [ref=e131]:
+          - text: Name
+          - textbox "Name" [ref=e132]:
+            - /placeholder: Your name
+        - generic [ref=e133]:
+          - text: Role
+          - combobox "Role" [ref=e134]:
+            - option "Select your role" [disabled] [selected]
+            - option "Founder"
+            - option "Agency operator"
+            - option "Product lead"
+            - option "Engineering leader"
+            - option "Other"
+        - generic [ref=e135]:
+          - text: What would you automate first?
+          - textbox "What would you automate first?" [ref=e136]:
+            - /placeholder: Describe the software workflow you want Sydeso to run.
+        - button "Join waitlist" [ref=e137] [cursor=pointer]
+        - paragraph [ref=e138]: No spam. Just product updates and beta invitations.

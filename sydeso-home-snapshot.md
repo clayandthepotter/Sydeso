@@ -1,0 +1,22 @@
+- generic [active] [ref=e1] [box=0,0,1023,3284]:
+  - main [ref=e2] [box=0,0,1023,3284]:
+    - generic [ref=e3] [box=0,0,1023,3284]:
+      - generic "Sydeso marketing navigation" [ref=e4] [box=16,32,991,58]:
+        - link "Sydeso home" [ref=e5] [cursor=pointer] [box=26,50,91,22]:
+          - /url: "#top"
+        - navigation "Page sections" [ref=e7] [box=728,42,269,39]
+      - generic [ref=e11] [box=16,74,991,935]:
+        - generic [ref=e12] [box=16,146,549,807]
+        - generic "Sydeso design lock preview" [ref=e30] [box=600,230,407,639]
+      - region "A locked visual guide is part of the workflow, not an afterthought." [ref=e52] [box=16,1010,991,719]:
+        - generic [ref=e53] [box=16,1082,896,143]
+        - generic "Sydeso core workflow" [ref=e56] [box=16,1257,991,400]
+      - region "Every project gets a visual contract before development starts." [ref=e81] [box=16,1729,991,689]:
+        - generic [ref=e82] [box=16,1801,704,201]
+        - generic [ref=e85] [box=16,2034,991,312]
+      - region "Join the teams defining Sydeso's design standard." [ref=e110] [box=16,2418,991,794]:
+        - generic [ref=e111] [box=16,2490,548,464]
+        - form "Join the Sydeso waitlist" [ref=e125] [box=596,2490,411,650]
+  - button "Open Next.js Dev Tools" [ref=e144] [cursor=pointer] [box=22,600,32,32]:
+    - img [ref=e145] [box=22,596,40,40]
+  - alert [ref=e148] [box=-1,3283,1,1]

@@ -22,6 +22,41 @@ This todo tracks progress against `docs/Sydeso Master Specification v1.md` and t
 
 - [ ] Rotate the Supabase database password after setup because it was shared in chat.
 
+## Open Source Maintenance
+
+- [x] Add MIT license.
+- [x] Add README.
+- [x] Add changelog.
+- [x] Add contributing guide.
+- [x] Add code of conduct.
+- [x] Add security policy.
+- [x] Add AGENTS.md.
+- [x] Add CI workflow.
+- [x] Add release validation workflow.
+- [x] Add issue templates.
+- [x] Add pull request template.
+- [x] Add dependency update automation.
+- [ ] Add first tagged release.
+
+## Marketing Website
+
+- [x] Build public waitlist landing page.
+- [x] Add accessible waitlist form UI.
+- [x] Persist waitlist signups through API and database.
+- [ ] Add analytics and conversion tracking.
+- [x] Add production deployment target for the marketing site.
+
+## Design System and Brand Lock
+
+- [x] Publish the Sydeso visual design lock and branding guide.
+- [x] Add the in-product design guide generator and design compliance artifact flow.
+
+## Strategic Product Documentation
+
+- [x] Document Sydeso competitive positioning against Plane, Linear, Jira, and ClickUp.
+- [x] Document governing documentation, company/project wikis, and guardrail concepts.
+- [x] Document artifact drafts and direct human editing workflows.
+
 ## Persistent Core Loop
 
 Target loop:

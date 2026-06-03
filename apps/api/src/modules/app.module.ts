@@ -7,6 +7,8 @@ import { FoundationController } from "./foundation/foundation.controller";
 import { FeaturesController } from "./features/features.controller";
 import { HealthController } from "./health/health.controller";
 import { RunnersController } from "./runners/runners.controller";
+import { WaitlistController } from "./waitlist/waitlist.controller";
+import { WaitlistService } from "./waitlist/waitlist.service";
 import { WorkflowRunsController } from "./workflows/workflow-runs.controller";
 
 @Module({
@@ -16,8 +18,9 @@ import { WorkflowRunsController } from "./workflows/workflow-runs.controller";
     FoundationController,
     HealthController,
     RunnersController,
+    WaitlistController,
     WorkflowRunsController,
   ],
-  providers: [CoreLoopService, PrismaService],
+  providers: [CoreLoopService, PrismaService, WaitlistService],
 })
 export class AppModule {}

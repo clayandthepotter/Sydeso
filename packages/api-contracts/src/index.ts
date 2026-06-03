@@ -29,3 +29,12 @@ export const runnerHeartbeatSchema = z.object({
   capabilities: z.array(z.string()),
   healthMetrics: z.record(z.unknown()).optional(),
 });
+
+export const waitlistSignupSchema = z.object({
+  email: z.string().trim().email().max(320),
+  name: z.string().trim().max(120).optional().or(z.literal("")),
+  role: z.string().trim().max(80).optional().or(z.literal("")),
+  useCase: z.string().trim().max(1000).optional().or(z.literal("")),
+});
+
+export type WaitlistSignupInput = z.infer<typeof waitlistSignupSchema>;

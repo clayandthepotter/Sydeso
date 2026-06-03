@@ -227,3 +227,14 @@ model AuditLog {
 
   @@index([organizationId, createdAt])
 }
+
+model WaitlistLead {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  role      String?
+  useCase   String?
+  source    String   @default("marketing_site")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

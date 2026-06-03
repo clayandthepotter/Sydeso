@@ -1,5 +1,7 @@
 RULES:
 
+Act as an open source contributor to thi project. You must follow all open source contribion conventions and protocols.
+
 In order to stay on track in the project, always check the status of tasks in TODO.md before doing anything. 
 
 Make sure to do tasks in order, by domain. Focus on fully completing one feature/domain/goal before moving on to another.

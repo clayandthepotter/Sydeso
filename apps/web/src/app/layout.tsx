@@ -3,29 +3,19 @@ import "./globals.css";
 import type { ReactNode } from "react";
 
 export const metadata = {
-  title: "Sydeso",
-  description: "Workflow operating system for AI-native software teams.",
+  title: "Sydeso | AI-native software delivery platform",
+  description:
+    "Join the Sydeso waitlist for an AI-native software delivery platform that transforms ideas into verified software through structured, agent-driven workflows.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
-
-const navItems = ["Dashboard", "Projects", "Features", "Workflows", "Runners", "Memory", "Settings"];
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <div className="shell">
-          <aside className="sidebar">
-            <div className="brand">Sydeso</div>
-            <nav className="nav" aria-label="Primary navigation">
-              {navItems.map(item => (
-                <a href="#" key={item}>
-                  {item}
-                </a>
-              ))}
-            </nav>
-          </aside>
-          <main className="content">{children}</main>
-        </div>
+        <main>{children}</main>
       </body>
     </html>
   );

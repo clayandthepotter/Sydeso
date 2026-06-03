@@ -1,0 +1,57 @@
+name: Release Validation
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-validation:
+    name: Build release artifacts
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://sydeso:sydeso@localhost:5432/sydeso
+      DIRECT_URL: postgresql://sydeso:sydeso@localhost:5432/sydeso
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-next-build
+          path: apps/web/.next
+
+      - name: Upload API build
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-dist
+          path: apps/api/dist
+
+      - name: Upload runner build
+        uses: actions/upload-artifact@v4
+        with:
+          name: runner-dist
+          path: apps/runner/dist

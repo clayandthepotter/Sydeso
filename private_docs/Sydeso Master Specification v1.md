@@ -154,6 +154,8 @@ Acceptance Criteria
 
 UI Specification
 
+Design System Guide
+
 API Design
 
 Risk Assessment
@@ -380,6 +382,8 @@ Research Report
 
 Design Package
 
+Design System Guide
+
 Implementation Package
 
 QA Report
@@ -415,6 +419,8 @@ Security Standards
 Accessibility Standards
 
 Design System Standards
+
+Visual Branding Guide
 
 Example Structure
 

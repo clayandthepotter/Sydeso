@@ -1,0 +1,43 @@
+name: Feature Request
+description: Propose a Sydeso feature or product improvement.
+title: "feature: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or workflow problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the expected behavior or workflow.
+    validations:
+      required: true
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Related phase
+      options:
+        - Phase 1: Real App Foundation
+        - Phase 2: Artifact System
+        - Phase 3: Workflow Engine
+        - Phase 4: Agent Orchestration
+        - Phase 5: Runner Protocol
+        - Phase 6: Development Execution
+        - Phase 7: Automated QA
+        - Phase 8: Remediation Loop
+        - Phase 9: Human Review and Ready
+        - Phase 10: Productionization
+        - Open Source Maintenance
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What must be true for this to be complete?

@@ -9,6 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@prisma/client": "^6.1.0",
+    "@sydeso/api-contracts": "workspace:*",
     "@sydeso/domain": "workspace:*",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
