@@ -150,6 +150,21 @@ Submitted edits should create draft versions, show diffs where possible, run val
 - The guide is versioned and reviewable
 - Developers can use the guide as implementation context
 - QA can validate screens against the guide
+- UI changes can be traced to design lock sections in issue/PR history
+- Marketing and application typography/radius choices remain consistent with approved design tokens
+
+---
+
+## Design Lint and Visual QA
+
+The implementation should include automated checks for design consistency.
+
+Initial checks:
+
+- Verify approved font families are used in designated surfaces
+- Verify corner radii stay within approved limits
+- Capture baseline visual regression screenshots for core marketing and app shell surfaces
+- Include accessibility checks for focus states and contrast
 
 ---
 

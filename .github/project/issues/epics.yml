@@ -1,0 +1,214 @@
+issues:
+  - id: epic-p1-foundation
+    title: "P1: Real App Foundation"
+    labels: ["type:epic", "area:api", "area:db", "phase:p1", "priority:p1"]
+    fields:
+      Status: Backlog
+      Phase: P1 Real App Foundation
+      Area: api
+      Priority: P1 High
+      Size: XL
+      Target: Alpha
+    body: |
+      Build the real multi-tenant app foundation.
+
+      Scope:
+      - Authentication
+      - Organization/workspace/project CRUD
+      - Memberships
+      - RBAC roles
+      - Tenant-safe query scoping
+      - API validation and consistent error responses
+      - Local development seed data
+
+      Exit criteria:
+      - User can sign in
+      - User can create organization, workspace, and project
+      - API access is tenant-scoped
+  - id: epic-p2-artifacts
+    title: "P2: Artifact System"
+    labels: ["type:epic", "area:artifacts", "area:db", "phase:p2", "priority:p1"]
+    fields:
+      Status: Backlog
+      Phase: P2 Artifact System
+      Area: artifacts
+      Priority: P1 High
+      Size: XL
+      Target: Alpha
+    body: |
+      Implement immutable, versioned artifacts as the system of record.
+
+      Scope:
+      - Artifact table/service
+      - Versioning
+      - Checksums
+      - S3-compatible storage
+      - Lineage/source metadata
+      - Artifact browser UI
+
+      Exit criteria:
+      - Creating a feature request stores a feature_request artifact
+      - Artifacts cannot be overwritten
+      - Artifact versions are browsable
+  - id: epic-p3-workflow
+    title: "P3: Workflow Engine"
+    labels: ["type:epic", "area:workflow", "phase:p3", "priority:p1"]
+    fields:
+      Status: Backlog
+      Phase: P3 Workflow Engine
+      Area: workflow
+      Priority: P1 High
+      Size: XL
+      Target: Alpha
+    body: |
+      Complete the workflow engine as the source of truth for delivery state.
+
+      Scope:
+      - Persisted workflow templates
+      - Approval gates
+      - Transition timeline UI
+      - Transition/audit completeness
+
+      Exit criteria:
+      - Feature can move from Backlog to Design Approval
+      - Every transition creates an audit record
+      - Workflow state is the source of truth
+  - id: epic-p4-agents
+    title: "P4: Agent Orchestration"
+    labels: ["type:epic", "area:agents", "phase:p4", "priority:p1"]
+    fields:
+      Status: Backlog
+      Phase: P4 Agent Orchestration
+      Area: agents
+      Priority: P1 High
+      Size: XL
+      Target: Alpha
+    body: |
+      Implement the agent orchestration baseline.
+
+      Scope:
+      - PM, Architect, Developer, QA agent abstractions
+      - BYO OpenAI API keys
+      - Skill and memory context injection
+      - Structured output validation
+
+      Exit criteria:
+      - Design stage generates a valid design package artifact
+  - id: epic-p5-runners
+    title: "P5: Runner Protocol"
+    labels: ["type:epic", "area:runner", "phase:p5", "priority:p2"]
+    fields:
+      Status: Backlog
+      Phase: P5 Runner Protocol
+      Area: runner
+      Priority: P2 Medium
+      Size: L
+      Target: Beta
+    body: |
+      Complete runner visibility and operational surfaces.
+
+      Scope:
+      - Persist runner logs and metrics
+      - Runner dashboard UI
+
+      Exit criteria:
+      - Self-hosted runner can claim and complete a real queued job with visible logs/metrics
+  - id: epic-p6-dev-exec
+    title: "P6: Development Execution"
+    labels: ["type:epic", "area:workflow", "phase:p6", "priority:p2"]
+    fields:
+      Status: Backlog
+      Phase: P6 Development Execution
+      Area: workflow
+      Priority: P2 Medium
+      Size: XL
+      Target: Beta
+    body: |
+      Implement code-oriented execution from approved designs.
+
+      Scope:
+      - Repository checkout
+      - Branch/worktree creation
+      - Patch generation
+      - Test generation
+      - Migration generation
+      - Implementation package artifact
+
+      Exit criteria:
+      - Development stage can produce code/test artifacts from approved design
+  - id: epic-p7-qa
+    title: "P7: Automated QA"
+    labels: ["type:epic", "area:qa", "phase:p7", "priority:p2"]
+    fields:
+      Status: Backlog
+      Phase: P7 Automated QA
+      Area: qa
+      Priority: P2 Medium
+      Size: XL
+      Target: Beta
+    body: |
+      Implement automated verification and QA evidence.
+
+      Scope:
+      - Unit/integration/E2E tests
+      - axe-core accessibility
+      - Lighthouse
+      - Visual regression evidence
+      - Acceptance criteria validation
+      - QA report artifact
+  - id: epic-p8-remediation
+    title: "P8: Remediation Loop"
+    labels: ["type:epic", "area:workflow", "area:qa", "phase:p8", "priority:p2"]
+    fields:
+      Status: Backlog
+      Phase: P8 Remediation Loop
+      Area: workflow
+      Priority: P2 Medium
+      Size: M
+      Target: Beta
+    body: |
+      Finalize failed-QA remediation behavior and escalation criteria.
+
+      Exit criteria:
+      - Failed QA loops through Developer Agent and QA Agent up to configured max, then escalates
+  - id: epic-p9-review-ready
+    title: "P9: Human Review and Ready"
+    labels: ["type:epic", "area:web", "area:workflow", "phase:p9", "priority:p2"]
+    fields:
+      Status: Backlog
+      Phase: P9 Human Review and Ready
+      Area: web
+      Priority: P2 Medium
+      Size: L
+      Target: Beta
+    body: |
+      Build the human review and Ready-state experience.
+
+      Scope:
+      - Manual review screen
+      - QA report viewer
+      - Screenshot viewer
+      - Coverage/compliance report viewer
+      - Approve/reject/escalate actions
+  - id: epic-p10-productionization
+    title: "P10: Productionization"
+    labels: ["type:epic", "area:infra", "area:release", "phase:p10", "priority:p2"]
+    fields:
+      Status: Backlog
+      Phase: P10 Productionization
+      Area: infra
+      Priority: P2 Medium
+      Size: XL
+      Target: GA
+    body: |
+      Productionize Sydeso for SaaS and self-hosted operation.
+
+      Scope:
+      - Web/API deployment
+      - Production Postgres/Redis/S3
+      - Secrets management
+      - Observability
+      - Backup/restore
+      - Managed runner provisioning
+      - Billing/entitlements
+      - Security hardening

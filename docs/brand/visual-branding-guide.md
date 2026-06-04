@@ -76,6 +76,14 @@ Accent should remain restrained. It should guide attention, not dominate the int
 - Keep body copy readable and direct
 - Avoid decorative or expressive display faces
 
+Approved directional stack:
+
+- Application UI: Inter
+- Marketing headings: Funnel Display
+- Marketing body: Kanit
+- Code/mono surfaces: IBM Plex Mono or Ubuntu Sans Mono
+- Optional accent display usage only: Zen Dots
+
 Rules:
 
 - Headings should feel editorial, not playful
@@ -109,6 +117,7 @@ Recommended spacing scale:
 - Use rounded, low-friction navigation chrome
 - Keep links minimal and direct
 - Highlight the current location subtly
+- Keep corner radii small and consistent
 
 ### Buttons
 
@@ -121,6 +130,7 @@ Recommended spacing scale:
 - Cards should feel like organized notes, not panels of machinery
 - Use 1 px borders and mild elevation
 - Keep card interiors calm and readable
+- Keep default card radius within 5-10 px
 
 ### Forms
 
@@ -184,3 +194,5 @@ The generated artifact should be versioned, immutable, and usable as the source 
 - Developers should reference the guide before implementation
 - QA should compare implemented screens against the guide
 - New visual changes should create a new guide version
+- UI changes should reference Design Lock sections in PR notes
+- Style checks should fail when unapproved font families or excessive corner radii are introduced

@@ -1,0 +1,91 @@
+project:
+  title: Sydeso Roadmap
+  owner: repository-owner
+  description: Public collaboration and execution board for Sydeso core.
+fields:
+  - name: Status
+    type: single_select
+    options:
+      - Triage
+      - Backlog
+      - Next
+      - In Progress
+      - Blocked
+      - In Review
+      - Done
+  - name: Phase
+    type: single_select
+    options:
+      - P0 Foundation/Admin
+      - P1 Real App Foundation
+      - P2 Artifact System
+      - P3 Workflow Engine
+      - P4 Agent Orchestration
+      - P5 Runner Protocol
+      - P6 Development Execution
+      - P7 Automated QA
+      - P8 Remediation Loop
+      - P9 Human Review and Ready
+      - P10 Productionization
+      - Design System
+      - Open Core Licensing
+      - Documentation and Community
+  - name: Area
+    type: single_select
+    options:
+      - docs
+      - design
+      - web
+      - api
+      - db
+      - workflow
+      - artifacts
+      - agents
+      - runner
+      - qa
+      - release
+      - infra
+      - security
+      - licensing
+      - community
+  - name: Priority
+    type: single_select
+    options:
+      - P0 Critical
+      - P1 High
+      - P2 Medium
+      - P3 Low
+  - name: Size
+    type: single_select
+    options:
+      - XS
+      - S
+      - M
+      - L
+      - XL
+  - name: Target
+    type: single_select
+    options:
+      - Pre-alpha
+      - Alpha
+      - Beta
+      - GA
+views:
+  - name: Roadmap by Phase
+    groupBy: Phase
+  - name: Kanban
+    groupBy: Status
+  - name: Triage
+    filter: status:Triage OR missing:required-fields
+  - name: Good First Issues
+    filter: label:"good first issue"
+  - name: Design System
+    filter: area:design
+  - name: Core Platform
+    filter: area:workflow OR area:artifacts OR area:api OR area:db OR area:runner
+  - name: Docs and Community
+    filter: area:docs OR area:community OR area:licensing
+  - name: High Priority
+    filter: priority:p0 OR priority:p1
+  - name: Blocked
+    filter: status:Blocked

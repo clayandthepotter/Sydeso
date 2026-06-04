@@ -1,6 +1,10 @@
 # Sydeso Project Todo
 
-This todo tracks progress against `docs/Sydeso Master Specification v1.md` and the current build plan.
+This todo tracks implementation status against the public roadmap and architecture docs.
+
+Primary collaboration/execution tracking is in GitHub Issues and GitHub Projects.
+
+`TODO.md` is the in-repo mirror/index and should reference linked GitHub work when available.
 
 ## Current Status
 
@@ -24,7 +28,7 @@ This todo tracks progress against `docs/Sydeso Master Specification v1.md` and t
 
 ## Open Source Maintenance
 
-- [x] Add MIT license.
+- [x] Add source-available BSL 1.1 license.
 - [x] Add README.
 - [x] Add changelog.
 - [x] Add contributing guide.
@@ -37,6 +41,54 @@ This todo tracks progress against `docs/Sydeso Master Specification v1.md` and t
 - [x] Add pull request template.
 - [x] Add dependency update automation.
 - [ ] Add first tagged release.
+
+## Public Collaboration and Source-Available Readiness (Phase A)
+
+- [x] Update root public `README.md` as the main project entry point.
+- [x] Update `LICENSE` to BSL 1.1 with Sydeso parameters.
+- [x] Add `LICENSE-FAQ.md`.
+- [x] Add `OPEN_CORE.md`.
+- [x] Add `COMMERCIAL.md`.
+- [x] Restore public `docs/RULES.md`.
+- [x] Keep `private_docs/RULES.md` as internal/private and maintain a sanitized public derivative in `docs/RULES.md`.
+- [x] Add public `docs/product/roadmap.md`.
+- [x] Update `CONTRIBUTING.md` with issue-first and project-first workflow.
+- [x] Update `.github/pull_request_template.md` with boundary/design/license checks.
+- [x] Add issue templates for epic/task/design/docs/licensing-boundary work.
+- [x] Add `.github/project` source-of-truth directory for labels, Project config, issues, wiki pages, and scripts.
+- [x] Add project sync workflow for labels, Project fields, and managed issues.
+- [x] Add wiki publish workflow.
+- [x] Add generated roadmap workflow.
+- [x] Add semantic-release workflow and config for changelog/release automation.
+- [ ] Create GitHub Project "Sydeso Roadmap" with required fields/views.
+- [ ] Create roadmap epics and milestone issues in GitHub.
+- [ ] Add labels taxonomy in GitHub (type/area/phase/priority/contributor labels).
+- [ ] Configure branch protection to require PRs to `main`.
+- [ ] Add `GH_PROJECTS_TOKEN` secret if repo-level Project v2 writes require a PAT.
+
+## Documentation Propagation Checklist
+
+Every major plan item must be documented in the correct location.
+
+Public docs (must remain contributor-safe):
+
+- [x] `README.md`
+- [x] `docs/RULES.md`
+- [x] `docs/product/roadmap.md`
+- [x] `CONTRIBUTING.md`
+- [x] `.github/pull_request_template.md`
+- [x] `.github/ISSUE_TEMPLATE/*`
+- [x] `LICENSE-FAQ.md`
+- [x] `OPEN_CORE.md`
+- [x] `COMMERCIAL.md`
+
+Private docs (`private_docs`):
+
+- [x] `private_docs/project-direction.md`
+- [x] `private_docs/repository-structure.md`
+- [x] `private_docs/provisioning-strategy.md`
+- [x] `private_docs/pricing-strategy.md`
+- [x] `private_docs/ui_design_inspo/README.md` (design inspiration index)
 
 ## Marketing Website
 

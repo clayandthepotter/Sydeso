@@ -1,0 +1,54 @@
+name: Project Sync
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/project/**"
+      - ".github/workflows/project-sync.yml"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run without writing changes"
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+  issues: write
+  repository-projects: write
+
+jobs:
+  sync:
+    name: Sync labels, project, and issues
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_PROJECTS_TOKEN || github.token }}
+      GH_PROJECTS_TOKEN: ${{ secrets.GH_PROJECTS_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      DRY_RUN: ${{ inputs.dry_run == 'true' && '1' || '0' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sync labels
+        run: pnpm project:sync:labels
+
+      - name: Sync project fields
+        run: pnpm project:sync:project
+
+      - name: Sync issues
+        run: pnpm project:sync:issues

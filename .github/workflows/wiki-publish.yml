@@ -1,0 +1,68 @@
+name: Publish Wiki
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/project/wiki/**"
+      - ".github/project/scripts/wiki-publish.mjs"
+      - ".github/workflows/wiki-publish.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish project wiki pages
+    runs-on: ubuntu-latest
+    env:
+      GIT_AUTHOR_NAME: github-actions[bot]
+      GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+      GIT_COMMITTER_NAME: github-actions[bot]
+      GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Checkout wiki
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+          token: ${{ github.token }}
+
+      - name: Initialize wiki if missing
+        working-directory: wiki
+        run: |
+          if [ ! -d .git ]; then
+            git init
+            git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git"
+          fi
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Copy wiki pages
+        working-directory: repo
+        run: node .github/project/scripts/wiki-publish.mjs ../wiki
+
+      - name: Commit wiki changes
+        working-directory: wiki
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "No wiki changes"
+            exit 0
+          fi
+          git commit -m "docs: sync wiki pages"
+          git push origin HEAD:master

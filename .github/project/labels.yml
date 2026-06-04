@@ -1,0 +1,124 @@
+labels:
+  - name: type:epic
+    color: 5319e7
+    description: Roadmap epic or phase-level work
+  - name: type:feature
+    color: 1d76db
+    description: User-facing or platform capability
+  - name: type:task
+    color: cfd3d7
+    description: Scoped implementation task
+  - name: type:bug
+    color: d73a4a
+    description: Reproducible defect
+  - name: type:docs
+    color: 0075ca
+    description: Documentation work
+  - name: type:design
+    color: bfd4f2
+    description: UI/UX or design-system work
+  - name: type:spike
+    color: fbca04
+    description: Research or technical discovery
+  - name: area:docs
+    color: 0e8a16
+    description: Documentation and wiki
+  - name: area:design
+    color: d4c5f9
+    description: Brand, UX, UI, design lock
+  - name: area:web
+    color: 0052cc
+    description: Next.js web application
+  - name: area:api
+    color: 0052cc
+    description: API/control plane
+  - name: area:db
+    color: 0052cc
+    description: Database and migrations
+  - name: area:workflow
+    color: 5319e7
+    description: Workflow engine and state machine
+  - name: area:artifacts
+    color: 5319e7
+    description: Artifact storage and versioning
+  - name: area:agents
+    color: 5319e7
+    description: Agent orchestration and execution
+  - name: area:runner
+    color: 5319e7
+    description: Runner protocol and execution plane
+  - name: area:qa
+    color: fef2c0
+    description: Testing and quality assurance
+  - name: area:release
+    color: fef2c0
+    description: Release and deployment workflow
+  - name: area:infra
+    color: c2e0c6
+    description: Infrastructure and local services
+  - name: area:security
+    color: d73a4a
+    description: Security-sensitive work
+  - name: area:licensing
+    color: f9d0c4
+    description: Licensing and repository boundaries
+  - name: area:community
+    color: c5def5
+    description: Contributor experience and collaboration
+  - name: phase:p1
+    color: e4e669
+    description: Phase 1 Real App Foundation
+  - name: phase:p2
+    color: e4e669
+    description: Phase 2 Artifact System
+  - name: phase:p3
+    color: e4e669
+    description: Phase 3 Workflow Engine
+  - name: phase:p4
+    color: e4e669
+    description: Phase 4 Agent Orchestration
+  - name: phase:p5
+    color: e4e669
+    description: Phase 5 Runner Protocol
+  - name: phase:p6
+    color: e4e669
+    description: Phase 6 Development Execution
+  - name: phase:p7
+    color: e4e669
+    description: Phase 7 Automated QA
+  - name: phase:p8
+    color: e4e669
+    description: Phase 8 Remediation Loop
+  - name: phase:p9
+    color: e4e669
+    description: Phase 9 Human Review and Ready
+  - name: phase:p10
+    color: e4e669
+    description: Phase 10 Productionization
+  - name: priority:p0
+    color: b60205
+    description: Critical priority
+  - name: priority:p1
+    color: d93f0b
+    description: High priority
+  - name: priority:p2
+    color: fbca04
+    description: Medium priority
+  - name: priority:p3
+    color: 0e8a16
+    description: Low priority
+  - name: good first issue
+    color: 7057ff
+    description: Safe first contribution
+  - name: help wanted
+    color: 008672
+    description: Maintainers want contributor help
+  - name: blocked
+    color: b60205
+    description: Blocked by dependency or decision
+  - name: needs design
+    color: d4c5f9
+    description: Needs design input
+  - name: needs product
+    color: fbca04
+    description: Needs product decision

@@ -1,0 +1,57 @@
+name: Generate Roadmap Docs
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/project/issues/**"
+      - ".github/project/scripts/generate-roadmap.mjs"
+      - ".github/workflows/roadmap-docs.yml"
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  generate:
+    name: Generate roadmap from GitHub issues
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      GIT_AUTHOR_NAME: github-actions[bot]
+      GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+      GIT_COMMITTER_NAME: github-actions[bot]
+      GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate roadmap
+        run: pnpm project:roadmap
+
+      - name: Commit roadmap changes
+        run: |
+          git add docs/product/roadmap.md
+          if git diff --cached --quiet; then
+            echo "No roadmap changes"
+            exit 0
+          fi
+          git commit -m "docs: sync roadmap from GitHub issues"
+          git push

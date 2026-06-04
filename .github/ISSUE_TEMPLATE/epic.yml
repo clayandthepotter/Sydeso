@@ -1,0 +1,36 @@
+name: Epic
+description: Define a roadmap epic with scope and exit criteria.
+title: "epic: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: What outcome does this epic deliver?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is included in this epic?
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: What is explicitly out of scope?
+  - type: textarea
+    id: child_issues
+    attributes:
+      label: Child issues
+      description: List linked issue placeholders.
+  - type: textarea
+    id: exit_criteria
+    attributes:
+      label: Exit criteria
+      description: What must be true for the epic to be considered done?
+    validations:
+      required: true

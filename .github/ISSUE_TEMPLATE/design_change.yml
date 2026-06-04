@@ -1,0 +1,43 @@
+name: Design Change
+description: Propose a UI/UX or visual system change.
+title: "design: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What design problem are we solving?
+    validations:
+      required: true
+  - type: textarea
+    id: surfaces
+    attributes:
+      label: Affected surfaces
+      description: Marketing page(s), app page(s), component(s).
+    validations:
+      required: true
+  - type: textarea
+    id: design_lock
+    attributes:
+      label: Design lock references
+      description: Which sections of docs/brand/visual-branding-guide.md apply?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe typography, spacing, radius, component, and token changes.
+    validations:
+      required: true
+  - type: textarea
+    id: figma
+    attributes:
+      label: Prototype links and screenshots
+      description: Include Figma/prototype links and image references.
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Accessibility notes
+      description: Contrast, focus states, keyboard flow, screen-reader considerations.

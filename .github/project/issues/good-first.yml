@@ -1,0 +1,73 @@
+issues:
+  - id: good-first-docs-index
+    title: "docs: add public docs index"
+    labels: ["type:docs", "area:docs", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: docs, Priority: P3 Low, Size: S, Target: Pre-alpha }
+    body: |
+      Add a public docs index page that links to architecture, product, PRDs, rules, and roadmap docs.
+  - id: good-first-local-setup
+    title: "docs: improve local setup guide"
+    labels: ["type:docs", "area:docs", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: docs, Priority: P3 Low, Size: S, Target: Pre-alpha }
+    body: |
+      Expand setup docs with Node, pnpm, Docker, database, and common troubleshooting notes.
+  - id: good-first-labels-doc
+    title: "docs: document issue label taxonomy"
+    labels: ["type:docs", "area:community", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: community, Priority: P3 Low, Size: S, Target: Pre-alpha }
+    body: |
+      Document type/area/phase/priority labels and how contributors should use them.
+  - id: good-first-wiki-starter
+    title: "docs: refine GitHub Wiki starter pages"
+    labels: ["type:docs", "area:community", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: community, Priority: P3 Low, Size: M, Target: Pre-alpha }
+    body: |
+      Improve wiki starter pages under .github/project/wiki with clearer contributor onboarding copy.
+  - id: good-first-design-token-table
+    title: "design: add token summary table to brand guide"
+    labels: ["type:design", "area:design", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Design System, Area: design, Priority: P3 Low, Size: S, Target: Pre-alpha }
+    body: |
+      Add a concise token table for radius, typography, colors, and motion to docs/brand/visual-branding-guide.md.
+  - id: good-first-radius-lint-spike
+    title: "design: spike radius lint rule"
+    labels: ["type:spike", "area:design", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Design System, Area: design, Priority: P3 Low, Size: M, Target: Pre-alpha }
+    body: |
+      Research a small script or stylelint rule to fail when CSS radius exceeds the approved max.
+  - id: good-first-ci-docs
+    title: "docs: document CI workflows"
+    labels: ["type:docs", "area:docs", "area:community", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: docs, Priority: P3 Low, Size: S, Target: Pre-alpha }
+    body: |
+      Document CI, release validation, project sync, wiki publish, and semantic-release workflows.
+  - id: good-first-docker-examples
+    title: "docs: add Docker infra examples"
+    labels: ["type:docs", "area:infra", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: infra, Priority: P3 Low, Size: S, Target: Pre-alpha }
+    body: |
+      Add examples for starting/stopping local Postgres, Redis, and MinIO with docker compose.
+  - id: good-first-glossary-governance
+    title: "docs: add GitHub collaboration terms to glossary"
+    labels: ["type:docs", "area:docs", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: docs, Priority: P3 Low, Size: S, Target: Pre-alpha }
+    body: |
+      Add terms for Project item, roadmap epic, issue-first workflow, and design lint to docs/glossary.md.
+  - id: good-first-readme-badges
+    title: "docs: add README status badges"
+    labels: ["type:docs", "area:docs", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: docs, Priority: P3 Low, Size: XS, Target: Pre-alpha }
+    body: |
+      Add CI/release/license badges to README once workflows and license docs are stable.
+  - id: good-first-rules-review
+    title: "docs: review public rules for contributor clarity"
+    labels: ["type:docs", "area:community", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: community, Priority: P3 Low, Size: S, Target: Pre-alpha }
+    body: |
+      Review docs/RULES.md and propose clearer wording for first-time contributors.
+  - id: good-first-env-table
+    title: "docs: add environment variable table"
+    labels: ["type:docs", "area:docs", "good first issue", "priority:p3"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: docs, Priority: P3 Low, Size: S, Target: Pre-alpha }
+    body: |
+      Add a public env-var table describing non-secret local development variables and examples.

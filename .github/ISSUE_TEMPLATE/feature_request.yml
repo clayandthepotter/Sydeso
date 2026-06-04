@@ -14,7 +14,29 @@ body:
     id: proposal
     attributes:
       label: Proposed solution
-      description: Describe the expected behavior or workflow.
+      description: Describe expected behavior and workflow impact.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - docs
+        - design
+        - web
+        - api
+        - db
+        - workflow
+        - artifacts
+        - agents
+        - runner
+        - qa
+        - release
+        - infra
+        - security
+        - licensing
+        - community
     validations:
       required: true
   - type: dropdown
@@ -22,18 +44,31 @@ body:
     attributes:
       label: Related phase
       options:
-        - Phase 1: Real App Foundation
-        - Phase 2: Artifact System
-        - Phase 3: Workflow Engine
-        - Phase 4: Agent Orchestration
-        - Phase 5: Runner Protocol
-        - Phase 6: Development Execution
-        - Phase 7: Automated QA
-        - Phase 8: Remediation Loop
-        - Phase 9: Human Review and Ready
-        - Phase 10: Productionization
-        - Open Source Maintenance
+        - P1 Real App Foundation
+        - P2 Artifact System
+        - P3 Workflow Engine
+        - P4 Agent Orchestration
+        - P5 Runner Protocol
+        - P6 Development Execution
+        - P7 Automated QA
+        - P8 Remediation Loop
+        - P9 Human Review and Ready
+        - P10 Productionization
+        - Design System
+        - Open Core Licensing
+        - Documentation and Community
         - Unsure
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0 Critical
+        - P1 High
+        - P2 Medium
+        - P3 Low
     validations:
       required: true
   - type: textarea
@@ -41,3 +76,10 @@ body:
     attributes:
       label: Acceptance criteria
       description: What must be true for this to be complete?
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: Related docs
+      description: List related docs paths to update (if known).

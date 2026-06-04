@@ -22,5 +22,6 @@ If there is not a remote GitHub repo fro the project, create one. If you require
 
 If the application is in a buildable state, you must ALWAYS build the application before commiting any changes to git. If the application builds successfully, you may commit to git. You must ensure that the application builds locally, and is error free, before pushing to main on GitHub.
 
-Commit often. 
+Commit often.
 
+Instead of assuming/presuming project direction, or making any executive decisions, ask clarifying questions you may need answered before any implementation.

@@ -1,0 +1,31 @@
+issues:
+  - id: docs-open-core-boundary
+    title: "docs: verify source-available open-core boundary docs"
+    labels: ["type:docs", "area:licensing", "priority:p1"]
+    fields: { Status: Backlog, Phase: Open Core Licensing, Area: licensing, Priority: P1 High, Size: M, Target: Pre-alpha }
+    body: |
+      Verify README, OPEN_CORE, COMMERCIAL, LICENSE-FAQ, CONTRIBUTING, and TODO all consistently describe BSL 1.1 and source-available open-core boundaries.
+  - id: design-lock-vnext
+    title: "design: define Design Lock vNext typography and radius tokens"
+    labels: ["type:design", "area:design", "priority:p1", "needs design"]
+    fields: { Status: Backlog, Phase: Design System, Area: design, Priority: P1 High, Size: L, Target: Pre-alpha }
+    body: |
+      Finalize approved marketing/app font stack, radius scale, visual tone, and enforcement rules in the design lock.
+  - id: design-marketing-redesign
+    title: "design: redesign marketing site toward minimal developer-focused style"
+    labels: ["type:design", "area:web", "area:design", "priority:p1", "needs design"]
+    fields: { Status: Backlog, Phase: Design System, Area: design, Priority: P1 High, Size: XL, Target: Pre-alpha }
+    body: |
+      Redesign the marketing site after Design Lock vNext is approved. Preserve Sydeso's primary value proposition.
+  - id: project-ops-automation-hardening
+    title: "task: harden project ops sync automation"
+    labels: ["type:task", "area:community", "priority:p1"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: community, Priority: P1 High, Size: L, Target: Pre-alpha }
+    body: |
+      Validate project sync scripts against GitHub Projects v2 API, document required tokens, add dry-run mode coverage, and verify idempotent issue updates.
+  - id: wiki-publish-setup
+    title: "docs: publish GitHub Wiki starter content"
+    labels: ["type:docs", "area:community", "priority:p2"]
+    fields: { Status: Backlog, Phase: Documentation and Community, Area: community, Priority: P2 Medium, Size: M, Target: Pre-alpha }
+    body: |
+      Publish .github/project/wiki pages to the GitHub Wiki and verify links back to canonical docs.

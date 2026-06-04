@@ -1,0 +1,38 @@
+name: Licensing and Boundary
+description: Track public/private boundary and licensing-related changes.
+title: "licensing: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Which files/dirs/modules are affected?
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale
+      description: Why should this be public core or private/commercial?
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: License impact
+      description: How does this affect BSL terms, contributor workflow, or commercial boundary?
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: Required documentation updates
+      description: README, LICENSE-FAQ, OPEN_CORE, COMMERCIAL, RULES, roadmap, etc.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What must be true for this boundary/licensing task to be complete?
+    validations:
+      required: true
