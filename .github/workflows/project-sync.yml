@@ -30,7 +30,7 @@ jobs:
       DRY_RUN: ${{ inputs.dry_run == 'true' && '1' || '0' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Enable Corepack
         run: corepack enable

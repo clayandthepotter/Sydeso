@@ -18,7 +18,7 @@ jobs:
       DIRECT_URL: postgresql://sydeso:sydeso@localhost:5432/sydeso
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Enable Corepack
         run: corepack enable
