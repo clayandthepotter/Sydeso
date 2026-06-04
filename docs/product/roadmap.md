@@ -1,7 +1,7 @@
 # Product - Public Roadmap
 
-Version: 0.1.0
-Status: Draft
+Version: generated
+Status: Generated from GitHub Issues
 Owner: Product
 Last Updated: 2026-06-04
 
@@ -9,137 +9,65 @@ Last Updated: 2026-06-04
 
 ## Purpose
 
-This is the public roadmap for Sydeso core collaboration.
+This roadmap is generated from live GitHub Issues and labels.
 
 GitHub Issues and GitHub Projects are the definitive execution trackers.
 
-`TODO.md` mirrors implementation status inside the repository.
+`TODO.md` remains the in-repo mirror/index.
 
 ---
 
 ## Product Direction
 
-Sydeso is a state-driven, AI-native software delivery platform.
-
-Primary outcome:
-
-```txt
-Concept -> Verified Production Outcome
-```
-
-Primary system model:
-
-```txt
-Workflow State + Artifact History + Approval Gates
-```
+Sydeso is a state-driven, AI-native software delivery platform that transforms concepts into verified production outcomes.
 
 ---
 
-## Now / Next / Later
-
-### Now
-
-- Public collaboration readiness
-- Source-available licensing transition (BSL 1.1)
-- Roadmap/project governance setup
-- Public/private documentation boundary cleanup
-- Design lock refinement and marketing UI alignment
-
-### Next
-
-- Phase 1: Real App Foundation
-- Phase 2: Artifact System
-- Phase 3: Workflow Engine completion
-- Phase 4: Agent Orchestration baseline
-
-### Later
-
-- Phase 5: Runner Protocol visibility and dashboard
-- Phase 6: Development Execution
-- Phase 7: Automated QA
-- Phase 8: Remediation loop completion
-- Phase 9: Human Review and Ready
-- Phase 10: Productionization
-
----
-
-## Phase Roadmap (P1-P10)
+## Roadmap by Phase
 
 ### P1 Real App Foundation
 
-Auth, org/workspace/project CRUD, memberships, RBAC, tenant scoping, API validation, seed data.
+- No tracked issues yet.
 
 ### P2 Artifact System
 
-Immutable/versioned artifacts, checksums, storage integration, lineage metadata, artifact browser.
+- No tracked issues yet.
 
 ### P3 Workflow Engine
 
-Workflow templates, approval gates, timeline UI, transition/audit completeness.
+- No tracked issues yet.
 
 ### P4 Agent Orchestration
 
-PM/Architect/Developer/QA abstractions, BYO API keys, context injection, structured outputs.
+- No tracked issues yet.
 
 ### P5 Runner Protocol
 
-Runner logs/metrics persistence, dashboard visibility, real queued job completion proof.
+- No tracked issues yet.
 
 ### P6 Development Execution
 
-Repo checkout, branch/worktree flow, patch/test/migration generation, implementation package artifacts.
+- No tracked issues yet.
 
 ### P7 Automated QA
 
-Unit/integration/E2E, accessibility, Lighthouse, visual regression, acceptance validation, QA artifacts.
+- No tracked issues yet.
 
 ### P8 Remediation Loop
 
-Failed QA routing loop and escalation behavior finalized.
+- No tracked issues yet.
 
 ### P9 Human Review and Ready
 
-Manual review screens, report viewers, approval/reject/escalate actions.
+- No tracked issues yet.
 
 ### P10 Productionization
 
-Production deployment, managed infrastructure, observability, backup/restore, hardening, billing/entitlements.
+- No tracked issues yet.
 
 ---
 
-## Cross-Cutting Tracks
+## Unphased / Cross-Cutting
 
-- Source-available open-core governance
-- GitHub collaboration model
-- Public/internal docs split
-- Design lock and UI standards
-- Contributor onboarding
+- No tracked issues yet.
 
----
-
-## Collaboration Rules
-
-- Every implementation item must have a GitHub Issue and Project item.
-- Work should not start without a tracked issue/project entry.
-- Owner may make emergency direct fixes only when needed; issue tracking must be added retroactively.
-
----
-
-## Non-Goals
-
-- Becoming a generic project management platform
-- Shipping ungoverned visual editors in MVP
-- Exposing private strategic documentation in public core
-- Bypassing workflow/artifact invariants for speed
-
----
-
-## References
-
-- `docs/vision.md`
-- `docs/product/mvp-definition.md`
-- `docs/product/competitive-positioning.md`
-- `docs/prds/core-workflow-engine.md`
-- `docs/prds/design-system-governance.md`
-- `docs/RULES.md`
-- `TODO.md`
