@@ -27,7 +27,7 @@ export const runnerHeartbeatSchema = z.object({
   status: z.enum(["online", "offline", "busy", "disabled"]),
   version: z.string(),
   capabilities: z.array(z.string()),
-  healthMetrics: z.record(z.unknown()).optional(),
+  healthMetrics: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const waitlistSignupSchema = z.object({
