@@ -63,7 +63,7 @@ Primary collaboration/execution tracking is in GitHub Issues and GitHub Projects
 - [ ] Create GitHub Project "Sydeso Roadmap" with required fields/views.
 - [ ] Create roadmap epics and milestone issues in GitHub.
 - [ ] Add labels taxonomy in GitHub (type/area/phase/priority/contributor labels).
-- [ ] Configure branch protection to require PRs to `main`.
+- [x] Configure branch protection to require PRs to `main`.
 - [ ] Add `GH_PROJECTS_TOKEN` secret if repo-level Project v2 writes require a PAT.
 
 ## Documentation Propagation Checklist
