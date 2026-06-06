@@ -40,6 +40,7 @@ Primary collaboration/execution tracking is in GitHub Issues and GitHub Projects
 - [x] Add issue templates.
 - [x] Add pull request template.
 - [x] Add dependency update automation.
+- [x] Fix grouped dependency update build by keeping Prisma on v6 and TypeScript on v5 until major migrations are planned.
 - [ ] Add first tagged release.
 
 ## Public Collaboration and Source-Available Readiness (Phase A)
