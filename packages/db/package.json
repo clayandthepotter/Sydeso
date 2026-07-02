@@ -10,10 +10,10 @@
     "lint": "cross-env DATABASE_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso DIRECT_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso prisma validate"
   },
   "dependencies": {
-    "@prisma/client": "^6.1.0"
+    "@prisma/client": "^7.8.0"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
-    "prisma": "^6.1.0"
+    "cross-env": "^10.1.0",
+    "prisma": "^7.8.0"
   }
 }
