@@ -110,7 +110,7 @@ The marketing site lives in the separate `sydeso-site` repository (Astro on Clou
 - [x] Artifact browser and artifact detail.
 - [x] Runner dashboard and runner registration.
 - [x] Organization audit log.
-- [ ] Authentication and tenant scoping in the UI (depends on Phase 1).
+- [x] Authentication and tenant scoping in the UI: sign-in, sign-up, invite links, members page, role-gated navigation.
 - [ ] Manual review screen with QA report, screenshot and coverage viewers (Phase 9).
 
 ## Design System and Brand Lock
@@ -151,18 +151,21 @@ Feature Request -> Artifact -> Workflow Run -> Transition -> Job -> Runner -> Ou
 
 ## Phase 1: Real App Foundation
 
-- [ ] Implement authentication.
-- [ ] Implement organization CRUD.
-- [ ] Implement workspace CRUD.
-- [ ] Implement project CRUD.
-- [ ] Implement memberships.
-- [ ] Implement RBAC roles: Organization Owner, Product Lead, Developer, QA Reviewer, Viewer.
-- [ ] Enforce tenant-safe query scoping.
-- [ ] Add API validation and consistent error responses.
-- [ ] Add seed data for local development.
-- [ ] Exit criteria: user can sign in.
-- [ ] Exit criteria: user can create organization, workspace, and project.
-- [ ] Exit criteria: API access is tenant-scoped.
+- [x] Implement authentication (email and password, Argon2id, server-side sessions, bearer or cookie).
+- [x] Implement organization CRUD.
+- [x] Implement workspace CRUD.
+- [x] Implement project CRUD (update, archive, delete).
+- [x] Implement memberships and invite links.
+- [x] Implement RBAC roles: Organization Owner, Organization Admin, Product Manager, Engineer, Reviewer, Viewer (per `docs/product/roles-and-permissions.md`).
+- [x] Enforce tenant-safe query scoping.
+- [x] Add API validation and consistent error responses.
+- [x] Add seed data for local development.
+- [x] Exit criteria: user can sign in.
+- [x] Exit criteria: user can create organization, workspace, and project.
+- [x] Exit criteria: API access is tenant-scoped.
+- [ ] Follow-up: email delivery for invitations (links are shown in the UI today).
+- [ ] Follow-up: GitHub sign-in as a second method.
+- [ ] Follow-up: fix `nest start` so the built API resolves workspace packages without ts-node.
 
 ## Phase 2: Artifact System
 
@@ -185,8 +188,9 @@ Feature Request -> Artifact -> Workflow Run -> Transition -> Job -> Runner -> Ou
 - [x] Implement audit logs.
 - [x] Implement job enqueueing from workflow transitions.
 - [x] Add feature workflow timeline UI.
+- [x] Transition permissions: gated transitions need `approval.approve`, escalation needs `workflow.escalate`.
 - [ ] Exit criteria: feature can move from Backlog to Design Approval.
-- [ ] Exit criteria: every transition creates an audit record.
+- [x] Exit criteria: every transition creates an audit record.
 - [ ] Exit criteria: workflow state is the source of truth.
 
 ## Phase 4: Agent Orchestration

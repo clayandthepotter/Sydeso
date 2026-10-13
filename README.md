@@ -84,7 +84,16 @@ Database commands:
 ```bash
 pnpm db:generate
 pnpm db:migrate
+pnpm db:seed
 ```
+
+`pnpm db:seed` creates a development owner account (`dev@sydeso.local` / `sydeso-dev-password`, overridable with `SEED_EMAIL`, `SEED_PASSWORD` and `SEED_NAME`) with one organization, workspace, project and feature request. Sign in at `/sign-in` of the web app.
+
+## Authentication and Access
+
+Authentication is built into the API: email and password (Argon2id), server-side sessions in Postgres, and a session token sent as `Authorization: Bearer …` by the web app and CLIs or as the `sydeso_session` cookie by browsers. Every route except health, the waitlist, sign-in and sign-up, invitation previews and the runner protocol requires a session.
+
+Access is role-based per organization. Roles and the permission matrix live in `packages/domain/src/roles.ts` and follow `docs/product/roles-and-permissions.md`. Every request resolves the organization that owns the entity it touches and checks the caller's role there; an entity in another organization answers 404. People join an organization by self sign-up (creating their own organization as its owner) or through an invite link created by an owner or admin.
 
 ## Environment
 

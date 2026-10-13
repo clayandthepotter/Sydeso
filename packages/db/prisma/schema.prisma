@@ -62,18 +62,89 @@ enum RunnerStatus {
   disabled
 }
 
+/// MVP roles from docs/product/roles-and-permissions.md. The permission matrix lives in @sydeso/domain.
+enum OrganizationRole {
+  owner
+  admin
+  product_manager
+  engineer
+  reviewer
+  viewer
+}
+
+model User {
+  id              String       @id @default(uuid())
+  email           String       @unique
+  name            String
+  passwordHash    String
+  memberships     Membership[]
+  sessions        Session[]
+  invitationsSent Invitation[] @relation("InvitationInviter")
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+/// A browser or CLI session. Only the hash of the bearer token is stored.
+model Session {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String   @unique
+  userAgent  String?
+  expiresAt  DateTime
+  lastUsedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// A user's role inside one organization. Permissions inherit downward to workspaces and projects.
+model Membership {
+  id             String           @id @default(uuid())
+  organizationId String
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           OrganizationRole
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+/// An invitation to join an organization with a role. The link carries a token; only its hash is stored.
+model Invitation {
+  id             String           @id @default(uuid())
+  organizationId String
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           OrganizationRole
+  tokenHash      String           @unique
+  invitedById    String
+  invitedBy      User             @relation("InvitationInviter", fields: [invitedById], references: [id], onDelete: Cascade)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime         @default(now())
+
+  @@index([organizationId, email])
+}
+
 model Organization {
-  id         String      @id @default(uuid())
-  name       String
-  slug       String      @unique
-  plan       String      @default("builder")
-  workspaces Workspace[]
-  projects   Project[]
-  runners    Runner[]
-  artifacts  Artifact[]
-  auditLogs  AuditLog[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id          String       @id @default(uuid())
+  name        String
+  slug        String       @unique
+  plan        String       @default("builder")
+  memberships Membership[]
+  invitations Invitation[]
+  workspaces  Workspace[]
+  projects    Project[]
+  runners     Runner[]
+  artifacts   Artifact[]
+  auditLogs   AuditLog[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Workspace {
@@ -84,6 +155,7 @@ model Workspace {
   slug           String
   projects       Project[]
   createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
 
   @@unique([organizationId, slug])
 }
@@ -98,9 +170,11 @@ model Project {
   repositoryUrl              String?
   defaultBranch              String       @default("main")
   maxRemediationIterations   Int          @default(3)
+  archivedAt                 DateTime?
   features                   Feature[]
   artifacts                  Artifact[]
   createdAt                  DateTime     @default(now())
+  updatedAt                  DateTime     @default(now()) @updatedAt
 }
 
 model Feature {

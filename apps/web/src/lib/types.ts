@@ -1,8 +1,56 @@
-import type { ActorType, ArtifactType, WorkflowState } from "@sydeso/domain";
+import type { ActorType, ArtifactType, OrganizationRole, WorkflowState } from "@sydeso/domain";
 
 export type JobStatus = "queued" | "assigned" | "running" | "succeeded" | "failed" | "cancelled";
 export type RunnerType = "self_hosted" | "managed";
 export type RunnerStatus = "online" | "offline" | "busy" | "disabled";
+
+export interface SessionUser {
+  id: string;
+  email: string;
+  name: string;
+}
+
+export interface AuthResult {
+  user: SessionUser;
+  token: string;
+  expiresAt: string;
+}
+
+export interface Me {
+  user: SessionUser;
+  memberships: Array<{
+    organizationId: string;
+    organization: Pick<Organization, "id" | "name" | "slug" | "plan">;
+    role: OrganizationRole;
+    createdAt: string;
+  }>;
+}
+
+export interface Member {
+  id: string;
+  organizationId: string;
+  role: OrganizationRole;
+  user: SessionUser;
+  createdAt: string;
+}
+
+export interface Invitation {
+  id: string;
+  organizationId: string;
+  email: string;
+  role: OrganizationRole;
+  expiresAt: string;
+  createdAt: string;
+  invitedBy?: SessionUser;
+}
+
+export interface InvitationPreview {
+  email: string;
+  role: OrganizationRole;
+  organization: Pick<Organization, "id" | "name" | "slug">;
+  invitedBy: { name: string };
+  expiresAt: string;
+}
 
 export interface Organization {
   id: string;
@@ -11,6 +59,8 @@ export interface Organization {
   plan: string;
   createdAt: string;
 }
+
+export type OrganizationWithRole = Organization & { role: OrganizationRole };
 
 export interface Workspace {
   id: string;
@@ -28,6 +78,7 @@ export interface Project {
   repositoryUrl: string | null;
   defaultBranch: string;
   maxRemediationIterations: number;
+  archivedAt: string | null;
   createdAt: string;
 }
 

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { apiBaseUrl } from "../lib/api";
+import { signOutAction } from "../app/auth-actions";
+import { api, apiBaseUrl } from "../lib/api";
 import { Mark } from "./mark";
 import { NavLink } from "./nav-link";
 
@@ -22,7 +23,7 @@ export interface Crumb {
   label: string;
 }
 
-export function AppShell({
+export async function AppShell({
   groups,
   context,
   crumbs,
@@ -35,6 +36,7 @@ export function AppShell({
   actions?: ReactNode;
   children: ReactNode;
 }) {
+  const me = await api.me();
   const apiHost = (() => {
     try {
       return new URL(apiBaseUrl()).host;
@@ -71,7 +73,20 @@ export function AppShell({
             </div>
           ))}
         </nav>
-        <div className="sidebar__foot mono">API · {apiHost}</div>
+        <div className="sidebar__foot">
+          {me && (
+            <div className="sidebar__user">
+              <strong>{me.user.name}</strong>
+              <span className="mono-text muted">{me.user.email}</span>
+              <form action={signOutAction}>
+                <button className="sidebar__signout mono" type="submit">
+                  Sign out
+                </button>
+              </form>
+            </div>
+          )}
+          <span className="mono">API · {apiHost}</span>
+        </div>
       </aside>
       <div className="main">
         <header className="topbar">
