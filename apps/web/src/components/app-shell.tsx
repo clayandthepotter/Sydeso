@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { apiBaseUrl } from "../lib/api";
+import { Mark } from "./mark";
 import { NavLink } from "./nav-link";
 
 export interface NavItem {
@@ -47,10 +48,7 @@ export function AppShell({
       <aside className="sidebar">
         <div className="sidebar__brand">
           <Link className="sidebar__mark" href="/app" aria-label="Sydeso, all organizations">
-            <svg viewBox="0 0 32 32" width="24" height="24" aria-hidden="true">
-              <path d="M4 4h14l10 10v14H14L4 18Z" fill="currentColor" />
-              <path d="M11 11h10v10H11Z" fill="var(--accent)" />
-            </svg>
+            <Mark size={26} />
           </Link>
           <span className="sidebar__name">Sydeso</span>
         </div>
