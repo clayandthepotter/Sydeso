@@ -264,6 +264,75 @@ export class CoreLoopService {
     });
   }
 
+  async listArtifactsForProject(projectId: string, limit = 200) {
+    return this.prisma.artifact.findMany({
+      where: { projectId },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      include: {
+        feature: { select: { id: true, title: true } },
+      },
+    });
+  }
+
+  async getArtifact(artifactId: string) {
+    const artifact = await this.prisma.artifact.findUnique({
+      where: { id: artifactId },
+      include: {
+        feature: { select: { id: true, title: true, projectId: true } },
+        workflowRun: { select: { id: true, currentState: true, status: true } },
+      },
+    });
+
+    if (!artifact) {
+      throw new NotFoundException("Artifact not found");
+    }
+
+    return artifact;
+  }
+
+  async listRunners(organizationId: string) {
+    return this.prisma.runner.findMany({
+      where: { organizationId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        organizationId: true,
+        name: true,
+        type: true,
+        status: true,
+        version: true,
+        capabilities: true,
+        healthMetrics: true,
+        lastSeenAt: true,
+        createdAt: true,
+        jobs: {
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          select: {
+            id: true,
+            workflowRunId: true,
+            state: true,
+            agentType: true,
+            status: true,
+            attempt: true,
+            startedAt: true,
+            completedAt: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+  }
+
+  async listAuditLogs(organizationId: string, limit = 100) {
+    return this.prisma.auditLog.findMany({
+      where: { organizationId },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+  }
+
   async registerRunner(input: {
     organizationId: string;
     name: string;

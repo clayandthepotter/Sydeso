@@ -15,4 +15,14 @@ export class ArtifactsController {
   listWorkflowRunArtifacts(@Param("workflowRunId") workflowRunId: string) {
     return this.coreLoop.listArtifactsForWorkflowRun(workflowRunId);
   }
+
+  @Get("projects/:projectId/artifacts")
+  listProjectArtifacts(@Param("projectId") projectId: string) {
+    return this.coreLoop.listArtifactsForProject(projectId);
+  }
+
+  @Get("artifacts/:artifactId")
+  getArtifact(@Param("artifactId") artifactId: string) {
+    return this.coreLoop.getArtifact(artifactId);
+  }
 }

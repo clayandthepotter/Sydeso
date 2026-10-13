@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Param, Post, UnauthorizedException } from "@nestjs/common";
+import { Body, Controller, Get, Headers, Param, Post, UnauthorizedException } from "@nestjs/common";
 import { ArtifactType, RunnerStatus, RunnerType } from "@prisma/client";
 import { hasRequiredCapabilities } from "@sydeso/domain";
 
@@ -19,6 +19,11 @@ export class RunnersController {
     return {
       compatible: hasRequiredCapabilities(body.runnerCapabilities, body.requiredCapabilities),
     };
+  }
+
+  @Get("organizations/:organizationId/runners")
+  listRunners(@Param("organizationId") organizationId: string) {
+    return this.coreLoop.listRunners(organizationId);
   }
 
   @Post("organizations/:organizationId/runners")
