@@ -92,11 +92,26 @@ Private docs (`private_docs`):
 
 ## Marketing Website
 
+The marketing site lives in the separate `sydeso-site` repository (Astro on Cloudflare Workers). `apps/web` is the product only.
+
 - [x] Build public waitlist landing page.
 - [x] Add accessible waitlist form UI.
 - [x] Persist waitlist signups through API and database.
+- [x] Move marketing pages out of `apps/web` into `sydeso-site`.
 - [ ] Add analytics and conversion tracking.
 - [x] Add production deployment target for the marketing site.
+
+## Product UI (apps/web)
+
+- [x] App shell with organization, workspace and project navigation.
+- [x] Organization, workspace and project creation forms against the API.
+- [x] Features board by workflow state.
+- [x] Feature detail with run trace, transitions, jobs, artifacts and transition actions.
+- [x] Artifact browser and artifact detail.
+- [x] Runner dashboard and runner registration.
+- [x] Organization audit log.
+- [ ] Authentication and tenant scoping in the UI (depends on Phase 1).
+- [ ] Manual review screen with QA report, screenshot and coverage viewers (Phase 9).
 
 ## Design System and Brand Lock
 
@@ -156,7 +171,7 @@ Feature Request -> Artifact -> Workflow Run -> Transition -> Job -> Runner -> Ou
 - [ ] Implement artifact checksums.
 - [ ] Integrate S3-compatible storage for large artifacts.
 - [ ] Add artifact lineage/source metadata.
-- [ ] Add artifact browser UI.
+- [x] Add artifact browser UI.
 - [ ] Exit criteria: creating a feature request stores a `feature_request` artifact.
 - [ ] Exit criteria: artifacts cannot be overwritten.
 - [ ] Exit criteria: artifact versions are browsable.
@@ -169,7 +184,7 @@ Feature Request -> Artifact -> Workflow Run -> Transition -> Job -> Runner -> Ou
 - [ ] Implement approval gates.
 - [x] Implement audit logs.
 - [x] Implement job enqueueing from workflow transitions.
-- [ ] Add feature workflow timeline UI.
+- [x] Add feature workflow timeline UI.
 - [ ] Exit criteria: feature can move from Backlog to Design Approval.
 - [ ] Exit criteria: every transition creates an audit record.
 - [ ] Exit criteria: workflow state is the source of truth.
@@ -195,7 +210,7 @@ Feature Request -> Artifact -> Workflow Run -> Transition -> Job -> Runner -> Ou
 - [x] Implement job claiming.
 - [x] Implement job completion.
 - [ ] Persist runner logs and metrics.
-- [ ] Add runner dashboard UI.
+- [x] Add runner dashboard UI.
 - [ ] Exit criteria: self-hosted runner can claim and complete a real queued job.
 
 ## Phase 6: Development Execution

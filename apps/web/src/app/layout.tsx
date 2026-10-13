@@ -1,22 +1,33 @@
 import "./globals.css";
 
+import type { Metadata } from "next";
+import { Archivo, Azeret_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 
-export const metadata = {
-  title: "Sydeso | AI-native software delivery platform",
-  description:
-    "Join the Sydeso waitlist for an AI-native software delivery platform that transforms ideas into verified software through structured, agent-driven workflows.",
-  icons: {
-    icon: "/icon.svg",
-  },
+const archivo = Archivo({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  variable: "--font-archivo",
+  display: "swap",
+});
+
+const azeret = Azeret_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-azeret",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: { default: "Sydeso", template: "%s · Sydeso" },
+  description: "Sydeso: a state-driven, AI-native software delivery platform.",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body>
-        <main>{children}</main>
-      </body>
+    <html lang="en" className={`${archivo.variable} ${azeret.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }

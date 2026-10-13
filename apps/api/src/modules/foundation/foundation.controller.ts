@@ -29,6 +29,11 @@ export class FoundationController {
     return this.coreLoop.listWorkspaces(organizationId);
   }
 
+  @Get("organizations/:organizationId/audit")
+  listAuditLogs(@Param("organizationId") organizationId: string) {
+    return this.coreLoop.listAuditLogs(organizationId);
+  }
+
   @Post("workspaces/:workspaceId/projects")
   createProject(
     @Param("workspaceId") workspaceId: string,
