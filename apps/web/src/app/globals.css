@@ -229,9 +229,77 @@ textarea {
 }
 
 .sidebar__foot {
+  display: grid;
+  gap: 0.75rem;
   padding: 0.875rem 1.25rem;
   border-top: 1px solid var(--line);
   color: var(--muted);
+}
+
+.sidebar__user {
+  display: grid;
+  gap: 0.15rem;
+  color: var(--ink);
+}
+
+.sidebar__user strong {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__signout {
+  margin-top: 0.4rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar__signout:hover {
+  color: var(--accent);
+}
+
+/* ---- auth pages ---- */
+
+.auth {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background-image: radial-gradient(var(--line) 1px, transparent 1.5px);
+  background-size: 32px 32px;
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 440px;
+  display: grid;
+  gap: 1.25rem;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+}
+
+.auth__mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.auth__card .form {
+  max-width: none;
+}
+
+.auth__foot a {
+  color: var(--accent);
 }
 
 .main {

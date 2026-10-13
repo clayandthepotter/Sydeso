@@ -5,14 +5,19 @@
   "scripts": {
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
+    "seed": "node prisma/seed.mjs",
     "build": "prisma generate",
     "typecheck": "cross-env DATABASE_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso DIRECT_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso prisma validate",
     "lint": "cross-env DATABASE_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso DIRECT_URL=postgresql://sydeso:sydeso@localhost:5432/sydeso prisma validate"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0"
   },
   "devDependencies": {
+    "@node-rs/argon2": "^2.2.2",
     "cross-env": "^7.0.3",
     "prisma": "^6.1.0"
   }

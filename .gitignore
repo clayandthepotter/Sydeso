@@ -12,3 +12,4 @@ coverage/
 *.log
 
 .vercel
+apps/api/tsconfig.local.json

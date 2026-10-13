@@ -16,6 +16,7 @@ import {
 import { defaultWorkflowRules, hasRequiredCapabilities } from "@sydeso/domain";
 import { createHash, randomBytes } from "node:crypto";
 
+import { AuditService, toJson } from "../audit/audit.service";
 import { PrismaService } from "../database/prisma.service";
 
 type TransactionClient = Prisma.TransactionClient;
@@ -29,96 +30,16 @@ type OutputArtifactInput = {
 
 const artifactTypeValues = new Set<string>(Object.values(ArtifactType));
 
+/**
+ * The persistent core loop: features, workflow runs, transitions, jobs, artifacts and the
+ * runner protocol. Organizations, workspaces and projects live in FoundationService.
+ */
 @Injectable()
 export class CoreLoopService {
-  constructor(private readonly prisma: PrismaService) {}
-
-  async createOrganization(input: { name: string; slug: string }) {
-    return this.prisma.organization.create({
-      data: {
-        name: input.name,
-        slug: input.slug,
-      },
-    });
-  }
-
-  async listOrganizations() {
-    return this.prisma.organization.findMany({ orderBy: { createdAt: "desc" } });
-  }
-
-  async createWorkspace(input: { organizationId: string; name: string; slug: string }) {
-    const organization = await this.prisma.organization.findUnique({
-      where: { id: input.organizationId },
-    });
-
-    if (!organization) {
-      throw new NotFoundException("Organization not found");
-    }
-
-    return this.prisma.workspace.create({
-      data: {
-        organizationId: input.organizationId,
-        name: input.name,
-        slug: input.slug,
-      },
-    });
-  }
-
-  async listWorkspaces(organizationId: string) {
-    return this.prisma.workspace.findMany({
-      where: { organizationId },
-      orderBy: { createdAt: "desc" },
-    });
-  }
-
-  async createProject(input: {
-    workspaceId: string;
-    name: string;
-    repositoryUrl?: string;
-    defaultBranch?: string;
-    maxRemediationIterations?: number;
-  }) {
-    const workspace = await this.prisma.workspace.findUnique({
-      where: { id: input.workspaceId },
-    });
-
-    if (!workspace) {
-      throw new NotFoundException("Workspace not found");
-    }
-
-    return this.prisma.project.create({
-      data: {
-        organizationId: workspace.organizationId,
-        workspaceId: workspace.id,
-        name: input.name,
-        repositoryUrl: input.repositoryUrl,
-        defaultBranch: input.defaultBranch ?? "main",
-        maxRemediationIterations: input.maxRemediationIterations ?? 3,
-      },
-    });
-  }
-
-  async listProjects(workspaceId: string) {
-    return this.prisma.project.findMany({
-      where: { workspaceId },
-      orderBy: { createdAt: "desc" },
-    });
-  }
-
-  async getProject(projectId: string) {
-    const project = await this.prisma.project.findUnique({
-      where: { id: projectId },
-      include: {
-        features: { orderBy: { createdAt: "desc" } },
-      },
-    });
-
-    if (!project) {
-      throw new NotFoundException("Project not found");
-    }
-
-    return project;
-  }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
   async createFeature(input: { projectId: string; title: string; description: string; actorId?: string }) {
     return this.prisma.$transaction(async tx => {
@@ -173,7 +94,7 @@ export class CoreLoopService {
         },
       });
 
-      await this.recordAudit(tx, {
+      await this.audit.record(tx, {
         organizationId: project.organizationId,
         actorType: ActorType.user,
         actorId: input.actorId,
@@ -339,30 +260,38 @@ export class CoreLoopService {
     type?: RunnerType;
     version: string;
     capabilities: string[];
+    actorId?: string;
   }) {
-    const organization = await this.prisma.organization.findUnique({
-      where: { id: input.organizationId },
-    });
-
-    if (!organization) {
-      throw new NotFoundException("Organization not found");
-    }
-
     const runnerToken = randomBytes(32).toString("hex");
 
-    const runner = await this.prisma.runner.create({
-      data: {
+    const runner = await this.prisma.$transaction(async tx => {
+      const created = await tx.runner.create({
+        data: {
+          organizationId: input.organizationId,
+          name: input.name,
+          type: input.type ?? RunnerType.self_hosted,
+          version: input.version,
+          capabilities: input.capabilities,
+          status: RunnerStatus.offline,
+          tokenHash: this.hashToken(runnerToken),
+        },
+      });
+
+      await this.audit.record(tx, {
         organizationId: input.organizationId,
-        name: input.name,
-        type: input.type ?? RunnerType.self_hosted,
-        version: input.version,
-        capabilities: input.capabilities,
-        status: RunnerStatus.offline,
-        tokenHash: this.hashToken(runnerToken),
-      },
+        actorType: ActorType.user,
+        actorId: input.actorId,
+        action: "runner.registered",
+        entityType: "runner",
+        entityId: created.id,
+        after: { name: created.name, type: created.type, capabilities: created.capabilities },
+      });
+
+      return created;
     });
 
-    return { runner, runnerToken };
+    const { tokenHash: _tokenHash, ...publicRunner } = runner;
+    return { runner: publicRunner, runnerToken };
   }
 
   async heartbeatRunner(input: {
@@ -610,7 +539,7 @@ export class CoreLoopService {
       data: { status: input.toState },
     });
 
-    await this.recordAudit(tx, {
+    await this.audit.record(tx, {
       organizationId: run.organizationId,
       actorType: input.actorType,
       actorId: input.actorId,
@@ -768,35 +697,6 @@ export class CoreLoopService {
     });
   }
 
-  private async recordAudit(
-    tx: TransactionClient,
-    input: {
-      organizationId: string;
-      actorType: ActorType;
-      actorId?: string;
-      action: string;
-      entityType: string;
-      entityId?: string;
-      before?: unknown;
-      after?: unknown;
-      metadata?: unknown;
-    },
-  ) {
-    await tx.auditLog.create({
-      data: {
-        organizationId: input.organizationId,
-        actorType: input.actorType,
-        actorId: input.actorId,
-        action: input.action,
-        entityType: input.entityType,
-        entityId: input.entityId,
-        before: input.before === undefined ? undefined : this.toJson(input.before),
-        after: input.after === undefined ? undefined : this.toJson(input.after),
-        metadata: this.toJson(input.metadata ?? {}),
-      },
-    });
-  }
-
   private async getRunnerForToken(runnerToken: string) {
     if (!runnerToken) {
       throw new UnauthorizedException("Missing runner token");
@@ -818,6 +718,6 @@ export class CoreLoopService {
   }
 
   private toJson(value: unknown): Prisma.InputJsonValue {
-    return JSON.parse(JSON.stringify(value ?? {})) as Prisma.InputJsonValue;
+    return toJson(value);
   }
 }

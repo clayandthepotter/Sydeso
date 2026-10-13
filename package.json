@@ -11,6 +11,7 @@
     "typecheck": "turbo typecheck",
     "db:generate": "pnpm --filter @sydeso/db generate",
     "db:migrate": "pnpm --filter @sydeso/db migrate",
+    "db:seed": "pnpm --filter @sydeso/db seed",
     "format": "prettier --write .",
     "project:sync:labels": "node .github/project/scripts/sync-labels.mjs",
     "project:sync:project": "node .github/project/scripts/sync-project.mjs",
