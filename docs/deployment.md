@@ -61,6 +61,23 @@ the Worker's settings):
 Non-secret values (`WEB_ORIGIN`, `STORAGE_ENDPOINT`, `STORAGE_BUCKET`, `STORAGE_REGION`,
 `STORAGE_FORCE_PATH_STYLE`) live in `wrangler.jsonc`.
 
+### Rotating a secret
+
+The container reads its environment once, when it starts, so a changed secret is not picked up
+by the running instance. Editing a secret in the dashboard also only saves a new Worker
+*version*; on this Worker it is not deployed automatically. After changing a secret:
+
+1. Deploy the newest version: `npx wrangler versions list --name sydeso-api`, then
+   `npx wrangler versions deploy <version-id>@100% --name sydeso-api -y`
+   (`wrangler secret put` deploys on its own and skips this step).
+2. Restart the container with a rollout. Either push a commit so Workers Builds redeploys, or
+   create a rollout against the current image with the Containers API:
+   `POST /accounts/<account>/containers/applications/<app-id>/rollouts` with
+   `{"strategy":"rolling","kind":"full_auto","step_percentage":100,"target_configuration":{"image":"<current image>"}}`
+   (`npx wrangler containers info <app-id>` prints the app id and image).
+3. Confirm `https://api.sydeso.com/api/v1/health` reports `"status":"ok"` and
+   `"migrationsPending":false`.
+
 ```bash
 cd apps/api
 npx wrangler deploy            # builds the image with Docker, pushes it, deploys the Worker
