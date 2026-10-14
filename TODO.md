@@ -165,7 +165,7 @@ Feature Request -> Artifact -> Workflow Run -> Transition -> Job -> Runner -> Ou
 - [x] Exit criteria: API access is tenant-scoped.
 - [ ] Follow-up: email delivery for invitations (links are shown in the UI today).
 - [ ] Follow-up: GitHub sign-in as a second method.
-- [ ] Follow-up: fix `nest start` so the built API resolves workspace packages without ts-node.
+- [x] Follow-up: fix `nest start` so the built API resolves workspace packages without ts-node (webpack bundle, `node dist/main.js`).
 
 ## Phase 2: Artifact System
 
@@ -261,12 +261,16 @@ Feature Request -> Artifact -> Workflow Run -> Transition -> Job -> Runner -> Ou
 
 ## Phase 10: Productionization
 
-- [ ] Deploy web app.
-- [ ] Deploy API.
-- [ ] Provision production PostgreSQL.
-- [ ] Provision production Redis.
-- [ ] Provision S3-compatible storage.
-- [ ] Implement secrets management.
+Hosting is Cloudflare next to the marketing site; see `docs/deployment.md`.
+
+- [x] Deploy web app (Workers via vinext, `app.sydeso.com`).
+- [x] Package the API for Cloudflare Containers (`apps/api/Dockerfile`, `apps/api/wrangler.jsonc`, `api.sydeso.com`).
+- [ ] Deploy API: needs the Workers Paid plan on the Cloudflare account, then `wrangler deploy` from `apps/api` (Docker or Workers Builds).
+- [ ] Provision production PostgreSQL: restore the paused Supabase project (account is at its free-project limit), rotate the password, set `DATABASE_URL` and `DIRECT_URL` secrets.
+- [ ] Provision production Redis (not used by the control plane yet).
+- [x] Provision S3-compatible storage (R2 bucket `sydeso-artifacts`); still needs an R2 API token in the `STORAGE_*` secrets.
+- [x] Implement secrets management (Worker secrets passed into the container as environment variables).
+- [ ] Retire the Vercel `sydeso` project and the old `sydeso` Worker once the Cloudflare deployment is live.
 - [ ] Add logging and observability.
 - [ ] Add backup and restore process.
 - [ ] Implement DigitalOcean managed runner provisioning.

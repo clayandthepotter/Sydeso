@@ -14,11 +14,11 @@
     "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
-    "@prisma/client": "^6.1.0"
+    "@prisma/client": "^6.1.0",
+    "prisma": "^6.1.0"
   },
   "devDependencies": {
     "@node-rs/argon2": "^2.2.2",
-    "cross-env": "^7.0.3",
-    "prisma": "^6.1.0"
+    "cross-env": "^7.0.3"
   }
 }
