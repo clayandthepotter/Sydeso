@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+**/.next
+**/.vinext
+**/.wrangler
+**/.turbo
+**/*.log
+**/.env
+**/.env.*
+!**/.env.example
+.git
+private_docs
+docs
+apps/web
+apps/runner
+infra

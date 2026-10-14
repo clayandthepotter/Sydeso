@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sydeso-api",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-14",
+  "compatibility_flags": ["nodejs_compat"],
+  // Cloudflare creates the DNS record for the custom domain on deploy.
+  "routes": [{ "pattern": "api.sydeso.com", "custom_domain": true }],
+  "containers": [
+    {
+      "class_name": "ApiContainer",
+      "image": "./Dockerfile",
+      // The Dockerfile copies the whole workspace, so the build context is the repository root.
+      "image_build_context": "../..",
+      "instance_type": "basic",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "API", "class_name": "ApiContainer" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ApiContainer"] }],
+  // Non-secret configuration. Secrets (DATABASE_URL, DIRECT_URL, STORAGE_ACCESS_KEY_ID,
+  // STORAGE_SECRET_ACCESS_KEY) are set with `wrangler secret put`; see docs/deployment.md.
+  "vars": {
+    "WEB_ORIGIN": "https://app.sydeso.com",
+    "STORAGE_ENDPOINT": "https://a1661db9c7fddbc59324385493deb453.r2.cloudflarestorage.com",
+    "STORAGE_BUCKET": "sydeso-artifacts",
+    "STORAGE_REGION": "auto",
+    "STORAGE_FORCE_PATH_STYLE": "false"
+  },
+  "observability": { "enabled": true },
+  "upload_source_maps": true
+}

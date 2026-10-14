@@ -99,6 +99,10 @@ Authentication is built into the API: email and password (Argon2id), server-side
 
 Access is role-based per organization. Roles and the permission matrix live in `packages/domain/src/roles.ts` and follow `docs/product/roles-and-permissions.md`. Every request resolves the organization that owns the entity it touches and checks the caller's role there; an entity in another organization answers 404. People join an organization by self sign-up (creating their own organization as its owner) or through an invite link created by an owner or admin.
 
+## Deployment
+
+Production runs on Cloudflare: the web app on Workers at `app.sydeso.com`, the API in a Cloudflare Container at `api.sydeso.com`, Postgres on Supabase and artifacts in R2. `docs/deployment.md` has the configuration, secrets and commands.
+
 ## Environment
 
 Copy `.env.example` for local service defaults.

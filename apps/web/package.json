@@ -6,7 +6,11 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dev:vinext": "vite dev --port 3001",
+    "build:vinext": "vite build",
+    "start:vinext": "wrangler dev --config dist/server/wrangler.json",
+    "deploy:vinext": "vinext-cloudflare deploy --config dist/server/wrangler.json"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
@@ -19,6 +23,15 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.2"
-  }
+    "@cloudflare/vite-plugin": "1",
+    "@vinext/cloudflare": "^1.1.1",
+    "@vitejs/plugin-react": "^6.1.2",
+    "@vitejs/plugin-rsc": "^0.5.37",
+    "react-server-dom-webpack": "^19.3.1",
+    "typescript": "^5.7.2",
+    "vinext": "^1.2.0",
+    "vite": "^8.3.4",
+    "wrangler": "^4.151.0"
+  },
+  "type": "module"
 }
