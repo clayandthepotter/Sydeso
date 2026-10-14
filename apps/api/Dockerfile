@@ -23,12 +23,13 @@ RUN pnpm --filter @sydeso/db generate && pnpm --filter @sydeso/api build
 FROM node:22-bookworm-slim
 RUN apt-get update \
   && apt-get install -y --no-install-recommends openssl ca-certificates \
-  && rm -rf /var/lib/apt/lists/* \
-  && corepack enable
+  && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production PORT=4000
 WORKDIR /repo
 COPY --from=build /repo /repo
+COPY apps/api/docker-entrypoint.sh /usr/local/bin/sydeso-api
+RUN chmod +x /usr/local/bin/sydeso-api
 
 EXPOSE 4000
 # Migrations run against DIRECT_URL before the API starts, so the schema and the code always match.
-CMD ["sh", "-c", "pnpm --filter @sydeso/db exec prisma migrate deploy && node apps/api/dist/main.js"]
+CMD ["sydeso-api"]

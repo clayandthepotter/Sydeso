@@ -25,7 +25,8 @@ async function bootstrap() {
   const origins = (process.env.WEB_ORIGIN ?? "http://localhost:3000").split(",").map(origin => origin.trim());
   app.enableCors({ origin: origins, credentials: true });
 
-  await app.listen(process.env.PORT ?? 4000);
+  // Bind every interface explicitly so container port checks reach the process over IPv4.
+  await app.listen(Number(process.env.PORT ?? 4000), "0.0.0.0");
 }
 
 void bootstrap();
