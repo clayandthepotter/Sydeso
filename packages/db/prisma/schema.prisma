@@ -232,6 +232,7 @@ model Job {
   runner                Runner?       @relation(fields: [runnerId], references: [id])
   inputArtifactIds      String[]      @default([])
   outputArtifactIds     String[]      @default([])
+  producedArtifacts     Artifact[]    @relation("JobOutputs")
   attempt               Int           @default(1)
   error                 Json?
   startedAt             DateTime?
@@ -242,29 +243,40 @@ model Job {
   @@index([runnerId])
 }
 
+/// The system of record. Rows are immutable: a database trigger rejects UPDATE, and a new
+/// version is a new row. Small content lives inline as JSON; large content lives in object
+/// storage under storageKey, with the SHA-256 of the bytes in checksum either way.
 model Artifact {
-  id              String        @id @default(uuid())
-  organizationId  String
-  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  projectId       String
-  project         Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  featureId       String?
-  feature         Feature?      @relation(fields: [featureId], references: [id], onDelete: Cascade)
-  workflowRunId   String?
-  workflowRun     WorkflowRun?  @relation(fields: [workflowRunId], references: [id], onDelete: Cascade)
-  type            ArtifactType
-  version         Int
-  title           String
-  content         Json?
-  storageKey      String?
-  checksum        String
-  createdByType   ActorType
-  createdById     String?
-  createdAt       DateTime      @default(now())
+  id                String        @id @default(uuid())
+  organizationId    String
+  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projectId         String
+  project           Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  featureId         String?
+  feature           Feature?      @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  workflowRunId     String?
+  workflowRun       WorkflowRun?  @relation(fields: [workflowRunId], references: [id], onDelete: Cascade)
+  type              ArtifactType
+  version           Int
+  title             String
+  content           Json?
+  storageKey        String?
+  contentType       String?
+  sizeBytes         Int?
+  checksum          String
+  /// lineage: the artifacts this one was produced from, and the job that produced it
+  sourceArtifactIds String[]      @default([])
+  producedByJobId   String?
+  producedByJob     Job?          @relation("JobOutputs", fields: [producedByJobId], references: [id], onDelete: SetNull)
+  metadata          Json          @default("{}")
+  createdByType     ActorType
+  createdById       String?
+  createdAt         DateTime      @default(now())
 
   @@unique([featureId, type, version])
   @@index([workflowRunId, type])
   @@index([projectId, createdAt])
+  @@index([producedByJobId])
 }
 
 model Runner {

@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ArtifactForm } from "../../../../../../components/artifact-forms";
 import { JsonView } from "../../../../../../components/json-view";
 import { RunTrace } from "../../../../../../components/run-trace";
 import { JobBadge, StateBadge } from "../../../../../../components/state-badge";
 import { TransitionPanel, type TransitionOption } from "../../../../../../components/transition-panel";
 import { api, ApiError } from "../../../../../../lib/api";
 import { formatDateTime, formatDuration } from "../../../../../../lib/format";
+import { can } from "../../../../../../lib/roles";
 import { describeTransition, shortId, stateLabels, transitionsFrom } from "../../../../../../lib/workflow";
 
 export const metadata = { title: "Feature" };
@@ -22,6 +24,8 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
   }
   if (feature.projectId !== projectId) notFound();
 
+  const organization = await api.getOrganization(feature.organizationId);
+  const canAttach = can(organization.role, "artifact.create");
   const run = feature.workflowRuns[0];
   const visited = run ? Array.from(new Set(run.transitions.map(transition => transition.toState))) : [];
   const options: TransitionOption[] = run
@@ -214,6 +218,14 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
                   </tbody>
                 </table>
               </div>
+            )}
+            {run && canAttach && (
+              <details className="panel__body">
+                <summary className="mono muted">Attach an artifact to this run</summary>
+                <div style={{ paddingTop: "0.75rem" }}>
+                  <ArtifactForm workflowRunId={run.id} projectId={projectId} featureId={feature.id} />
+                </div>
+              </details>
             )}
           </section>
         </aside>

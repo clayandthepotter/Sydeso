@@ -16,6 +16,7 @@ import {
 import { defaultWorkflowRules, hasRequiredCapabilities } from "@sydeso/domain";
 import { createHash, randomBytes } from "node:crypto";
 
+import { ArtifactsService } from "../artifacts/artifacts.service";
 import { AuditService, toJson } from "../audit/audit.service";
 import { PrismaService } from "../database/prisma.service";
 
@@ -39,6 +40,7 @@ export class CoreLoopService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly artifacts: ArtifactsService,
   ) {}
 
   async createFeature(input: { projectId: string; title: string; description: string; actorId?: string }) {
@@ -67,7 +69,7 @@ export class CoreLoopService {
         },
       });
 
-      const artifact = await this.createArtifact(tx, {
+      const artifact = await this.artifacts.create(tx, {
         organizationId: project.organizationId,
         projectId: project.id,
         featureId: feature.id,
@@ -416,16 +418,17 @@ export class CoreLoopService {
         throw new NotFoundException("Claimed job not found");
       }
 
-      const outputArtifacts = input.outputArtifacts ?? [];
-      const createdArtifacts = [];
+      // Outputs the runner already uploaded for this job, plus the inline ones in this request.
+      // Every output descends from the job's inputs and is attributed to the job.
+      const createdArtifacts = await this.artifacts.listProducedByJob(tx, job.id);
 
-      for (const outputArtifact of outputArtifacts) {
+      for (const outputArtifact of input.outputArtifacts ?? []) {
         if (!artifactTypeValues.has(outputArtifact.type)) {
           throw new BadRequestException(`Invalid artifact type: ${outputArtifact.type}`);
         }
 
         createdArtifacts.push(
-          await this.createArtifact(tx, {
+          await this.artifacts.create(tx, {
             organizationId: job.organizationId,
             projectId: job.workflowRun.feature.projectId,
             featureId: job.workflowRun.featureId,
@@ -434,6 +437,8 @@ export class CoreLoopService {
             title: outputArtifact.title,
             content: outputArtifact.content ?? {},
             storageKey: outputArtifact.storageKey,
+            sourceArtifactIds: job.inputArtifactIds,
+            producedByJobId: job.id,
             createdByType: ActorType.runner,
             createdById: runner.id,
           }),
@@ -466,6 +471,39 @@ export class CoreLoopService {
       });
 
       return { job: completedJob, outputArtifacts: createdArtifacts, nextTransition };
+    });
+  }
+
+  /** A runner streams a large output into storage for the job it holds, before completing it. */
+  async uploadJobArtifact(input: {
+    runnerToken: string;
+    jobId: string;
+    type: ArtifactType;
+    title: string;
+    filename?: string;
+    contentType?: string;
+    bytes: Buffer;
+  }) {
+    const runner = await this.getRunnerForToken(input.runnerToken);
+    const job = await this.prisma.job.findFirst({
+      where: { id: input.jobId, runnerId: runner.id, status: { in: [JobStatus.assigned, JobStatus.running] } },
+    });
+
+    if (!job) {
+      throw new NotFoundException("Claimed job not found");
+    }
+
+    return this.artifacts.createFromUpload({
+      workflowRunId: job.workflowRunId,
+      type: input.type,
+      title: input.title,
+      filename: input.filename,
+      contentType: input.contentType,
+      bytes: input.bytes,
+      sourceArtifactIds: job.inputArtifactIds,
+      producedByJobId: job.id,
+      createdByType: ActorType.runner,
+      createdById: runner.id,
     });
   }
 
@@ -652,49 +690,6 @@ export class CoreLoopService {
       default:
         return null;
     }
-  }
-
-  private async createArtifact(
-    tx: TransactionClient,
-    input: {
-      organizationId: string;
-      projectId: string;
-      featureId?: string;
-      workflowRunId?: string;
-      type: ArtifactType;
-      title: string;
-      content: unknown;
-      storageKey?: string;
-      createdByType: ActorType;
-      createdById?: string;
-    },
-  ) {
-    const version = await tx.artifact.count({
-      where: {
-        featureId: input.featureId,
-        type: input.type,
-      },
-    });
-
-    const content = this.toJson(input.content);
-    const checksum = createHash("sha256").update(JSON.stringify(content)).digest("hex");
-
-    return tx.artifact.create({
-      data: {
-        organizationId: input.organizationId,
-        projectId: input.projectId,
-        featureId: input.featureId,
-        workflowRunId: input.workflowRunId,
-        type: input.type,
-        title: input.title,
-        content,
-        storageKey: input.storageKey,
-        checksum,
-        version: version + 1,
-        createdByType: input.createdByType,
-        createdById: input.createdById,
-      },
-    });
   }
 
   private async getRunnerForToken(runnerToken: string) {

@@ -1,10 +1,12 @@
-import type { OrganizationRole, WorkflowState } from "@sydeso/domain";
+import type { ArtifactType, OrganizationRole, WorkflowState } from "@sydeso/domain";
 import { redirect } from "next/navigation";
 
 import { getSessionToken } from "./session";
 import type {
   Artifact,
   ArtifactDetail,
+  ArtifactLineage,
+  ArtifactVersion,
   ArtifactWithFeature,
   AuditLog,
   AuthResult,
@@ -159,6 +161,39 @@ export const api = {
 
   listProjectArtifacts: (projectId: string) => request<ArtifactWithFeature[]>(`/projects/${projectId}/artifacts`),
   getArtifact: (artifactId: string) => request<ArtifactDetail>(`/artifacts/${artifactId}`),
+  getArtifactVersions: (artifactId: string) => request<ArtifactVersion[]>(`/artifacts/${artifactId}/versions`),
+  getArtifactLineage: (artifactId: string) => request<ArtifactLineage>(`/artifacts/${artifactId}/lineage`),
+  createArtifact: (
+    workflowRunId: string,
+    input: { type: ArtifactType; title: string; content: unknown; sourceArtifactIds?: string[] },
+  ) => request<Artifact>(`/workflow-runs/${workflowRunId}/artifacts`, json(input)),
+  /** Raw file upload; the body is the file itself. */
+  uploadArtifact: async (
+    workflowRunId: string,
+    input: { type: ArtifactType; title: string; filename: string; contentType: string; bytes: ArrayBuffer },
+  ) => {
+    const token = await getSessionToken();
+    const query = new URLSearchParams({ type: input.type, title: input.title, filename: input.filename });
+    const response = await fetch(`${apiBaseUrl()}/workflow-runs/${workflowRunId}/artifacts/upload?${query}`, {
+      method: "POST",
+      cache: "no-store",
+      headers: { "content-type": input.contentType, ...(token ? { authorization: `Bearer ${token}` } : {}) },
+      body: input.bytes,
+    });
+    if (!response.ok) {
+      const body = (await response.json().catch(() => ({}))) as { message?: string };
+      throw new ApiError(response.status, body.message ?? response.statusText);
+    }
+    return (await response.json()) as Artifact;
+  },
+  /** The artifact's bytes as a streaming response, for the download route to pass through. */
+  fetchArtifactContent: async (artifactId: string) => {
+    const token = await getSessionToken();
+    return fetch(`${apiBaseUrl()}/artifacts/${artifactId}/content`, {
+      cache: "no-store",
+      headers: token ? { authorization: `Bearer ${token}` } : {},
+    });
+  },
 
   // ---------------------------------------------------------------- runners and audit
   listRunners: (organizationId: string) => request<Runner[]>(`/organizations/${organizationId}/runners`),

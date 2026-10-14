@@ -89,6 +89,10 @@ pnpm db:seed
 
 `pnpm db:seed` creates a development owner account (`dev@sydeso.local` / `sydeso-dev-password`, overridable with `SEED_EMAIL`, `SEED_PASSWORD` and `SEED_NAME`) with one organization, workspace, project and feature request. Sign in at `/sign-in` of the web app.
 
+## Artifacts and Storage
+
+Artifacts are immutable and versioned per feature and type: a database trigger rejects any `UPDATE` on the artifact table, and a new version is a new row with its own SHA-256 checksum. Small artifacts keep their JSON inline; files go to S3-compatible object storage (MinIO locally, S3, R2 or similar in production) configured by the `STORAGE_*` variables in `apps/api/.env.example`. Every artifact records its lineage: the artifacts it was produced from and the job that produced it. `GET /artifacts/:id/content` streams the bytes with the checksum in a header; `/versions` and `/lineage` expose the history and the graph.
+
 ## Authentication and Access
 
 Authentication is built into the API: email and password (Argon2id), server-side sessions in Postgres, and a session token sent as `Authorization: Bearer …` by the web app and CLIs or as the `sydeso_session` cookie by browsers. Every route except health, the waitlist, sign-in and sign-up, invitation previews and the runner protocol requires a session.

@@ -141,10 +141,29 @@ export interface Artifact {
   title: string;
   content: unknown;
   storageKey: string | null;
+  contentType: string | null;
+  sizeBytes: number | null;
   checksum: string;
+  sourceArtifactIds: string[];
+  producedByJobId: string | null;
+  metadata: unknown;
   createdByType: ActorType;
   createdById: string | null;
   createdAt: string;
+}
+
+export type ArtifactVersion = Pick<
+  Artifact,
+  "id" | "version" | "title" | "checksum" | "storageKey" | "sizeBytes" | "createdByType" | "createdById" | "createdAt"
+>;
+
+export type ArtifactRef = Pick<Artifact, "id" | "type" | "version" | "title" | "createdAt">;
+
+export interface ArtifactLineage {
+  artifact: Artifact;
+  sources: ArtifactRef[];
+  derived: ArtifactRef[];
+  producedByJob: Pick<Job, "id" | "state" | "agentType" | "status" | "runnerId" | "attempt" | "completedAt"> | null;
 }
 
 export type FeatureWithLatestRun = Feature & { workflowRuns: WorkflowRun[] };

@@ -623,6 +623,11 @@ select.input {
   }
 }
 
+.stack {
+  display: grid;
+  gap: 0.35rem;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
