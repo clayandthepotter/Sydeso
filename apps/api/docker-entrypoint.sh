@@ -19,15 +19,25 @@ else
 fi
 
 attempt=1
+migrated=0
 until node packages/db/node_modules/prisma/build/index.js migrate deploy --schema packages/db/prisma/schema.prisma; do
-  if [ "$attempt" -ge 5 ]; then
-    echo "[sydeso-api] migrations failed after $attempt attempts, giving up"
-    exit 1
+  if [ "$attempt" -ge 3 ]; then
+    break
   fi
   attempt=$((attempt + 1))
-  echo "[sydeso-api] migrations failed, retrying in 10s (attempt $attempt of 5)"
+  echo "[sydeso-api] migrations failed, retrying in 10s (attempt $attempt of 3)"
   sleep 10
 done
+if [ "$attempt" -lt 3 ] || node packages/db/node_modules/prisma/build/index.js migrate status --schema packages/db/prisma/schema.prisma >/dev/null 2>&1; then
+  migrated=1
+fi
 
-echo "[sydeso-api] starting the API"
+# The API starts either way so the health endpoint can report the database state instead of
+# the container silently exiting; requests that need the database fail until it is reachable.
+if [ "$migrated" -eq 1 ]; then
+  echo "[sydeso-api] migrations applied, starting the API"
+else
+  echo "[sydeso-api] migrations could not be applied, starting the API in degraded mode"
+  export SYDESO_MIGRATIONS_PENDING=1
+fi
 exec node apps/api/dist/main.js
