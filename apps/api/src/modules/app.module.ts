@@ -4,6 +4,7 @@ import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import { HttpExceptionFilter } from "../common/http-exception.filter";
 import { AccessService } from "./access/access.service";
 import { ArtifactsController } from "./artifacts/artifacts.controller";
+import { ArtifactsService } from "./artifacts/artifacts.service";
 import { AuditService } from "./audit/audit.service";
 import { AuthController } from "./auth/auth.controller";
 import { AuthGuard } from "./auth/auth.guard";
@@ -19,6 +20,7 @@ import { InvitationsService } from "./members/invitations.service";
 import { MembersController } from "./members/members.controller";
 import { MembersService } from "./members/members.service";
 import { RunnersController } from "./runners/runners.controller";
+import { StorageService } from "./storage/storage.service";
 import { WaitlistController } from "./waitlist/waitlist.controller";
 import { WaitlistService } from "./waitlist/waitlist.service";
 import { WorkflowRunsController } from "./workflows/workflow-runs.controller";
@@ -39,6 +41,8 @@ import { WorkflowRunsController } from "./workflows/workflow-runs.controller";
     PrismaService,
     AuditService,
     AccessService,
+    StorageService,
+    ArtifactsService,
     PasswordService,
     AuthService,
     FoundationService,

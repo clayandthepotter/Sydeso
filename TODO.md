@@ -169,15 +169,16 @@ Feature Request -> Artifact -> Workflow Run -> Transition -> Job -> Runner -> Ou
 
 ## Phase 2: Artifact System
 
-- [ ] Implement immutable artifact table and service.
-- [ ] Implement artifact versioning.
-- [ ] Implement artifact checksums.
-- [ ] Integrate S3-compatible storage for large artifacts.
-- [ ] Add artifact lineage/source metadata.
+- [x] Implement immutable artifact table and service (single writer, database trigger rejects updates).
+- [x] Implement artifact versioning (per feature and type, next version from the highest existing).
+- [x] Implement artifact checksums (SHA-256 of inline JSON or of stored bytes, sent on download).
+- [x] Integrate S3-compatible storage for large artifacts (uploads by people and runners, streamed downloads).
+- [x] Add artifact lineage/source metadata (source artifacts, producing job, derived artifacts).
 - [x] Add artifact browser UI.
-- [ ] Exit criteria: creating a feature request stores a `feature_request` artifact.
-- [ ] Exit criteria: artifacts cannot be overwritten.
-- [ ] Exit criteria: artifact versions are browsable.
+- [x] Exit criteria: creating a feature request stores a `feature_request` artifact.
+- [x] Exit criteria: artifacts cannot be overwritten.
+- [x] Exit criteria: artifact versions are browsable.
+- [ ] Follow-up: artifact drafts and human editing per `docs/prds/artifact-drafts-and-human-editing.md`.
 
 ## Phase 3: Workflow Engine
 

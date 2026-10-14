@@ -1,10 +1,17 @@
-import { Body, Controller, Get, Headers, Param, Post, UnauthorizedException } from "@nestjs/common";
+import { Body, Controller, Get, Headers, Param, Post, Query, Req, UnauthorizedException } from "@nestjs/common";
 import { ArtifactType, RunnerStatus } from "@prisma/client";
-import { registerRunnerSchema, type RegisterRunnerInput } from "@sydeso/api-contracts";
+import {
+  registerRunnerSchema,
+  uploadArtifactQuerySchema,
+  type RegisterRunnerInput,
+  type UploadArtifactQuery,
+} from "@sydeso/api-contracts";
 import { hasRequiredCapabilities } from "@sydeso/domain";
+import type { Request } from "express";
 
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { AccessService } from "../access/access.service";
+import { rawBody } from "../artifacts/artifacts.controller";
 import type { SessionUser } from "../auth/auth.types";
 import { CurrentUser, Public } from "../auth/decorators";
 import { CoreLoopService } from "../core-loop/core-loop.service";
@@ -78,6 +85,30 @@ export class RunnersController {
     return this.coreLoop.claimJob({
       runnerToken: readBearerToken(authorization),
       capabilities: body.capabilities ?? [],
+    });
+  }
+
+  /**
+   * A runner uploads a large output (logs, a package, screenshots) for the job it holds
+   * before completing it. The artifact is linked to the job and to the job's input artifacts.
+   */
+  @Public()
+  @Post("runners/me/jobs/:jobId/artifacts/upload")
+  uploadJobArtifact(
+    @Headers("authorization") authorization: string | undefined,
+    @Param("jobId") jobId: string,
+    @Query(new ZodValidationPipe(uploadArtifactQuerySchema)) query: UploadArtifactQuery,
+    @Headers("content-type") contentType: string | undefined,
+    @Req() request: Request,
+  ) {
+    return this.coreLoop.uploadJobArtifact({
+      runnerToken: readBearerToken(authorization),
+      jobId,
+      type: query.type,
+      title: query.title,
+      filename: query.filename,
+      contentType,
+      bytes: rawBody(request),
     });
   }
 

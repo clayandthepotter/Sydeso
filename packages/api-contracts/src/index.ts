@@ -77,6 +77,43 @@ export const transitionWorkflowRunSchema = z.object({
   reason: z.string().trim().max(2000).optional(),
 });
 
+// ---------------------------------------------------------------- artifacts
+
+export const artifactTypeSchema = z.enum([
+  "feature_request",
+  "prd",
+  "research_report",
+  "design_package",
+  "implementation_package",
+  "qa_report",
+  "review_report",
+  "release_candidate",
+  "skill_file",
+  "workflow_template",
+  "policy_definition",
+]);
+
+/** An artifact with inline JSON content, created by a person against a workflow run. */
+export const createArtifactSchema = z.object({
+  type: artifactTypeSchema,
+  title: z.string().trim().min(1).max(200),
+  content: z.unknown().refine(value => value !== undefined, "content is required"),
+  sourceArtifactIds: z.array(z.string().uuid()).max(50).optional(),
+  metadata: z.record(z.unknown()).optional(),
+});
+
+/** Query string that accompanies a raw upload; the body is the file. */
+export const uploadArtifactQuerySchema = z.object({
+  type: artifactTypeSchema,
+  title: z.string().trim().min(1).max(200),
+  filename: z.string().trim().min(1).max(255).optional(),
+  sourceArtifactIds: z
+    .string()
+    .transform(value => value.split(",").map(id => id.trim()).filter(Boolean))
+    .pipe(z.array(z.string().uuid()).max(50))
+    .optional(),
+});
+
 // ---------------------------------------------------------------- runners
 
 export const registerRunnerSchema = z.object({
@@ -114,5 +151,7 @@ export type InviteMemberInput = z.infer<typeof inviteMemberSchema>;
 export type UpdateMemberRoleInput = z.infer<typeof updateMemberRoleSchema>;
 export type CreateFeatureInput = z.infer<typeof createFeatureSchema>;
 export type TransitionWorkflowRunInput = z.infer<typeof transitionWorkflowRunSchema>;
+export type CreateArtifactInput = z.infer<typeof createArtifactSchema>;
+export type UploadArtifactQuery = z.infer<typeof uploadArtifactQuerySchema>;
 export type RegisterRunnerInput = z.infer<typeof registerRunnerSchema>;
 export type WaitlistSignupInput = z.infer<typeof waitlistSignupSchema>;

@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { organizationRoleSchema, workflowStateSchema } from "@sydeso/api-contracts";
+import { artifactTypeSchema, organizationRoleSchema, workflowStateSchema } from "@sydeso/api-contracts";
 
 import { api, ApiError } from "../../lib/api";
 
@@ -179,6 +179,43 @@ export async function revokeInvitationAction(_prev: ActionState, formData: FormD
     return { error: messageOf(error) };
   }
   revalidatePath(`/app/organizations/${organizationId}/members`);
+  return { ok: true };
+}
+
+export async function createArtifactAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const workflowRunId = text(formData, "workflowRunId");
+  const projectId = text(formData, "projectId");
+  const featureId = text(formData, "featureId");
+  const title = text(formData, "title");
+  const type = artifactTypeSchema.safeParse(text(formData, "type"));
+  if (!title || !type.success) return { error: "Type and title are required" };
+
+  try {
+    if (text(formData, "mode") === "file") {
+      const file = formData.get("file");
+      if (!(file instanceof File) || file.size === 0) return { error: "Choose a file to upload" };
+      await api.uploadArtifact(workflowRunId, {
+        type: type.data,
+        title,
+        filename: file.name,
+        contentType: file.type || "application/octet-stream",
+        bytes: await file.arrayBuffer(),
+      });
+    } else {
+      let content: unknown;
+      try {
+        content = JSON.parse(text(formData, "content") || "{}");
+      } catch {
+        return { error: "Content must be valid JSON" };
+      }
+      await api.createArtifact(workflowRunId, { type: type.data, title, content });
+    }
+  } catch (error) {
+    return { error: messageOf(error) };
+  }
+
+  revalidatePath(`/app/projects/${projectId}/features/${featureId}`);
+  revalidatePath(`/app/projects/${projectId}/artifacts`);
   return { ok: true };
 }
 
