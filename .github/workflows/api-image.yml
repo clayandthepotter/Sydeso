@@ -1,0 +1,56 @@
+name: API image
+
+# Builds the API container image from apps/api/Dockerfile and publishes it to GitHub's
+# registry. The deploy step copies the image into Cloudflare's registry and rolls it out
+# (see docs/deployment.md), so no Cloudflare credentials live in this repository.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - apps/api/**
+      - packages/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - tsconfig.base.json
+      - .dockerignore
+      - .github/workflows/api-image.yml
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Sign in to GitHub's registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          platforms: linux/amd64
+          push: true
+          provenance: false
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/sydeso-api:latest
+            ghcr.io/${{ github.repository_owner }}/sydeso-api:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

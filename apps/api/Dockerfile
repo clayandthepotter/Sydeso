@@ -18,8 +18,7 @@ RUN pnpm install --frozen-lockfile --filter @sydeso/api... --filter @sydeso/db
 
 COPY packages ./packages
 COPY apps/api ./apps/api
-RUN pnpm --filter @sydeso/db generate && pnpm --filter @sydeso/api build \
-  && pnpm prune --prod
+RUN pnpm --filter @sydeso/db generate && pnpm --filter @sydeso/api build
 
 FROM node:22-bookworm-slim
 RUN apt-get update \
