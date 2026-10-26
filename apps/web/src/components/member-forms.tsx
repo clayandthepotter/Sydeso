@@ -14,7 +14,7 @@ import {
 import { roleLabel } from "../lib/roles";
 
 function ErrorNotice({ error }: { error?: string }) {
-  return error ? <p className="notice notice--error mono-text">{error}</p> : null;
+  return error ? <p className="notice notice--error">{error}</p> : null;
 }
 
 export function InviteForm({ organizationId, roles }: { organizationId: string; roles: OrganizationRole[] }) {
@@ -25,24 +25,18 @@ export function InviteForm({ organizationId, roles }: { organizationId: string; 
         <div className="token">
           <span className="mono">Invite link for {state.email}. Shown once.</span>
           <code>{state.inviteUrl}</code>
-          <span className="mono-text">
-            Send this link to them. It expires in 7 days and is revoked if you invite the same address again.
-          </span>
+          <span className="hint">Send this link to them. It expires in 7 days and is revoked if you invite the same address again.</span>
         </div>
       ) : null}
       <form className="form" action={action}>
         <input type="hidden" name="organizationId" value={organizationId} />
         <div className="form__row">
           <div className="field" style={{ flex: "1 1 240px" }}>
-            <label className="mono" htmlFor="invite-email">
-              Email
-            </label>
+            <label htmlFor="invite-email">Email</label>
             <input id="invite-email" className="input" name="email" type="email" required autoComplete="off" />
           </div>
           <div className="field">
-            <label className="mono" htmlFor="invite-role">
-              Role
-            </label>
+            <label htmlFor="invite-role">Role</label>
             <select id="invite-role" className="input" name="role" defaultValue={roles.includes("engineer") ? "engineer" : roles[0]}>
               {roles.map(role => (
                 <option key={role} value={role}>
@@ -63,6 +57,7 @@ export function InviteForm({ organizationId, roles }: { organizationId: string; 
   );
 }
 
+/** The role of one member: a badge when it cannot be changed, otherwise a small select that saves on change. */
 export function RoleSelect({
   organizationId,
   userId,
@@ -84,21 +79,25 @@ export function RoleSelect({
   }
 
   return (
-    <form className="form__row" action={action}>
+    <form className="inline-form" action={action}>
       <input type="hidden" name="organizationId" value={organizationId} />
       <input type="hidden" name="userId" value={userId} />
-      <select className="input" name="role" defaultValue={role} disabled={pending} style={{ minHeight: 34, width: "auto" }}>
+      <select
+        className="input input--sm"
+        name="role"
+        defaultValue={role}
+        disabled={pending}
+        aria-label="Role"
+        onChange={event => event.currentTarget.form?.requestSubmit()}
+      >
         {roles.map(option => (
           <option key={option} value={option}>
             {roleLabel(option)}
           </option>
         ))}
       </select>
-      <button className="btn btn--ghost" type="submit" disabled={pending}>
-        Save
-      </button>
-      {state.error && <span className="mono-text" style={{ color: "var(--alert)" }}>{state.error}</span>}
-      {state.ok && <span className="hint">Saved</span>}
+      {state.error && <span className="hint hint--error">{state.error}</span>}
+      {state.ok && !pending && <span className="hint">Saved</span>}
     </form>
   );
 }
@@ -106,13 +105,13 @@ export function RoleSelect({
 export function RemoveMemberButton({ organizationId, userId, self }: { organizationId: string; userId: string; self: boolean }) {
   const [state, action, pending] = useActionState<ActionState, FormData>(removeMemberAction, {});
   return (
-    <form className="form__row" action={action}>
+    <form className="inline-form" action={action}>
       <input type="hidden" name="organizationId" value={organizationId} />
       <input type="hidden" name="userId" value={userId} />
-      <button className="btn btn--ghost" type="submit" disabled={pending}>
+      <button className="btn btn--ghost btn--sm" type="submit" disabled={pending}>
         {self ? "Leave" : "Remove"}
       </button>
-      {state.error && <span className="mono-text" style={{ color: "var(--alert)" }}>{state.error}</span>}
+      {state.error && <span className="hint hint--error">{state.error}</span>}
     </form>
   );
 }
@@ -120,13 +119,13 @@ export function RemoveMemberButton({ organizationId, userId, self }: { organizat
 export function RevokeInvitationButton({ organizationId, invitationId }: { organizationId: string; invitationId: string }) {
   const [state, action, pending] = useActionState<ActionState, FormData>(revokeInvitationAction, {});
   return (
-    <form className="form__row" action={action}>
+    <form className="inline-form" action={action}>
       <input type="hidden" name="organizationId" value={organizationId} />
       <input type="hidden" name="invitationId" value={invitationId} />
-      <button className="btn btn--ghost" type="submit" disabled={pending}>
+      <button className="btn btn--ghost btn--sm" type="submit" disabled={pending}>
         Revoke
       </button>
-      {state.error && <span className="mono-text" style={{ color: "var(--alert)" }}>{state.error}</span>}
+      {state.error && <span className="hint hint--error">{state.error}</span>}
     </form>
   );
 }

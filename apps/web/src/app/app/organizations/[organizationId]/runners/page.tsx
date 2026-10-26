@@ -24,7 +24,7 @@ export default async function RunnersPage({ params }: { params: Promise<{ organi
       </div>
 
       {runners.length === 0 ? (
-        <div className="empty mono-text">No runners registered. Register one below, then start it with the token.</div>
+        <div className="empty">No runners registered. Register one below, then start it with the token.</div>
       ) : (
         <div className="panel">
           <div className="table-wrap">
@@ -87,10 +87,10 @@ export default async function RunnersPage({ params }: { params: Promise<{ organi
         </div>
       )}
 
-      <section className="panel">
+      <section className="panel panel--form">
         <div className="panel__head">
           <h2 className="title">Register a runner</h2>
-          <span className="mono muted">Returns a bearer token once</span>
+          <span className="muted">Returns a bearer token once</span>
         </div>
         <RunnerForm organizationId={organizationId} />
       </section>

@@ -5,6 +5,15 @@ import { can, roleLabel } from "../../../../../lib/roles";
 
 export const metadata = { title: "Members" };
 
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
 export default async function MembersPage({ params }: { params: Promise<{ organizationId: string }> }) {
   const { organizationId } = await params;
   const [me, organization, { members, assignableRoles }] = await Promise.all([
@@ -28,59 +37,46 @@ export default async function MembersPage({ params }: { params: Promise<{ organi
         </div>
       </div>
 
-      <div className="panel">
-        <div className="table-wrap">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Member</th>
-                <th>Role</th>
-                <th>Joined</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.map(member => {
-                const self = member.user.id === me?.user.id;
-                const lastOwner = member.role === "owner" && owners <= 1;
-                return (
-                  <tr key={member.id}>
-                    <td>
-                      <strong>{member.user.name}</strong>
-                      {self && <span className="mono muted"> · you</span>}
-                      <div className="mono-text muted">{member.user.email}</div>
-                    </td>
-                    <td>
-                      <RoleSelect
-                        organizationId={organizationId}
-                        userId={member.user.id}
-                        role={member.role}
-                        roles={assignableRoles}
-                        disabled={!manage || lastOwner}
-                      />
-                    </td>
-                    <td className="muted" title={formatDateTime(member.createdAt)}>
-                      {formatRelative(member.createdAt)}
-                    </td>
-                    <td>
-                      {(self || (manage && assignableRoles.includes(member.role))) && !lastOwner && (
-                        <RemoveMemberButton organizationId={organizationId} userId={member.user.id} self={self} />
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      <div className="rows" role="list" aria-label="Members">
+        {members.map(member => {
+          const self = member.user.id === me?.user.id;
+          const lastOwner = member.role === "owner" && owners <= 1;
+          return (
+            <div className="row" key={member.id} role="listitem">
+              <span className="avatar" aria-hidden="true">
+                {initials(member.user.name)}
+              </span>
+              <span className="row__title">
+                <strong>{member.user.name}</strong>
+                {self && <span className="badge mono badge--muted row__tag">you</span>}
+                <span className="muted"> · {member.user.email}</span>
+              </span>
+              <span className="row__meta">
+                <RoleSelect
+                  organizationId={organizationId}
+                  userId={member.user.id}
+                  role={member.role}
+                  roles={assignableRoles}
+                  disabled={!manage || lastOwner}
+                />
+                <span className="muted" title={formatDateTime(member.createdAt)}>
+                  joined {formatRelative(member.createdAt)}
+                </span>
+                {(self || (manage && assignableRoles.includes(member.role))) && !lastOwner && (
+                  <RemoveMemberButton organizationId={organizationId} userId={member.user.id} self={self} />
+                )}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       {manage && (
         <>
-          <section className="panel">
+          <section className="panel panel--form">
             <div className="panel__head">
               <h2 className="title">Invite someone</h2>
-              <span className="mono muted">Creates a link to send them</span>
+              <span className="muted">Creates a link to send them</span>
             </div>
             <InviteForm organizationId={organizationId} roles={assignableRoles} />
           </section>
@@ -89,37 +85,24 @@ export default async function MembersPage({ params }: { params: Promise<{ organi
             <section className="panel">
               <div className="panel__head">
                 <h2 className="title">Open invitations</h2>
-                <span className="mono muted">{invitations.length}</span>
+                <span className="muted">{invitations.length}</span>
               </div>
-              <div className="table-wrap">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Email</th>
-                      <th>Role</th>
-                      <th>Invited by</th>
-                      <th>Expires</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {invitations.map(invitation => (
-                      <tr key={invitation.id}>
-                        <td className="mono-text">{invitation.email}</td>
-                        <td>
-                          <span className="badge mono badge--muted">{roleLabel(invitation.role)}</span>
-                        </td>
-                        <td className="muted">{invitation.invitedBy?.name ?? "—"}</td>
-                        <td className="muted" title={formatDateTime(invitation.expiresAt)}>
-                          {formatRelative(invitation.expiresAt)}
-                        </td>
-                        <td>
-                          <RevokeInvitationButton organizationId={organizationId} invitationId={invitation.id} />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="rows" role="list" aria-label="Open invitations">
+                {invitations.map(invitation => (
+                  <div className="row" key={invitation.id} role="listitem">
+                    <span className="row__title">
+                      {invitation.email}
+                      <span className="muted"> · invited by {invitation.invitedBy?.name ?? "someone who has since left"}</span>
+                    </span>
+                    <span className="row__meta">
+                      <span className="badge mono badge--muted">{roleLabel(invitation.role)}</span>
+                      <span className="muted" title={formatDateTime(invitation.expiresAt)}>
+                        expires {formatRelative(invitation.expiresAt)}
+                      </span>
+                      <RevokeInvitationButton organizationId={organizationId} invitationId={invitation.id} />
+                    </span>
+                  </div>
+                ))}
               </div>
             </section>
           )}
