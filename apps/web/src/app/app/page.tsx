@@ -2,8 +2,9 @@ import Link from "next/link";
 
 import { AppShell } from "../../components/app-shell";
 import { OrganizationForm } from "../../components/forms";
+import { Icon } from "../../components/icons";
 import { api } from "../../lib/api";
-import { formatDateTime } from "../../lib/format";
+import { formatDateTime, formatRelative } from "../../lib/format";
 
 export const metadata = { title: "Organizations" };
 
@@ -31,35 +32,25 @@ export default async function OrganizationsPage() {
       </div>
 
       {organizations.length === 0 ? (
-        <div className="empty mono-text">No organizations yet. Create the first one below.</div>
+        <div className="empty">No organizations yet. Create the first one below.</div>
       ) : (
-        <div className="panel">
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Slug</th>
-                  <th>Plan</th>
-                  <th>Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {organizations.map(organization => (
-                  <tr key={organization.id}>
-                    <td>
-                      <Link href={`/app/organizations/${organization.id}`}>{organization.name}</Link>
-                    </td>
-                    <td className="mono-text muted">{organization.slug}</td>
-                    <td>
-                      <span className="badge mono badge--muted">{organization.plan}</span>
-                    </td>
-                    <td className="muted">{formatDateTime(organization.createdAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="rows" role="list">
+          {organizations.map(organization => (
+            <Link className="row" href={`/app/organizations/${organization.id}`} key={organization.id} role="listitem">
+              <span className="row__glyph">
+                <Icon name="organization" />
+              </span>
+              <span className="row__title">
+                <strong>{organization.name}</strong> <span className="mono-text muted">{organization.slug}</span>
+              </span>
+              <span className="row__meta">
+                <span className="badge mono badge--muted">{organization.plan}</span>
+                <span className="muted" title={formatDateTime(organization.createdAt)}>
+                  {formatRelative(organization.createdAt)}
+                </span>
+              </span>
+            </Link>
+          ))}
         </div>
       )}
 

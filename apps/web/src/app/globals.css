@@ -621,6 +621,37 @@ summary::-webkit-details-marker {
   width: 28px;
 }
 
+/* Segmented control: a row of small ghost buttons in one bordered pill; the current one is filled. */
+.seg,
+.page__head .seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  flex: none;
+}
+
+.seg .btn {
+  min-height: 24px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 4px;
+}
+
+.seg .btn:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+
+.seg .btn[aria-current="page"] {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+
 .btn .mono {
   letter-spacing: 0;
   text-transform: none;
