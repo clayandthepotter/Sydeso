@@ -58,7 +58,7 @@ export function WorkspaceForm({ organizationId }: { organizationId: string }) {
         <button className="btn btn--ghost" type="submit" disabled={pending}>
           Add workspace
         </button>
-        {state.ok && <span className="mono muted">Added</span>}
+        {state.ok && <span className="hint">Added</span>}
       </div>
     </form>
   );
@@ -121,7 +121,7 @@ export function FeatureForm({ projectId }: { projectId: string }) {
         <button className="btn btn--accent" type="submit" disabled={pending}>
           {pending ? "Creating…" : "Create feature request"}
         </button>
-        <span className="mono muted">Stored as the feature_request artifact and starts a run in Backlog.</span>
+        <span className="hint">Stored as the feature_request artifact and starts a run in Backlog.</span>
       </div>
     </form>
   );

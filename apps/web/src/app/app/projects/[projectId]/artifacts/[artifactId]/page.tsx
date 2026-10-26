@@ -28,8 +28,8 @@ export default async function ArtifactPage({ params }: { params: Promise<{ proje
     <>
       <div className="page__head">
         <div>
-          <p className="mono muted">
-            <Link href={`/app/projects/${projectId}/artifacts`}>Artifacts</Link> / {artifact.type} v{artifact.version}
+          <p className="hint">
+            <Link href={`/app/projects/${projectId}/artifacts`}>Artifacts</Link> / <span className="mono-text">{artifact.type}</span> v{artifact.version}
           </p>
           <h1 className="display">{artifact.title}</h1>
         </div>

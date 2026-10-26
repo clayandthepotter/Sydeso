@@ -11,7 +11,15 @@ export const metadata: Metadata = {
 export default function DesignLockPage() {
   return (
     <AppShell
-      groups={[{ label: "Sydeso", items: [{ href: "/app", label: "Organizations", exact: true }, { href: "/app/design-lock", label: "Design lock" }] }]}
+      groups={[
+        {
+          label: "Sydeso",
+          items: [
+            { href: "/app", label: "Organizations", icon: "organization", exact: true },
+            { href: "/app/design-lock", label: "Design lock", icon: "design" },
+          ],
+        },
+      ]}
       crumbs={[{ href: "/app", label: "Sydeso" }, { label: "Design lock" }]}
     >
       <div className="page__head">

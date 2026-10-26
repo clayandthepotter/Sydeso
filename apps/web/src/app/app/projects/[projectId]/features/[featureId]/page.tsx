@@ -43,8 +43,8 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
     <>
       <div className="page__head">
         <div>
-          <p className="mono muted">
-            Feature {shortId(feature.id)} · created {formatDateTime(feature.createdAt)}
+          <p className="hint">
+            Feature <span className="mono-text">{shortId(feature.id)}</span> · created {formatDateTime(feature.createdAt)}
           </p>
           <h1 className="display">{feature.title}</h1>
         </div>
@@ -166,7 +166,7 @@ export default async function FeaturePage({ params }: { params: Promise<{ projec
                     .filter(job => job.error)
                     .map(job => (
                       <div key={job.id}>
-                        <p className="mono muted">Error · attempt {job.attempt}</p>
+                        <p className="hint">Error · attempt {job.attempt}</p>
                         <JsonView value={job.error} />
                       </div>
                     ))}

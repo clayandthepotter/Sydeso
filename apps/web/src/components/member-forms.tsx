@@ -98,7 +98,7 @@ export function RoleSelect({
         Save
       </button>
       {state.error && <span className="mono-text" style={{ color: "var(--alert)" }}>{state.error}</span>}
-      {state.ok && <span className="mono muted">Saved</span>}
+      {state.ok && <span className="hint">Saved</span>}
     </form>
   );
 }
