@@ -538,6 +538,15 @@ summary::-webkit-details-marker {
   max-width: 72ch;
 }
 
+/* badges and buttons at the right of a page head */
+.page__actions,
+.page__head > .page__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+}
+
 /* ---- buttons ---- */
 
 .btn {
@@ -916,6 +925,7 @@ details[open] > summary.mono::before {
 
 .rows {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-l);
@@ -1069,6 +1079,44 @@ a.row:hover {
 
 .props__row dd.wrap {
   white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+  padding: 0.35rem 0;
+}
+
+.props__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 100%;
+}
+
+.props__value .row__glyph {
+  width: 14px;
+}
+
+/* rows inside a panel share the panel's border and background */
+.panel .rows {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.panel .rows:not(:last-child) {
+  border-bottom: 1px solid var(--line);
+}
+
+.panel .rows .row:last-child {
+  border-bottom: 0;
+}
+
+.row--current {
+  background: var(--surface-2);
+}
+
+.row__title .muted svg {
+  vertical-align: -2px;
+  margin: 0 0.15rem;
 }
 
 /* ---- badges ---- */
