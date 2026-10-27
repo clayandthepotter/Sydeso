@@ -50,10 +50,10 @@ export function ArtifactForm({ workflowRunId, projectId, featureId }: { workflow
         </div>
       </div>
       <div className="form__row" role="radiogroup" aria-label="Content">
-        <label className="mono" style={{ display: "inline-flex", gap: "0.4rem", alignItems: "center" }}>
+        <label className="hint" style={{ display: "inline-flex", gap: "0.4rem", alignItems: "center" }}>
           <input type="radio" name="content-mode" checked={mode === "json"} onChange={() => setMode("json")} /> JSON content
         </label>
-        <label className="mono" style={{ display: "inline-flex", gap: "0.4rem", alignItems: "center" }}>
+        <label className="hint" style={{ display: "inline-flex", gap: "0.4rem", alignItems: "center" }}>
           <input type="radio" name="content-mode" checked={mode === "file"} onChange={() => setMode("file")} /> File upload
         </label>
       </div>
@@ -77,7 +77,7 @@ export function ArtifactForm({ workflowRunId, projectId, featureId }: { workflow
         <button className="btn btn--ghost" type="submit" disabled={pending}>
           {pending ? "Saving…" : "Add artifact"}
         </button>
-        {state.ok && <span className="mono muted">Added as a new version</span>}
+        {state.ok && <span className="hint">Added as a new version</span>}
       </div>
     </form>
   );

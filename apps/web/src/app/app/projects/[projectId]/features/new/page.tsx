@@ -15,7 +15,7 @@ export default async function NewFeaturePage({ params }: { params: Promise<{ pro
           </p>
         </div>
       </div>
-      <section className="panel">
+      <section className="panel panel--form">
         <div className="panel__body">
           <FeatureForm projectId={projectId} />
         </div>

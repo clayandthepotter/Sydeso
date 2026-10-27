@@ -103,6 +103,15 @@ The marketing site lives in the separate `sydeso-site` repository (Astro on Clou
 
 ## Product UI (apps/web)
 
+Daily-work redesign (Linear density, Sydeso palette); rules in `docs/brand/product-ui-guide.md`.
+
+- [x] Product UI guide: tokens, type, shell, components.
+- [x] Shell: tokens, sidebar with organization switcher, primary action, ⌘K go-to, icon navigation, topbar.
+- [x] List pages as compact rows (organizations, projects, features list with board view, artifacts).
+- [x] Detail pages with a properties panel (feature, artifact).
+- [x] Forms, members, auth pages and the design-lock generator on the new primitives.
+- [ ] Runner and audit tables as rows once there is live data to shape them around.
+
 - [x] App shell with organization, workspace and project navigation.
 - [x] Organization, workspace and project creation forms against the API.
 - [x] Features board by workflow state.

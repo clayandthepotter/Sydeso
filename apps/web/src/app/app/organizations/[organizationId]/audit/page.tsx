@@ -19,7 +19,7 @@ export default async function AuditPage({ params }: { params: Promise<{ organiza
       </div>
 
       {entries.length === 0 ? (
-        <div className="empty mono-text">Nothing recorded yet. The first feature request writes the first entry.</div>
+        <div className="empty">Nothing recorded yet. The first feature request writes the first entry.</div>
       ) : (
         <div className="panel">
           <div className="table-wrap">

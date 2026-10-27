@@ -43,7 +43,7 @@ export function TransitionPanel({
       {options.map(option => (
         <button
           key={option.to}
-          className={`btn ${option.kind === "approve" ? "btn--accent" : option.kind === "escalate" ? "btn--alert" : "btn--ghost"}`}
+          className={`btn ${option.kind === "approve" ? "btn--accent" : option.kind === "escalate" ? "btn--alert" : ""}`}
           type="submit"
           name="toState"
           value={option.to}
@@ -51,7 +51,7 @@ export function TransitionPanel({
           title={option.agentType ? `Queues a ${option.agentType} job` : undefined}
         >
           {option.label}
-          {option.agentType && <span className="mono">· {option.agentType} job</span>}
+          {option.agentType && <span className="mono">{option.agentType} job</span>}
         </button>
       ))}
       {state.error && <p className="notice notice--error mono-text">{state.error}</p>}

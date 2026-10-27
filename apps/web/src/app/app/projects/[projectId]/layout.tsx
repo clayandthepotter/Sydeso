@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -30,35 +29,39 @@ export default async function ProjectLayout({
 
   return (
     <AppShell
+      organizationId={project.organizationId}
       context={{ kind: workspace ? `${organization?.name ?? "Organization"} / ${workspace.name}` : "Project", name: project.name }}
       groups={[
         {
           label: "Project",
           items: [
-            { href: `${base}/features`, label: "Features", meta: String(project.features.length) },
-            { href: `${base}/artifacts`, label: "Artifacts" },
+            { href: `${base}/features`, label: "Features", icon: "feature", meta: String(project.features.length) },
+            { href: `${base}/artifacts`, label: "Artifacts", icon: "artifact" },
           ],
         },
         {
           label: "Organization",
           items: [
-            { href: orgBase, label: "Projects", exact: true },
-            { href: `${orgBase}/runners`, label: "Runners" },
-            { href: `${orgBase}/audit`, label: "Audit log" },
+            { href: orgBase, label: "Projects", icon: "project", exact: true },
+            { href: `${orgBase}/members`, label: "Members", icon: "members" },
+            { href: `${orgBase}/runners`, label: "Runners", icon: "runner" },
+            { href: `${orgBase}/audit`, label: "Audit log", icon: "audit" },
           ],
         },
-        { label: "Sydeso", items: [{ href: "/app", label: "Organizations", exact: true }, { href: "/app/design-lock", label: "Design lock" }] },
+        {
+          label: "Sydeso",
+          items: [
+            { href: "/app", label: "Organizations", icon: "organization", exact: true },
+            { href: "/app/design-lock", label: "Design lock", icon: "design" },
+          ],
+        },
       ]}
       crumbs={[
         { href: "/app", label: "Organizations" },
         { href: orgBase, label: organization?.name ?? "Organization" },
         { href: `${base}/features`, label: project.name },
       ]}
-      actions={
-        <Link className="btn btn--accent" href={`${base}/features/new`}>
-          New feature request
-        </Link>
-      }
+      primary={{ href: `${base}/features/new`, label: "New feature" }}
     >
       {children}
     </AppShell>
