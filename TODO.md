@@ -103,6 +103,18 @@ The marketing site lives in the separate `sydeso-site` repository (Astro on Clou
 
 ## Product UI (apps/web)
 
+User process map first, then the UI is reworked against it: `docs/product/user-process-map.md`.
+
+- [ ] Review and settle the open questions in the user process map.
+- [ ] Home as an inbox (Waiting on you, In progress, Recent); organizations move to Settings.
+- [ ] Request page as a session: step blocks, activity lines, live timers, borderless accordions.
+- [ ] Decision row: Approve / Reject with note, overflow for Escalate and Regenerate.
+- [ ] User vocabulary and status labels applied everywhere.
+- [ ] New request as one text area; sign-up flows into repository connection and the first request.
+- [ ] Needs you page section with cause and actions.
+- [ ] PWA: manifest, service worker, push notifications, badge; email fallback.
+- [ ] Settings gathers Organization, Members, Machines, Audit log.
+
 Daily-work redesign (Linear density, Sydeso palette); rules in `docs/brand/product-ui-guide.md`.
 
 - [x] Product UI guide: tokens, type, shell, components.
