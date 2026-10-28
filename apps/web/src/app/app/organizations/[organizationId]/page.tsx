@@ -56,7 +56,7 @@ export default async function OrganizationPage({ params }: { params: Promise<{ o
               {projects.map(project => {
                 const repository = repositoryPath(project.repositoryUrl);
                 return (
-                  <Link className="row" href={`/app/projects/${project.id}/features`} key={project.id}>
+                  <Link className="row" href={`/app/projects/${project.id}/requests`} key={project.id}>
                     <span className="row__glyph">
                       <Icon name="project" />
                     </span>

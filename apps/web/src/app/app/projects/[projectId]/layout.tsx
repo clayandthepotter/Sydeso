@@ -29,39 +29,33 @@ export default async function ProjectLayout({
 
   return (
     <AppShell
-      organizationId={project.organizationId}
+      projectId={projectId}
       context={{ kind: workspace ? `${organization?.name ?? "Organization"} / ${workspace.name}` : "Project", name: project.name }}
       groups={[
         {
           label: "Project",
           items: [
-            { href: `${base}/features`, label: "Features", icon: "feature", meta: String(project.features.length) },
-            { href: `${base}/artifacts`, label: "Artifacts", icon: "artifact" },
+            { href: "/app", label: "Home", icon: "menu", exact: true },
+            { href: `${base}/requests`, label: "Requests", icon: "feature", meta: String(project.features.length) },
+            { href: `${base}/documents`, label: "Documents", icon: "artifact" },
           ],
         },
         {
-          label: "Organization",
+          label: "Settings",
           items: [
-            { href: orgBase, label: "Projects", icon: "project", exact: true },
+            { href: orgBase, label: "Organization", icon: "organization", exact: true },
             { href: `${orgBase}/members`, label: "Members", icon: "members" },
-            { href: `${orgBase}/runners`, label: "Runners", icon: "runner" },
+            { href: `${orgBase}/machines`, label: "Machines", icon: "runner" },
             { href: `${orgBase}/audit`, label: "Audit log", icon: "audit" },
-          ],
-        },
-        {
-          label: "Sydeso",
-          items: [
-            { href: "/app", label: "Organizations", icon: "organization", exact: true },
             { href: "/app/design-lock", label: "Design lock", icon: "design" },
           ],
         },
       ]}
       crumbs={[
-        { href: "/app", label: "Organizations" },
-        { href: orgBase, label: organization?.name ?? "Organization" },
-        { href: `${base}/features`, label: project.name },
+        { href: "/app", label: "Home" },
+        { href: `${base}/requests`, label: project.name },
       ]}
-      primary={{ href: `${base}/features/new`, label: "New feature" }}
+      primary={{ href: `${base}/requests/new`, label: "New request" }}
     >
       {children}
     </AppShell>

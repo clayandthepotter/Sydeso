@@ -15,12 +15,13 @@ export default function DesignLockPage() {
         {
           label: "Sydeso",
           items: [
-            { href: "/app", label: "Organizations", icon: "organization", exact: true },
+            { href: "/app", label: "Home", icon: "menu", exact: true },
+            { href: "/app/organizations", label: "Organizations", icon: "organization", exact: true },
             { href: "/app/design-lock", label: "Design lock", icon: "design" },
           ],
         },
       ]}
-      crumbs={[{ href: "/app", label: "Sydeso" }, { label: "Design lock" }]}
+      crumbs={[{ href: "/app", label: "Home" }, { label: "Design lock" }]}
     >
       <div className="page__head">
         <div>

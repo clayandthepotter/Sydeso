@@ -1155,6 +1155,284 @@ a.row:hover {
   margin: 0 0.15rem;
 }
 
+/* ---- request page: status line, request text, session ---- */
+
+.status-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 13px;
+}
+
+.status-line .row__glyph {
+  width: 16px;
+}
+
+.timer {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  color: var(--ink-2);
+}
+
+.request-text {
+  max-width: 72ch;
+}
+
+.session {
+  display: grid;
+  gap: 0;
+}
+
+.block {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.block:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.block__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 24px;
+  font-size: 13px;
+}
+
+.block__actor {
+  font-weight: 500;
+}
+
+.block__step::before {
+  content: "·";
+  margin-right: 0.5rem;
+  color: var(--muted);
+}
+
+.block__time {
+  margin-left: auto;
+  flex: none;
+}
+
+.block--current .block__actor,
+.block--current .block__step {
+  color: var(--ink);
+}
+
+.block:not(.block--current) .block__head {
+  color: var(--ink-2);
+}
+
+.block__lines {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 calc(16px + 0.5rem);
+  display: grid;
+  gap: 0.3rem;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.line--muted {
+  color: var(--muted);
+}
+
+.line--danger {
+  color: var(--danger);
+}
+
+.block__summary {
+  margin: 0;
+  padding-left: calc(16px + 0.5rem);
+  font-size: 13px;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.block .fold,
+.block .evidence,
+.block .decision {
+  margin-left: calc(16px + 0.5rem);
+}
+
+.evidence {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.evidence__group {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.evidence__list {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  display: grid;
+  gap: 0.2rem;
+  font-size: 13px;
+}
+
+.evidence__list.mono-text {
+  font-size: 12px;
+}
+
+/* ---- fold: a borderless accordion ---- */
+
+.fold {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.fold__head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 24px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  width: fit-content;
+}
+
+.fold__head::-webkit-details-marker {
+  display: none;
+}
+
+.fold__head svg {
+  transition: transform var(--t-fast) ease;
+}
+
+.fold[open] > .fold__head svg {
+  transform: rotate(90deg);
+}
+
+.fold__head:hover {
+  color: var(--ink);
+}
+
+.fold__body {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* ---- decision row ---- */
+
+.decision {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 0.25rem;
+}
+
+.decision .field {
+  max-width: 560px;
+}
+
+.decision__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.decision__choice {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.decision__choice .btn {
+  min-width: 96px;
+}
+
+/* ---- overflow menu ---- */
+
+.more {
+  position: relative;
+}
+
+.more > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.more__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  min-width: 180px;
+  padding: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: grid;
+}
+
+.decision__row .more__menu {
+  right: auto;
+  left: 0;
+}
+
+.more__menu .menu__item {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.more__menu .menu__item:hover {
+  background: var(--surface-3);
+}
+
+/* ---- needs you ---- */
+
+.needs {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 74, 42, 0.35);
+  border-radius: var(--radius-l);
+  background: var(--danger-soft);
+}
+
+.needs__cause {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.needs .fold__head {
+  color: var(--ink-2);
+}
+
 /* ---- badges ---- */
 
 .badge {

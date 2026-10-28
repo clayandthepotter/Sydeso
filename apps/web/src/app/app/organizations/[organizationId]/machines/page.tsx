@@ -1,10 +1,10 @@
-import { RunnerForm } from "../../../../../components/forms";
+import { MachineForm } from "../../../../../components/forms";
 import { JobBadge, RunnerBadge, StateBadge } from "../../../../../components/state-badge";
 import { api } from "../../../../../lib/api";
 import { formatDateTime, formatRelative } from "../../../../../lib/format";
 import { shortId } from "../../../../../lib/workflow";
 
-export const metadata = { title: "Runners" };
+export const metadata = { title: "Machines" };
 
 export default async function RunnersPage({ params }: { params: Promise<{ organizationId: string }> }) {
   const { organizationId } = await params;
@@ -15,23 +15,23 @@ export default async function RunnersPage({ params }: { params: Promise<{ organi
     <>
       <div className="page__head">
         <div>
-          <h1 className="display">Runners</h1>
+          <h1 className="display">Machines</h1>
           <p className="muted">
-            {runners.length} registered · {online} online. Runners claim queued jobs whose required capabilities they
+            {runners.length} connected · {online} online. Machines run the agents; each one claims the jobs whose capabilities it
             advertise.
           </p>
         </div>
       </div>
 
       {runners.length === 0 ? (
-        <div className="empty">No runners registered. Register one below, then start it with the token.</div>
+        <div className="empty">No machines connected. Add one below, then start it with the token.</div>
       ) : (
         <div className="panel">
           <div className="table-wrap">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Runner</th>
+                  <th>Machine</th>
                   <th>Type</th>
                   <th>Status</th>
                   <th>Version</th>
@@ -89,10 +89,10 @@ export default async function RunnersPage({ params }: { params: Promise<{ organi
 
       <section className="panel panel--form">
         <div className="panel__head">
-          <h2 className="title">Register a runner</h2>
+          <h2 className="title">Add a machine</h2>
           <span className="muted">Returns a bearer token once</span>
         </div>
-        <RunnerForm organizationId={organizationId} />
+        <MachineForm organizationId={organizationId} />
       </section>
     </>
   );

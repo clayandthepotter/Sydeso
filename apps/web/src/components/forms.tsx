@@ -3,9 +3,9 @@
 import { useActionState } from "react";
 
 import {
-  createFeatureAction,
   createOrganizationAction,
   createProjectAction,
+  createRequestAction,
   createWorkspaceAction,
   registerRunnerAction,
   type ActionState,
@@ -13,7 +13,7 @@ import {
 } from "../app/app/actions";
 
 function ErrorNotice({ error }: { error?: string }) {
-  return error ? <p className="notice notice--error mono-text">{error}</p> : null;
+  return error ? <p className="notice notice--error">{error}</p> : null;
 }
 
 export function OrganizationForm() {
@@ -21,15 +21,11 @@ export function OrganizationForm() {
   return (
     <form className="form" action={action}>
       <div className="field">
-        <label className="mono" htmlFor="org-name">
-          Organization name
-        </label>
+        <label htmlFor="org-name">Organization name</label>
         <input id="org-name" className="input" name="name" required autoComplete="organization" />
       </div>
       <div className="field">
-        <label className="mono" htmlFor="org-slug">
-          Slug (optional)
-        </label>
+        <label htmlFor="org-slug">Slug (optional)</label>
         <input id="org-slug" className="input" name="slug" pattern="[a-z0-9-]+" />
       </div>
       <ErrorNotice error={state.error} />
@@ -48,14 +44,12 @@ export function WorkspaceForm({ organizationId }: { organizationId: string }) {
     <form className="form" action={action}>
       <input type="hidden" name="organizationId" value={organizationId} />
       <div className="field">
-        <label className="mono" htmlFor="ws-name">
-          Workspace name
-        </label>
+        <label htmlFor="ws-name">Workspace name</label>
         <input id="ws-name" className="input" name="name" required />
       </div>
       <ErrorNotice error={state.error} />
       <div className="form__row">
-        <button className="btn btn--ghost" type="submit" disabled={pending}>
+        <button className="btn" type="submit" disabled={pending}>
           Add workspace
         </button>
         {state.ok && <span className="hint">Added</span>}
@@ -71,20 +65,16 @@ export function ProjectForm({ organizationId, workspaceId }: { organizationId: s
       <input type="hidden" name="organizationId" value={organizationId} />
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <div className="field">
-        <label className="mono" htmlFor={`project-name-${workspaceId}`}>
-          Project name
-        </label>
+        <label htmlFor={`project-name-${workspaceId}`}>Project name</label>
         <input id={`project-name-${workspaceId}`} className="input" name="name" required />
       </div>
       <div className="field">
-        <label className="mono" htmlFor={`project-repo-${workspaceId}`}>
-          Repository URL (optional)
-        </label>
+        <label htmlFor={`project-repo-${workspaceId}`}>Repository URL (optional)</label>
         <input id={`project-repo-${workspaceId}`} className="input" name="repositoryUrl" type="url" placeholder="https://github.com/…" />
       </div>
       <ErrorNotice error={state.error} />
       <div className="form__row">
-        <button className="btn btn--ghost" type="submit" disabled={pending}>
+        <button className="btn" type="submit" disabled={pending}>
           Add project
         </button>
       </div>
@@ -92,51 +82,45 @@ export function ProjectForm({ organizationId, workspaceId }: { organizationId: s
   );
 }
 
-export function FeatureForm({ projectId }: { projectId: string }) {
-  const [state, action, pending] = useActionState<ActionState, FormData>(createFeatureAction, {});
+/** One text area. The title comes from the first line; the request starts when it is submitted. */
+export function RequestForm({ projectId, repositoryMissing = false }: { projectId: string; repositoryMissing?: boolean }) {
+  const [state, action, pending] = useActionState<ActionState, FormData>(createRequestAction, {});
   return (
     <form className="form" action={action}>
       <input type="hidden" name="projectId" value={projectId} />
       <div className="field">
-        <label className="mono" htmlFor="feature-title">
-          Title
-        </label>
-        <input id="feature-title" className="input" name="title" required maxLength={160} />
-      </div>
-      <div className="field">
-        <label className="mono" htmlFor="feature-description">
-          Feature request
-        </label>
+        <label htmlFor="request-description">Describe what you want built</label>
         <textarea
-          id="feature-description"
+          id="request-description"
           className="input"
           name="description"
           required
           rows={8}
-          placeholder="What should exist when this run reaches Released, and for whom."
+          autoFocus
+          placeholder="Add a dark mode toggle to the settings page."
         />
       </div>
       <ErrorNotice error={state.error} />
       <div className="form__row">
         <button className="btn btn--accent" type="submit" disabled={pending}>
-          {pending ? "Creating…" : "Create feature request"}
+          {pending ? "Submitting…" : "Submit"}
         </button>
-        <span className="hint">Stored as the feature_request artifact and starts a run in Backlog.</span>
       </div>
+      {repositoryMissing && <p className="hint">No repository connected. The build step needs one.</p>}
     </form>
   );
 }
 
-export function RunnerForm({ organizationId }: { organizationId: string }) {
+export function MachineForm({ organizationId }: { organizationId: string }) {
   const [state, action, pending] = useActionState<RunnerActionState, FormData>(registerRunnerAction, {});
   return (
     <div className="panel__body">
       {state.runnerToken ? (
         <div className="token">
-          <span className="mono">Runner token for {state.runnerName}. Shown once.</span>
+          <span className="mono">Token for {state.runnerName}. Shown once.</span>
           <code>{state.runnerToken}</code>
-          <span className="mono-text">
-            Start the runner with <code>SYDESO_RUNNER_TOKEN</code> set to this value. It is stored hashed and cannot be
+          <span className="hint">
+            Start the machine with <code>SYDESO_RUNNER_TOKEN</code> set to this value. It is stored hashed and cannot be
             recovered.
           </span>
         </div>
@@ -144,32 +128,24 @@ export function RunnerForm({ organizationId }: { organizationId: string }) {
       <form className="form" action={action}>
         <input type="hidden" name="organizationId" value={organizationId} />
         <div className="field">
-          <label className="mono" htmlFor="runner-name">
-            Name
-          </label>
+          <label htmlFor="runner-name">Name</label>
           <input id="runner-name" className="input" name="name" required placeholder="build-01" />
         </div>
         <div className="form__row">
           <div className="field">
-            <label className="mono" htmlFor="runner-type">
-              Type
-            </label>
+            <label htmlFor="runner-type">Type</label>
             <select id="runner-type" className="input" name="type" defaultValue="self_hosted">
-              <option value="self_hosted">self_hosted</option>
-              <option value="managed">managed</option>
+              <option value="self_hosted">Self-hosted</option>
+              <option value="managed">Managed</option>
             </select>
           </div>
           <div className="field">
-            <label className="mono" htmlFor="runner-version">
-              Version
-            </label>
+            <label htmlFor="runner-version">Version</label>
             <input id="runner-version" className="input" name="version" required placeholder="0.1.0" />
           </div>
         </div>
         <div className="field">
-          <label className="mono" htmlFor="runner-capabilities">
-            Capabilities, comma separated
-          </label>
+          <label htmlFor="runner-capabilities">Capabilities, comma separated</label>
           <input
             id="runner-capabilities"
             className="input"
@@ -180,7 +156,7 @@ export function RunnerForm({ organizationId }: { organizationId: string }) {
         <ErrorNotice error={state.error} />
         <div className="form__row">
           <button className="btn btn--accent" type="submit" disabled={pending}>
-            Register runner
+            Add machine
           </button>
         </div>
       </form>

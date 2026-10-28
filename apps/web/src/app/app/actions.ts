@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { artifactTypeSchema, organizationRoleSchema, workflowStateSchema } from "@sydeso/api-contracts";
 
 import { api, ApiError } from "../../lib/api";
+import { titleFrom } from "../../lib/requests";
 
 export interface ActionState {
   error?: string;
@@ -76,41 +77,55 @@ export async function createProjectAction(_prev: ActionState, formData: FormData
     return { error: messageOf(error) };
   }
   revalidatePath(`/app/organizations/${organizationId}`);
-  redirect(`/app/projects/${projectId}/features`);
+  revalidatePath("/app");
+  redirect(`/app/projects/${projectId}/requests`);
 }
 
-export async function createFeatureAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+export async function createRequestAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const projectId = text(formData, "projectId");
-  const title = text(formData, "title");
   const description = text(formData, "description");
-  if (!title || !description) return { error: "Title and description are required" };
-  let featureId: string;
+  if (description.split(/\s+/).filter(Boolean).length < 3) return { error: "Write at least one sentence" };
+  const title = titleFrom(description);
+  let requestId: string;
   try {
     const result = await api.createFeature(projectId, { title, description });
-    featureId = result.feature.id;
+    requestId = result.feature.id;
   } catch (error) {
     return { error: messageOf(error) };
   }
-  revalidatePath(`/app/projects/${projectId}/features`);
-  redirect(`/app/projects/${projectId}/features/${featureId}`);
+  revalidatePath(`/app/projects/${projectId}/requests`);
+  revalidatePath("/app");
+  redirect(`/app/projects/${projectId}/requests/${requestId}`);
 }
 
+const defaultReasons: Record<string, string> = {
+  stop: "Stopped",
+  escalate: "Escalated",
+  regenerate: "Regenerate",
+  start: "Started",
+};
+
+/** A decision from the decision row: "toState|kind", with the note as the reason when given. */
 export async function transitionAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const workflowRunId = text(formData, "workflowRunId");
   const projectId = text(formData, "projectId");
-  const featureId = text(formData, "featureId");
-  const parsed = workflowStateSchema.safeParse(text(formData, "toState"));
-  if (!parsed.success) return { error: "Unknown target state" };
+  const requestId = text(formData, "requestId");
+  const [to, kind] = text(formData, "decision").split("|");
+  const parsed = workflowStateSchema.safeParse(to);
+  if (!parsed.success) return { error: "Unknown decision" };
+  const note = text(formData, "reason");
+  if (kind === "reject" && !note) return { error: "A note is required to reject" };
   try {
     await api.transitionWorkflowRun(workflowRunId, {
       toState: parsed.data,
-      reason: text(formData, "reason") || undefined,
+      reason: note || defaultReasons[kind ?? ""] || undefined,
     });
   } catch (error) {
     return { error: messageOf(error) };
   }
-  revalidatePath(`/app/projects/${projectId}/features/${featureId}`);
-  revalidatePath(`/app/projects/${projectId}/features`);
+  revalidatePath(`/app/projects/${projectId}/requests/${requestId}`);
+  revalidatePath(`/app/projects/${projectId}/requests`);
+  revalidatePath("/app");
   return { ok: true };
 }
 
@@ -185,7 +200,7 @@ export async function revokeInvitationAction(_prev: ActionState, formData: FormD
 export async function createArtifactAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const workflowRunId = text(formData, "workflowRunId");
   const projectId = text(formData, "projectId");
-  const featureId = text(formData, "featureId");
+  const requestId = text(formData, "requestId");
   const title = text(formData, "title");
   const type = artifactTypeSchema.safeParse(text(formData, "type"));
   if (!title || !type.success) return { error: "Type and title are required" };
@@ -214,8 +229,8 @@ export async function createArtifactAction(_prev: ActionState, formData: FormDat
     return { error: messageOf(error) };
   }
 
-  revalidatePath(`/app/projects/${projectId}/features/${featureId}`);
-  revalidatePath(`/app/projects/${projectId}/artifacts`);
+  revalidatePath(`/app/projects/${projectId}/requests/${requestId}`);
+  revalidatePath(`/app/projects/${projectId}/documents`);
   return { ok: true };
 }
 
@@ -231,7 +246,7 @@ export async function registerRunnerAction(_prev: RunnerActionState, formData: F
     .filter(Boolean);
   try {
     const result = await api.registerRunner(organizationId, { name, type, version, capabilities });
-    revalidatePath(`/app/organizations/${organizationId}/runners`);
+    revalidatePath(`/app/organizations/${organizationId}/machines`);
     return { ok: true, runnerToken: result.runnerToken, runnerName: result.runner.name };
   } catch (error) {
     return { error: messageOf(error) };
