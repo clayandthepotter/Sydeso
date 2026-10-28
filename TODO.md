@@ -105,15 +105,25 @@ The marketing site lives in the separate `sydeso-site` repository (Astro on Clou
 
 User process map first, then the UI is reworked against it: `docs/product/user-process-map.md`.
 
-- [ ] Review and settle the open questions in the user process map.
+- [x] Review and settle the open questions in the user process map (0.3.0, approved for build).
 - [ ] Home as an inbox (Waiting on you, In progress, Recent); organizations move to Settings.
 - [ ] Request page as a session: step blocks, activity lines, live timers, borderless accordions.
 - [ ] Decision row: Approve / Reject with note, overflow for Escalate and Regenerate.
-- [ ] User vocabulary and status labels applied everywhere.
-- [ ] New request as one text area; sign-up flows into repository connection and the first request.
+- [ ] User vocabulary and status labels applied everywhere (Request, Machine, Planning, Approve plan).
+- [ ] New request as one text area with the conditional trial and repository lines.
 - [ ] Needs you page section with cause and actions.
+- [ ] Engine: Research, PRD and PRD approval states; Researcher and Planner agents; design approval as a project setting.
+- [ ] Engine: live activity stream per job.
+- [ ] Sign-up flows into repository connection and the first request; default hierarchy and managed machine provisioned silently.
+- [ ] Sydeso-hosted repositories for projects without one, with the in-app file view and clone URL.
+- [ ] Project settings: auto-start, require design approval, allow approve with failing tests, fix attempts, repository, preview deployment.
+- [ ] Follow-up requests, linked on both ends.
+- [ ] Live preview at Approve result: project preview deployment, else served from the testing machine.
+- [ ] Trial: 14 days premium on a platform key with a token budget; Add your API key / Choose a plan when it ends.
+- [ ] Automatic release detection from the GitHub merge webhook; Merge button on hosted repositories.
 - [ ] PWA: manifest, service worker, push notifications, badge; email fallback.
-- [ ] Settings gathers Organization, Members, Machines, Audit log.
+- [ ] Settings gathers Account, Organization, Members, Machines, Audit log.
+- [ ] Later: splitting large requests into children; project context page.
 
 Daily-work redesign (Linear density, Sydeso palette); rules in `docs/brand/product-ui-guide.md`.
 

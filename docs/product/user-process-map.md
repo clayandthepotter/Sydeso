@@ -1,9 +1,11 @@
 # Product - User Process Map
 
-Version: 0.2.0
-Status: Draft for review
+Version: 0.3.0
+Status: Approved for build
 Owner: Product
 Last Updated: 2026-10-28
+
+Changes from 0.2.0: the trial is 14 days of the premium plan with a token budget and an automatically provisioned managed machine; the live preview, follow-up requests and the in-app file view are in the first pass; no open questions remain.
 
 Changes from 0.1.0: Research and PRD mapped; one plain-language gate before code by default, the design gate optional per project; typical-duration lines removed; the ten open questions settled (see Decisions); projects without a repository get a Sydeso-hosted one; proposals added for a live preview at review, follow-up requests, splitting large requests, automatic release detection and a project context page.
 
@@ -167,7 +169,7 @@ A finished step collapses to its header row and a one-line summary. The current 
 One text area, "Describe what you want built", and the project if the user has more than one. One button, Submit. Below the button, one line only when it applies:
 
 - No repository on the project: "No repository connected. Changes are kept in Sydeso's repository for this project until you connect one." with a link to project settings.
-- On the trial key: "2 trial requests left." When none are left, Submit is replaced by "Add your API key" linking to Settings → Account.
+- On the trial, when under 20% of the token budget or under 3 days remain: "Trial: 3 days left" or "Trial: 14% of budget left". When either runs out, Submit is replaced by two buttons of equal weight, Add your API key and Choose a plan.
 - Auto-start off on the project: "Waits in Submitted until you press Start."
 
 The title is derived from the first line of the text, editable later. The user is not asked for a title.
@@ -178,7 +180,7 @@ Reached from the project switcher. Lists every request in the project, grouped b
 
 ## Settings
 
-Behind the gear in the sidebar footer. Tabs: Account (name, email, password, API key, notifications), Organization (name, plan, trial status), Members, Machines, Audit log. Workspaces appear only if the organization has more than one.
+Behind the gear in the sidebar footer. Tabs: Account (name, email, password, API key, notifications), Organization (name, plan, and during the trial: days left, budget used as a number, Choose a plan), Members, Machines, Audit log. Workspaces appear only if the organization has more than one.
 
 ---
 
@@ -202,7 +204,7 @@ Seen only when the project has auto-start off. With auto-start on, the default, 
 
 Edge cases:
 
-- No machine online with the needed capabilities. Start is allowed. The Planning block shows "Waiting for a machine" with the timer running and one line: "No machine is online. Connect one in Settings → Machines." The job stays queued; when a machine appears the line is replaced by activity. Accounts whose plan includes a managed machine never see this.
+- No machine online with the needed capabilities. Start is allowed. The Planning block shows "Waiting for a machine" with the timer running and one line: "No machine is online. Connect one in Settings → Machines." The job stays queued; when a machine appears the line is replaced by activity. Accounts on the trial or a plan with a managed machine never see this: the machine is provisioned automatically when the organization is created.
 
 ## Planning (research, then prd)
 
@@ -320,7 +322,7 @@ The second gate. It answers "is this what you wanted?" with the thing itself.
 
 | | |
 |---|---|
-| Sees | Status "Approve result". The block, in order: the verdict in numbers ("112 of 112 tests passed · 6 of 6 criteria met · 9 files changed"), the acceptance-criteria checklist with each item ticked or not, the preview link as one button, Open preview (see Proposals: live preview; until it exists, the screenshot strip stands in its place), the Files changed accordion, the Test results accordion, "Open the pull request" or "Open the branch", then the decision row. |
+| Sees | Status "Approve result". The block, in order: the verdict in numbers ("112 of 112 tests passed · 6 of 6 criteria met · 9 files changed"), the acceptance-criteria checklist with each item ticked or not, one button, Open preview (the project's preview deployment when one is connected, otherwise the branch served from the machine that ran the tests; the screenshot strip is shown beneath it either way), the Files changed accordion, the Test results accordion, "Open the pull request" or "Open the branch", then the decision row. |
 | System | Waiting. |
 | Asked | Approve or Reject. Optional note on Approve, required on Reject. Overflow: Escalate. |
 | Approve does | Moves to Ready. Cannot be undone; it is the end of the run. Under the button: "Marks the pull request ready for review." |
@@ -351,7 +353,7 @@ This is the moment the person remembers. It is quiet: one line, one link, the nu
 | | |
 |---|---|
 | Sees | Status "Released" with the merge date. |
-| Asked | Nothing. Overflow: Follow up (see Proposals). The request drops out of Recent after 14 days. |
+| Asked | Nothing. Overflow: Follow up, which opens New request with this request linked (see Follow-up requests). The request drops out of Recent after 14 days. |
 
 ## Needs you (escalated)
 
@@ -359,7 +361,7 @@ The only state where the page changes shape. The step indicator lights the escal
 
 | | |
 |---|---|
-| Sees | One line with the cause, in these fixed forms: "Stopped by [name]", "Escalated by [name]: [note]", "Tests still failing after 3 fix attempts", "Tests could not run: [cause]", "The [Researcher/Planner/Architect/Developer/Tester] failed: [one-line error]", "Machine [name] went offline during [step]", "Took too long. Stopped after [time]", "Could not reach the repository", "No changes were made", "The AI provider refused the request: [provider's message]", "Trial limit reached". Under it, an accordion with the raw detail. |
+| Sees | One line with the cause, in these fixed forms: "Stopped by [name]", "Escalated by [name]: [note]", "Tests still failing after 3 fix attempts", "Tests could not run: [cause]", "The [Researcher/Planner/Architect/Developer/Tester] failed: [one-line error]", "Machine [name] went offline during [step]", "Took too long. Stopped after [time]", "Could not reach the repository", "No changes were made", "The AI provider refused the request: [provider's message]", "Trial ended", "Trial budget used". Under it, an accordion with the raw detail. |
 | Asked | At most three buttons, chosen by cause: |
 
 | Cause | Buttons |
@@ -371,7 +373,7 @@ The only state where the page changes shape. The step indicator lights the escal
 | Could not reach the repository | Fix the connection (link to project settings) · Try again |
 | No changes were made | Reject with a note · Close request |
 | AI provider refused | Fix the API key (link to Settings → Account) · Try again |
-| Trial limit reached | Add your API key · Close request |
+| Trial ended, or trial budget used | Add your API key · Choose a plan |
 
 Approve anyway moves to Ready and is recorded as "Approved with failing tests by [name]". It is governed by the project setting "Allow approve with failing tests", on by default.
 
@@ -390,20 +392,24 @@ Close request marks the run closed, keeps everything, and removes it from Home. 
 
 1. Sign up: name, email, password. One screen.
 2. "Connect a repository" with the GitHub button and a Start without one link. Without one, Sydeso creates a repository for the project and says so in one line on the next screen.
-3. The New request form, with a muted example beneath the text area ("Add a dark mode toggle to the settings page") and the trial line, "3 trial requests left".
+3. The New request form, with a muted example beneath the text area ("Add a dark mode toggle to the settings page"). No trial line yet; it appears only when the trial is nearly used.
 4. On submit: the request page with the Planning block running.
 
 The organization is created with the user's name, the workspace with the organization's name, the project from the repository name or "First project". None of this is shown. All of it is renameable in Settings.
 
 What the first run skips and when it comes back:
 
-- No machine connected: the first request shows "Waiting for a machine" with the link, unless the plan includes a managed machine. Decision: the trial includes a managed machine, otherwise the first run stalls on the first screen that matters.
-- No API key: the first three requests run on a platform key. The form shows the count. When it reaches zero, Submit is replaced by Add your API key.
+- No machine: a managed machine is provisioned automatically with the organization, so the first request never waits for one. Self-hosted machines are an addition in Settings, not a requirement.
+- No API key: the trial runs on a platform key with a token budget for 14 days on the premium plan. Nothing is shown about it until under 20% of the budget or under 3 days remain. When either runs out, every Submit and every Try again is replaced by Add your API key and Choose a plan; running requests finish their current step and then stop with "Trial ended" or "Trial budget used" in Needs you.
 - No teammates: nothing prompts for them.
+
+## The trial
+
+Fourteen days of the premium plan with a token budget, starting at sign-up. The organization gets a managed machine, unlimited projects and every premium feature. The budget is spent by agent work and shown as a number only in Settings → Organization and in the New request line when it is nearly used. At the end of 14 days, or when the budget is used, the organization must either add its own API key or choose a paid plan before anything else runs. Nothing is deleted at the end of a trial; requests, documents and the hosted repository remain readable. The size of the token budget, and what an API key alone entitles the organization to after the 14 days, are pricing questions for `docs/product/roadmap.md`, not this document.
 
 ## A project without a repository
 
-Sydeso hosts a git repository for the project. The Developer commits to it exactly as it would to GitHub, so every change has a commit and a branch from the first request. The project's settings show the clone URL and Connect GitHub. When a repository is connected later, Sydeso pushes the hosted history to it and switches; the hosted copy is kept read-only for 30 days. Open repository on a request shows the branch in an in-app file view with the commit list. Decision: the in-app file view ships after the clone URL.
+Sydeso hosts a git repository for the project. The Developer commits to it exactly as it would to GitHub, so every change has a commit and a branch from the first request. The project's settings show the clone URL and Connect GitHub. When a repository is connected later, Sydeso pushes the hosted history to it and switches; the hosted copy is kept read-only for 30 days. Open repository on a request shows the branch in an in-app file view with the commit list; the clone URL is one click away on the same view. Both ship in the first pass.
 
 ## Inviting someone
 
@@ -518,27 +524,32 @@ Settled on 2026-10-28.
 5. Approve anyway on failing tests is a project setting, on by default.
 6. Close request is final. Reopening may come later from user feedback.
 7. Approving without opening any evidence is recorded in the audit log and not shown.
-8. The first three requests run on a platform key as a free trial. After that, the user adds their own key.
+8. The trial is 14 days of the premium plan on a platform key with a token budget. After that, the user adds their own key or chooses a plan. (Revised from "three requests" on 2026-10-28.)
 9. The thing the user submits is a Request.
 10. Runners are Machines.
 11. Typical durations are not shown anywhere.
 12. Research and PRD are mapped as one user step, Planning, with one gate, Approve plan. Design approval is a project setting, off by default.
+13. Live preview at Approve result uses the project's preview deployment when connected and the testing machine otherwise. Both in the first pass.
+14. Follow-up requests are in the first UI pass.
+15. The trial is measured by a token budget, not a request count.
+16. A managed machine is provisioned automatically for every new organization during the trial.
+17. The in-app file view for Sydeso-hosted repositories is in the first pass.
 
 ---
 
 # Proposals
 
-Changes to the model that this document recommends and that need a decision. Each says what the user gets and what it costs.
+Changes to the model beyond the core map. The first two are decided and in the first pass; the rest are scheduled as noted. Each says what the user gets and what it costs.
 
-## Live preview at Approve result
+## Live preview at Approve result (decided, first pass)
 
-The reviewer opens the feature running, on a URL, instead of looking at screenshots. The machine that ran the tests serves the branch for the life of the review, or the project's preview deployment (Vercel, Cloudflare) is linked when one exists. This is the single largest change to how the result gate feels: the user judges software by using it, which they can do, rather than by reading a report, which they often cannot. Cost: a preview-serving capability on machines, or a preview-deployment integration per project. Recommendation: build it; use the project's own preview deployment first because most repositories already have one.
+The reviewer opens the feature running, on a URL, instead of looking at screenshots. When the project has a preview deployment (Vercel, Cloudflare) connected, that URL is linked. Otherwise the machine that ran the tests serves the branch for the life of the review. This is the single largest change to how the result gate feels: the user judges software by using it, which they can do, rather than by reading a report, which they often cannot. Cost: a preview-deployment integration per project and a preview-serving capability on machines.
 
-## Follow-up requests
+## Follow-up requests (decided, first pass)
 
-From a Ready or Released request, Follow up opens the New request form with the original request linked. The Researcher starts from the previous plan, design and changes, so "the button is in the wrong place" takes a minute of planning, not ten. The new request shows "Follows [title]" in its properties and the old one lists its follow-ups. Cost: a parent link on requests and the Researcher reading linked requests. Recommendation: build it in the first UI pass; it is small and it is how people actually work.
+From a Ready or Released request, Follow up opens the New request form with the original request linked. The Researcher starts from the previous plan, design and changes, so "the button is in the wrong place" takes a minute of planning, not ten. The new request shows "Follows [title]" in its properties and the old one lists its follow-ups. Cost: a parent link on requests and the Researcher reading linked requests.
 
-## Splitting large requests
+## Splitting large requests (second pass)
 
 When the Planner judges a request too large for one run, the plan proposes a split into ordered child requests, each with its own acceptance criteria. The Approve plan gate shows the split as a list; Approve creates the children and runs them in order, each through its own build, test and review. The parent shows "2 of 5 done". Cost: parent and child requests, ordering, and a Planner that can judge size. Recommendation: second pass. Until then, the Planner says in the plan that the request is large and the user may split it by hand.
 
@@ -574,16 +585,15 @@ Against what is on `main` today, in priority order:
 9. Push and email notifications, the PWA manifest, service worker and badge.
 10. Settings gathers Account, Organization, Members, Machines, Audit log.
 
-Engine work the UI depends on: the Research, PRD and PRD approval states and the Researcher and Planner agents; the default hierarchy on sign-up; Sydeso-hosted repositories; a live activity stream per job; the platform trial key with its counter; notification delivery; the step time limit; the project settings above; and, from Proposals, follow-up links and the GitHub merge webhook.
+11. Follow up on Ready and Released requests, with the link shown on both ends.
+12. Open preview at Approve result, and Open repository with the in-app file view for Sydeso-hosted repositories.
+
+Engine work the UI depends on: the Research, PRD and PRD approval states and the Researcher and Planner agents; the default hierarchy on sign-up with an automatically provisioned managed machine; Sydeso-hosted repositories with a file and commit API; a live activity stream per job; the platform trial key with its token budget and the 14-day clock; preview serving on machines and the preview-deployment link per project; follow-up links; notification delivery; the step time limit; the project settings above; and the GitHub merge webhook.
+
+Suggested order, so that something usable exists at every step: items 1 to 5 and 7 against the current engine (the inbox, the session, the decision row, vocabulary, the new request form, Needs you) while the engine gains the Planning states and the activity stream; then 6 and 8 (sign-up flow, hosted repositories, project settings); then 11 and 12 (follow-ups, preview, file view); then 9 and 10 (notifications and PWA, settings).
 
 ---
 
 # Open questions
 
-New since 0.1.0.
-
-1. Live preview: the project's own preview deployment first, or machine-served previews first.
-2. Follow-up requests in the first UI pass, as recommended, or later.
-3. The trial: three requests, as written, or a token budget.
-4. Does the trial include a managed machine. Without one the first run stalls at "Waiting for a machine".
-5. The in-app file view for Sydeso-hosted repositories: with the first pass, or clone URL only at first.
+None. Every question raised in 0.1.0 and 0.2.0 is answered under Decisions. New questions go here as they arise.
