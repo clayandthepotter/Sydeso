@@ -1,0 +1,26 @@
+{
+  "name": "desk",
+  "version": "0.1.0",
+  "private": true,
+  "license": "BUSL-1.1",
+  "description": "Desk. A personal capture and planning app on Cloudflare.",
+  "packageManager": "pnpm@9.15.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:domain": "vitest run --project domain --project testing",
+    "test:db": "vitest run --project db",
+    "test:features": "vitest run --project features",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@amiceli/vitest-cucumber": "8.0.0",
+    "@cloudflare/vitest-plugin": "1.4.10",
+    "@cloudflare/workers-types": "^5.20261001.0",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "5.0.5",
+    "wrangler": "4.155.0"
+  }
+}

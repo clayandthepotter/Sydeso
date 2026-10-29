@@ -1,0 +1,9 @@
+{
+  "name": "@desk/testing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Fake adapters and fixture helpers for Desk tests.",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@desk/domain": "workspace:*" }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@desk/capture",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Desk capture context.",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@desk/domain": "workspace:*" }
+}

@@ -1,0 +1,5 @@
+# Desk is its own workspace. It does not join the Sydeso root workspace.
+packages:
+  - "apps/*"
+  - "services/*"
+  - "packages/*"

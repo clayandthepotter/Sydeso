@@ -1,0 +1,9 @@
+{
+  "name": "@desk/scheduling",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Desk scheduling context.",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@desk/domain": "workspace:*" }
+}
