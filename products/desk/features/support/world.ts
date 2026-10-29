@@ -67,8 +67,8 @@ export function createWorld() {
   const tenants = new FakeTenantDirectory([SCENARIO_TENANT, OTHER_TENANT]);
 
   const services = {
-    triage: createTriage({ extraction, projects: issueTracker, inbox, clock, tenants }),
-    planner: createPlanner({ issueTracker, inbox, clock }),
+    triage: createTriage({ extraction, projects: () => issueTracker, inbox, clock, tenants }),
+    planner: createPlanner({ issueTracker: () => issueTracker, inbox, clock }),
     parser: createInviteParser({ rawStore, inbox, clock, tenants }),
     mirror: createMirror({ calendar, inbox, clock }),
     scheduler: createScheduler({ availability, calendar, inbox, clock, ids: new SequentialIds("tb"), tenants }),

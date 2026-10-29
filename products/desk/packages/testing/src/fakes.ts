@@ -148,6 +148,10 @@ export class InMemoryEventStore implements EventStorePort {
 export class InMemoryInbox implements InboxPort {
   private readonly seen = new Set<string>();
 
+  async hasProcessed(consumer: string, eventId: string): Promise<boolean> {
+    return this.seen.has(`${consumer}\u0000${eventId}`);
+  }
+
   async markProcessed(consumer: string, eventId: string): Promise<boolean> {
     const key = `${consumer}\u0000${eventId}`;
     if (this.seen.has(key)) return false;

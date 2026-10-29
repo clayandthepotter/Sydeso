@@ -4,6 +4,15 @@
   "private": true,
   "type": "module",
   "description": "Desk triage context.",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@desk/domain": "workspace:*" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@desk/domain": "workspace:*",
+    "@anthropic-ai/sdk": "^1.2.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@desk/testing": "workspace:*"
+  }
 }

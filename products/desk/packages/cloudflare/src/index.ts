@@ -85,6 +85,14 @@ export class D1Inbox implements InboxPort {
     private readonly now: () => Date,
   ) {}
 
+  async hasProcessed(consumer: string, eventId: string): Promise<boolean> {
+    const row = await this.db
+      .prepare("SELECT 1 AS seen FROM processed_events WHERE consumer = ? AND event_id = ?")
+      .bind(consumer, eventId)
+      .first();
+    return row !== null;
+  }
+
   async markProcessed(consumer: string, eventId: string): Promise<boolean> {
     const result = await this.db
       .prepare("INSERT OR IGNORE INTO processed_events (consumer, event_id, processed_at) VALUES (?, ?, ?)")

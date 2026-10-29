@@ -80,7 +80,13 @@ export const reviewSourceSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("invite"), emailId: idSchema }),
 ]);
 
-export const REVIEW_REASONS = ["low_confidence", "no_project", "invite_parse_failed", "p1_limit"] as const;
+export const REVIEW_REASONS = [
+  "low_confidence",
+  "no_project",
+  "invite_parse_failed",
+  "p1_limit",
+  "extraction_refused",
+] as const;
 
 export const itemNeedsReviewSchema = z.object({
   source: reviewSourceSchema,

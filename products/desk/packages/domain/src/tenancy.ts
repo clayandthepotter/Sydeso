@@ -22,6 +22,11 @@ export function noteEventId(tenantId: string, noteId: string): string {
   return `note/${tenantId}/${noteId}`;
 }
 
+/** The local calendar date in the time zone, for example 2026-10-28. */
+export function localDate(date: Date, timeZone: string): string {
+  return toOffsetIso(date, timeZone).slice(0, 10);
+}
+
 const pad = (value: number, length = 2) => String(value).padStart(length, "0");
 
 /** Writes an instant as ISO 8601 with the offset of the time zone, for example 2026-10-28T09:00:00.000-04:00. */

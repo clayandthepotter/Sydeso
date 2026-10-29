@@ -124,8 +124,13 @@ export interface EventStorePort {
   all(): Promise<readonly AnyEvent[]>;
 }
 
-/** Records which event IDs a consumer has processed. */
+/**
+ * Records which event IDs a consumer has processed.
+ * A consumer checks first, does its work, then marks the event.
+ * If the work fails, the event is not marked, so the queue retry does the work again.
+ */
 export interface InboxPort {
+  hasProcessed(consumer: string, eventId: string): Promise<boolean>;
   /** Returns true the first time, and false for a repeat delivery. */
   markProcessed(consumer: string, eventId: string): Promise<boolean>;
 }

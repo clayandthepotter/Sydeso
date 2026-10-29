@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { noteEventId, toOffsetIso } from "../src/index.js";
+import { localDate, noteEventId, toOffsetIso } from "../src/index.js";
 
 describe("toOffsetIso", () => {
   it("writes an instant with the offset of the time zone", () => {
@@ -18,6 +18,12 @@ describe("toOffsetIso", () => {
   it("keeps the same instant", () => {
     const date = new Date("2026-12-31T23:59:59.999Z");
     expect(Date.parse(toOffsetIso(date, "Asia/Kolkata"))).toBe(date.getTime());
+  });
+});
+
+describe("localDate", () => {
+  it("uses the date in the time zone, not in UTC", () => {
+    expect(localDate(new Date("2026-10-29T02:00:00Z"), "America/La_Paz")).toBe("2026-10-28");
   });
 });
 
