@@ -29,6 +29,7 @@ Workflow state is the source of truth. Artifacts are the system of record. Agent
 - `packages/api-contracts` - shared validation schemas.
 - `packages/db` - Prisma schema, migrations, and database package.
 - `infra/docker` - local infrastructure.
+- `products/desk` - Desk, a separate pnpm workspace on Cloudflare. Read `products/desk/CLAUDE.md` before changes.
 - `docs` - product and process documentation.
 
 ## Engineering Rules

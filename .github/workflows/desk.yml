@@ -1,0 +1,52 @@
+name: Desk
+
+on:
+  pull_request:
+    paths:
+      - "products/desk/**"
+      - ".github/workflows/desk.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "products/desk/**"
+      - ".github/workflows/desk.yml"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: products/desk
+
+jobs:
+  validate:
+    name: Typecheck and tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: products/desk/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # The Gherkin scenarios fail on purpose until each service is built.
+      # Add `pnpm test:features` here when all scenarios pass.
+      - name: Domain and testing unit tests
+        run: pnpm test:domain
+
+      - name: D1 migration tests
+        run: pnpm test:db
