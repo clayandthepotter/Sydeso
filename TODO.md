@@ -167,7 +167,10 @@ Desk is a personal capture and planning app on Cloudflare. It is a separate pnpm
 - [x] Multi-tenant identity: invite sign-up, passkey sign-in, sessions, tenant isolation.
 - [ ] Email one-time code sign-in fallback (needs a mail sender).
 - [ ] Account recovery and more than one passkey per account.
-- [ ] Step 3: Triage and Linear routing (Claude on the server).
+- [x] Step 3: Triage and Linear routing (Claude on the server). Deployed.
+- [ ] Add the Claude API key to desk-triage (user, in the Cloudflare dashboard).
+- [ ] Linear OAuth instead of personal API keys, before other people use Desk.
+- [ ] A way to triage again: notes saved before step 3, and items in review.
 - [ ] Step 4: Calendar, meeting notes, morning brief, and the corporate invite mirror.
 - [ ] Step 5: Time block proposals.
 - [ ] Step 6: Desk for Windows with bot-free meeting capture.

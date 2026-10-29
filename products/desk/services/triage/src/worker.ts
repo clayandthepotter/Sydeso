@@ -63,8 +63,17 @@ export function createTriageRuntime(deps: TriageRuntimeDeps) {
 
 const systemClock = { now: () => new Date() };
 
+/** Wait this long before a retry while the Claude API key is not set. */
+const MISSING_KEY_RETRY_SECONDS = 1800;
+
 export default {
   async queue(batch, env) {
+    if (!env.ANTHROPIC_API_KEY) {
+      // Keep the notes in the queue. They run after the operator adds the secret.
+      console.warn(`${TRIAGE_CONSUMER}: ANTHROPIC_API_KEY is not set. The batch waits.`);
+      batch.retryAll({ delaySeconds: MISSING_KEY_RETRY_SECONDS });
+      return;
+    }
     const handle = createTriageRuntime({
       db: env.DB,
       plannerQueue: env.PLANNER_QUEUE,

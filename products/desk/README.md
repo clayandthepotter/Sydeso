@@ -14,7 +14,7 @@ Live at https://desk.sydeso.com. Sign-up is invite only.
 |---|---|---|
 | 1 | Repo, events, migrations, fixtures, scenarios | Done |
 | 2 | PWA offline note box and sync, invite sign-up, passkey sign-in | Done, deployed |
-| 3 | Triage and Linear routing | Built and tested. Waits for deploy. |
+| 3 | Triage and Linear routing | Deployed. Needs the Claude key on desk-triage. |
 | 4 | Invite forwarding and the mirror calendar | Not started |
 | 5 | Time block proposals and the morning brief | Not started |
 | 6 | Tauri shell | Not started |
@@ -139,7 +139,9 @@ node apps/web/e2e/phone-flow.cjs "<join link>" /tmp
 
 ## Deploy
 
-Ask the user first. The resources are `desk-api` (Worker), `desk-events` (D1), and `desk-raw` (R2).
+Ask the user first. The resources are the Workers `desk-api`, `desk-triage`, and `desk-planner`, the D1 database `desk-events`, the R2 bucket `desk-raw`, the AI Gateway `desk-ai` (logs off), and the queues `desk-triage-inbox`, `desk-planner-inbox`, `desk-triage-dlq`, and `desk-planner-dlq`.
+
+Secrets: `DESK_SECRETS_KEY` on `desk-api` and `desk-planner` (the same value), and `ANTHROPIC_API_KEY` on `desk-triage`. Without the Claude key, `desk-triage` keeps notes in the queue and retries every 30 minutes.
 
 ```bash
 pnpm build
