@@ -1,0 +1,12 @@
+{
+  "outcome": "parsed",
+  "invite": {
+    "icalUid": "040000008200E00074C5B7101A82E0080000000002",
+    "sequence": 0,
+    "method": "REQUEST",
+    "title": "Vendor sync",
+    "start": "2026-11-02T11:00:00-04:00",
+    "end": "2026-11-02T11:30:00-04:00",
+    "originalTimeZone": "Eastern Standard Time"
+  }
+}

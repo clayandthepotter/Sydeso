@@ -1,0 +1,15 @@
+{
+  "text": "the thing with marco, maybe?",
+  "capturedAt": "2026-10-28T11:15:00.000-04:00",
+  "expectedItems": [
+    {
+      "action": "Follow up with Marco",
+      "project": null,
+      "dueDate": null,
+      "durationMinutes": null,
+      "priority": "P3",
+      "confidence": 0.35
+    }
+  ],
+  "expectReview": true
+}

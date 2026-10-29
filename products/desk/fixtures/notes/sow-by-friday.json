@@ -1,0 +1,14 @@
+{
+  "text": "send Dana the SOW by Friday",
+  "capturedAt": "2026-10-28T09:00:00.000-04:00",
+  "expectedItems": [
+    {
+      "action": "Send Dana the SOW",
+      "project": "Client Work",
+      "dueDate": "2026-10-30",
+      "durationMinutes": 30,
+      "priority": "P2",
+      "confidence": 0.92
+    }
+  ]
+}

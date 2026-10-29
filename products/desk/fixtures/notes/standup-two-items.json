@@ -1,0 +1,22 @@
+{
+  "text": "standup: fix the login bug today, about 1h, urgent. ask Priya for the Q4 budget next week",
+  "capturedAt": "2026-10-28T09:30:00.000-04:00",
+  "expectedItems": [
+    {
+      "action": "Fix the login bug",
+      "project": "Sydeso",
+      "dueDate": "2026-10-28",
+      "durationMinutes": 60,
+      "priority": "P1",
+      "confidence": 0.88
+    },
+    {
+      "action": "Ask Priya for the Q4 budget",
+      "project": "Operations",
+      "dueDate": null,
+      "durationMinutes": 15,
+      "priority": "P3",
+      "confidence": 0.81
+    }
+  ]
+}

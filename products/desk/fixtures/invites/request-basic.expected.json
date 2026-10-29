@@ -1,0 +1,12 @@
+{
+  "outcome": "parsed",
+  "invite": {
+    "icalUid": "040000008200E00074C5B7101A82E0080000000001",
+    "sequence": 0,
+    "method": "REQUEST",
+    "title": "Quarterly planning",
+    "start": "2026-10-30T10:00:00-04:00",
+    "end": "2026-10-30T11:00:00-04:00",
+    "originalTimeZone": "UTC"
+  }
+}
