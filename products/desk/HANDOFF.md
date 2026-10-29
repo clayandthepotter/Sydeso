@@ -1,6 +1,39 @@
 # Desk: Handoff for Claude Code
 
-## Goal
+## Direction (2026-10-29)
+
+Desk is a Sydeso product with a free plan and a paid plan. It combines two jobs:
+
+- **What happened?** Bot-free meeting capture, like anarlog (https://github.com/fastrepl/anarlog). Each meeting has a memo, a transcript, and a summary, linked to its calendar event.
+- **What do I do next, and when?** Triage turns notes and meeting action items into Linear issues and proposed time blocks.
+
+Decisions from the user:
+
+1. Triage runs on the server. Notes stay readable to desk-api. There is no end-to-end encryption for now.
+2. Meeting recording is in scope. The first platform is Windows.
+3. Build path C: Desk stays the planning brain on Cloudflare. The Tauri desktop app captures meetings. Reuse MIT parts of anarlog where they fit, with credit. Never copy from anarlog's `enterprise/` folder.
+4. Desk is a product for many people, with free and paid plans.
+
+```mermaid
+flowchart LR
+  subgraph Win["Desk for Windows (Tauri)"]
+    MIC[Mic + system audio, WASAPI] --> REC[Recorder]
+    HOT[Hotkey quick capture]
+  end
+  subgraph Phone["PWA (phone, browser)"]
+    BOX[Note box, offline]
+  end
+  REC -->|audio chunks| TX[Transcription port]
+  TX -->|TranscriptReady| BUS[(desk-bus)]
+  BOX -->|NoteCaptured| BUS
+  HOT -->|NoteCaptured| BUS
+  CAL[Google Calendar + Corporate Mirror] -->|MeetingScheduled| BUS
+  BUS --> TRI[Triage, Claude on server]
+  TRI --> LIN[Linear issues]
+  TRI --> TB[Time block proposals]
+  BUS --> BRIEF[Morning brief]
+```
+
 
 Build Desk. Desk is a personal capture and planning app for one user (Clayton).
 
@@ -15,13 +48,15 @@ Desk must also:
 
 - Multi-tenant from day one (changed on 2026-10-29). One person is one tenant. Each tenant has its own time zone, Linear, Google Calendar, and invite address. The first tenant is Clayton, in America/La_Paz (UTC-04:00).
 - Platform: Cloudflare only. The account is paid. Domain: `sydeso.com`.
-- Client: one web app. It is installed as a PWA on Windows and phone.
-- Windows wrapper: Tauri. It adds only a global hotkey, tray icon, autostart, and single instance. The wrapper has no business logic. Build it last.
+- Clients: the web app, installed as a PWA on the phone. Desk for Windows, a Tauri app that shows the same web app (changed on 2026-10-29).
+- Desk for Windows adds a global hotkey, tray icon, autostart, single instance, and meeting capture (microphone and system audio). Capture is the only logic in the shell. It uploads audio or transcripts to desk-api and keeps no business rules.
 - Task system of record: Linear.
 - Calendar the agent reads: the user's unified Google calendar. It subscribes to the user's other Google calendars.
 - Corporate calendars cannot be subscribed or published (company security). The only way in is forwarded invites. Mirror them to a "Corporate Mirror" Google calendar. The unified calendar subscribes to that calendar.
 - The agent writes time blocks to its own "Desk Focus Blocks" Google calendar. The unified calendar subscribes to it.
-- LLM: Claude API, called through Cloudflare AI Gateway.
+- LLM: Claude API, called through Cloudflare AI Gateway. Triage runs on the server.
+- Transcription sits behind a `TranscriptionPort`. The first adapter is a hosted provider. A local model can come later.
+- Plans: free and paid. An Entitlements context decides what each tenant can use. The plan limits are not decided yet.
 - Auth (changed on 2026-10-29): Desk owns its accounts in D1. Sign-up is invite only. Sign-in uses a passkey. An email one-time code comes later, when Desk has a mail sender. Cloudflare Access is not used.
 
 ## Name and isolation rules
@@ -139,11 +174,13 @@ The starting scenarios are in `features/`.
 ## Build order
 
 1. Repo, event schema, D1 migrations, fixtures, failing scenarios. **Done.**
-2. PWA with offline note box and sync (Capture), plus invite sign-up and passkey sign-in. **Done. Live at https://desk.sydeso.com.**
-3. Triage and Linear routing.
-4. Invite forwarding: Email Worker, parser, mirror calendar.
-5. Time block proposals and the morning brief.
-6. Tauri shell: global hotkey (Ctrl+Shift+Space), tray, autostart, single instance, quick capture window at `/capture`.
+2. PWA with offline note box and sync, invite sign-up, passkey sign-in. **Done. Live at https://desk.sydeso.com.**
+3. Triage and Linear routing. Claude on the server, through AI Gateway.
+4. Calendar: connect Google Calendar, a meeting note for each event, the morning brief, and the corporate invite mirror.
+5. Time block proposals, confirmed by the user.
+6. Desk for Windows: Tauri shell, quick capture hotkey, and bot-free meeting capture with transcription. Meeting action items go to triage.
+7. Plans and billing: Entitlements context, free and paid plans, checkout.
+8. Later: model choice (bring your own key), CLI and MCP with pending edits that the user approves, automations, sharing.
 
 ## Working agreements
 

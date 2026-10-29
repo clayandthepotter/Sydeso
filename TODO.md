@@ -167,10 +167,11 @@ Desk is a personal capture and planning app on Cloudflare. It is a separate pnpm
 - [x] Multi-tenant identity: invite sign-up, passkey sign-in, sessions, tenant isolation.
 - [ ] Email one-time code sign-in fallback (needs a mail sender).
 - [ ] Account recovery and more than one passkey per account.
-- [ ] Step 3: Triage and Linear routing.
-- [ ] Step 4: Invite forwarding: Email Worker, parser, and mirror calendar.
-- [ ] Step 5: Time block proposals and the morning brief.
-- [ ] Step 6: Tauri shell.
+- [ ] Step 3: Triage and Linear routing (Claude on the server).
+- [ ] Step 4: Calendar, meeting notes, morning brief, and the corporate invite mirror.
+- [ ] Step 5: Time block proposals.
+- [ ] Step 6: Desk for Windows with bot-free meeting capture.
+- [ ] Step 7: Plans and billing (free and paid).
 - [ ] Before step 4: confirm the `in.sydeso.com` MX records, the forwarding policy, and the Outlook rule with the user.
 
 ## Phase 1: Real App Foundation
