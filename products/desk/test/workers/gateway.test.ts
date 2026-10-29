@@ -8,9 +8,28 @@ const ORIGIN = "https://desk.sydeso.com";
 let now = new Date("2026-10-28T13:00:00.000Z");
 const clock = { now: () => new Date(now) };
 
+/** A fake queue that keeps what it gets. */
+export const recordingQueue = () => {
+  const messages: unknown[] = [];
+  const queue = {
+    messages,
+    send: async (body: unknown) => void messages.push(body),
+    sendBatch: async (batch: Iterable<MessageSendRequest>) => {
+      for (const message of batch) messages.push(message.body);
+    },
+  };
+  return queue as unknown as Queue & { messages: unknown[] };
+};
+
+const triageQueue = recordingQueue();
+const plannerQueue = recordingQueue();
+
 const appEnv: AppEnv = {
   DB: env.DB,
   RAW: env.RAW,
+  TRIAGE_QUEUE: triageQueue,
+  PLANNER_QUEUE: plannerQueue,
+  DESK_SECRETS_KEY: btoa(String.fromCharCode(...new Uint8Array(32).fill(7))),
   APP_ORIGIN: ORIGIN,
   SESSION_TTL_DAYS: "30",
   CHALLENGE_TTL_MINUTES: "5",
@@ -313,6 +332,20 @@ describe("Notes API", () => {
     };
     expect(aliceNotes.notes.map((row) => row.text)).toEqual(["alice note"]);
     expect(bobNotes.notes.map((row) => row.text)).toEqual(["bob note"]);
+  });
+
+  it("sends each captured note to the triage queue, and sends it again on a retry", async () => {
+    const { cookie } = await signUp();
+    const before = triageQueue.messages.length;
+
+    await call("POST", "/api/notes", { cookie, body: note("queued-1") });
+    await call("POST", "/api/notes", { cookie, body: note("queued-1") });
+
+    const sent = triageQueue.messages.slice(before) as Array<{ type: string; payload: { noteId: string } }>;
+    expect(sent.map((event) => [event.type, event.payload.noteId])).toEqual([
+      ["NoteCaptured", "queued-1"],
+      ["NoteCaptured", "queued-1"],
+    ]);
   });
 
   it("keeps the raw note in R2", async () => {

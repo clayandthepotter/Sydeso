@@ -4,16 +4,23 @@ import {
   limitTodayP1,
   type Clock,
   type EventConsumer,
-  type InboxPort,
   type IssueTrackerPort,
 } from "@desk/domain";
 
 export const PLANNER_CONSUMER = "desk-planner";
 
+/** The tenant has not connected Linear. The queue retries, then keeps the message in the dead letter queue. */
+export class LinearNotConnectedError extends Error {
+  override readonly name = "LinearNotConnectedError";
+
+  constructor(readonly tenantId: string) {
+    super(`Tenant ${tenantId} has not connected Linear.`);
+  }
+}
+
 export interface PlanningDeps {
-  /** The Linear workspace of one tenant. */
-  readonly issueTracker: (tenantId: string) => IssueTrackerPort;
-  readonly inbox: InboxPort;
+  /** The Linear team of one tenant, or null when the tenant has not connected Linear. */
+  readonly issueTracker: (tenantId: string) => Promise<IssueTrackerPort | null>;
   readonly clock: Clock;
 }
 
@@ -27,10 +34,10 @@ export function createPlanner(deps: PlanningDeps): EventConsumer {
     consumes: ["ItemRouted"],
     async handle(event) {
       if (event.type !== "ItemRouted") return [];
-      if (await deps.inbox.hasProcessed(PLANNER_CONSUMER, event.id)) return [];
+      const tracker = await deps.issueTracker(event.tenantId);
+      if (!tracker) throw new LinearNotConnectedError(event.tenantId);
 
       const { item } = event.payload;
-      const tracker = deps.issueTracker(event.tenantId);
       const p1InToday =
         event.payload.state === "Today" && item.priority === "P1"
           ? await tracker.countIssues({ state: "Today", priority: "P1" })
@@ -57,9 +64,9 @@ export function createPlanner(deps: PlanningDeps): EventConsumer {
           correlationId: event.correlationId ?? event.id,
         },
       );
-      await deps.inbox.markProcessed(PLANNER_CONSUMER, event.id);
       return [created];
     },
   };
 }
 export * from "./linear.js";
+export * from "./connections.js";

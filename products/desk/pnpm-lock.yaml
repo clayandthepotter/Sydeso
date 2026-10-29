@@ -127,6 +127,12 @@ importers:
       '@desk/identity':
         specifier: workspace:*
         version: link:../identity
+      '@desk/planning':
+        specifier: workspace:*
+        version: link:../planning
+      '@desk/triage':
+        specifier: workspace:*
+        version: link:../triage
 
   services/identity:
     dependencies:
@@ -148,9 +154,16 @@ importers:
 
   services/planning:
     dependencies:
+      '@desk/cloudflare':
+        specifier: workspace:*
+        version: link:../../packages/cloudflare
       '@desk/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+    devDependencies:
+      '@desk/testing':
+        specifier: workspace:*
+        version: link:../../packages/testing
 
   services/scheduling:
     dependencies:
@@ -163,9 +176,15 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^1.2.0
         version: 1.3.0(zod@4.6.7)
+      '@desk/cloudflare':
+        specifier: workspace:*
+        version: link:../../packages/cloudflare
       '@desk/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@desk/identity':
+        specifier: workspace:*
+        version: link:../identity
       zod:
         specifier: ^4.1.0
         version: 4.6.7

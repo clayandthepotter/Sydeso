@@ -5,12 +5,16 @@
   "type": "module",
   "description": "Desk triage context.",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./d1": "./src/d1.ts",
+    "./worker": "./src/worker.ts"
   },
   "dependencies": {
     "@desk/domain": "workspace:*",
     "@anthropic-ai/sdk": "^1.2.0",
-    "zod": "^4.1.0"
+    "zod": "^4.1.0",
+    "@desk/cloudflare": "workspace:*",
+    "@desk/identity": "workspace:*"
   },
   "devDependencies": {
     "@desk/testing": "workspace:*"

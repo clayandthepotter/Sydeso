@@ -11,6 +11,8 @@
     "@desk/domain": "workspace:*",
     "@desk/identity": "workspace:*",
     "@desk/capture": "workspace:*",
-    "@desk/cloudflare": "workspace:*"
+    "@desk/cloudflare": "workspace:*",
+    "@desk/planning": "workspace:*",
+    "@desk/triage": "workspace:*"
   }
 }

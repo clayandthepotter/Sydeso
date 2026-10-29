@@ -135,7 +135,7 @@ describe("EVENT_CATALOG", () => {
       capture: ["NoteCaptured"],
       ingestion: ["InviteReceived", "InviteParsed", "InviteRejected"],
       triage: ["ItemsExtracted", "ItemRouted", "ItemNeedsReview"],
-      planning: ["WorkItemCreated", "WorkItemUpdated"],
+      planning: ["WorkItemCreated", "WorkItemUpdated", "ProjectsSynced"],
       scheduling: [
         "MirrorEventUpserted",
         "MirrorEventRemoved",

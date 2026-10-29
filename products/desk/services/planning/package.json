@@ -4,6 +4,15 @@
   "private": true,
   "type": "module",
   "description": "Desk planning context.",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@desk/domain": "workspace:*" }
+  "exports": {
+    ".": "./src/index.ts",
+    "./worker": "./src/worker.ts"
+  },
+  "dependencies": {
+    "@desk/domain": "workspace:*",
+    "@desk/cloudflare": "workspace:*"
+  },
+  "devDependencies": {
+    "@desk/testing": "workspace:*"
+  }
 }

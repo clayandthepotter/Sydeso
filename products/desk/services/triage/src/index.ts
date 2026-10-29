@@ -8,7 +8,6 @@ import {
   type EventConsumer,
   type EventEnvelope,
   type ExtractionPort,
-  type InboxPort,
   type ProjectDirectoryPort,
   type TenantDirectoryPort,
 } from "@desk/domain";
@@ -24,7 +23,6 @@ export interface TriageDeps {
   readonly extraction: ExtractionPort;
   /** The Linear projects of one tenant. */
   readonly projects: (tenantId: string) => ProjectDirectoryPort;
-  readonly inbox: InboxPort;
   readonly clock: Clock;
   readonly tenants: TenantDirectoryPort;
 }
@@ -105,11 +103,7 @@ export function createTriage(deps: TriageDeps): EventConsumer {
     name: TRIAGE_CONSUMER,
     consumes: ["NoteCaptured"],
     async handle(event) {
-      if (event.type !== "NoteCaptured") return [];
-      if (await deps.inbox.hasProcessed(TRIAGE_CONSUMER, event.id)) return [];
-      const events = await triageNote(event);
-      await deps.inbox.markProcessed(TRIAGE_CONSUMER, event.id);
-      return events;
+      return event.type === "NoteCaptured" ? triageNote(event) : [];
     },
   };
 }

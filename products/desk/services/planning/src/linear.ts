@@ -120,6 +120,12 @@ export class LinearIssueTracker implements IssueTrackerPort {
     return id;
   }
 
+  /** The Desk states that the team does not have. Desk needs Today, Next, and Later. */
+  async missingStates(): Promise<LinearState[]> {
+    const { states } = await this.teamSetup();
+    return LINEAR_STATES.filter((state) => !states[state]);
+  }
+
   async listProjects(): Promise<readonly string[]> {
     return [...(await this.teamSetup()).projects.values()].map((project) => project.name);
   }

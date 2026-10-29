@@ -117,6 +117,13 @@ export const workItemUpdatedSchema = z.object({
     .refine((changes) => Object.keys(changes).length > 0, "changes must not be empty"),
 });
 
+/** The Linear team and its projects. Planning publishes it on connect and on refresh. */
+export const projectsSyncedSchema = z.object({
+  teamId: idSchema,
+  teamName: z.string().min(1),
+  projects: z.array(z.string().min(1)),
+});
+
 /* Scheduling */
 
 export const mirrorEventUpsertedSchema = z.object({
@@ -180,6 +187,7 @@ export const EVENT_CATALOG = {
   ItemNeedsReview: entry("triage", 1, itemNeedsReviewSchema),
   WorkItemCreated: entry("planning", 1, workItemCreatedSchema),
   WorkItemUpdated: entry("planning", 1, workItemUpdatedSchema),
+  ProjectsSynced: entry("planning", 1, projectsSyncedSchema),
   MirrorEventUpserted: entry("scheduling", 1, mirrorEventUpsertedSchema),
   MirrorEventRemoved: entry("scheduling", 1, mirrorEventRemovedSchema),
   TimeBlockProposed: entry("scheduling", 1, timeBlockProposedSchema),

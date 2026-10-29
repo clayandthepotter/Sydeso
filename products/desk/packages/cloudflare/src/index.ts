@@ -1,3 +1,5 @@
+export * from "./publisher.js";
+export * from "./secret-box.js";
 import {
   parseEvent,
   type AnyEvent,

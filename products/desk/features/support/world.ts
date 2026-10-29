@@ -67,15 +67,15 @@ export function createWorld() {
   const tenants = new FakeTenantDirectory([SCENARIO_TENANT, OTHER_TENANT]);
 
   const services = {
-    triage: createTriage({ extraction, projects: () => issueTracker, inbox, clock, tenants }),
-    planner: createPlanner({ issueTracker: () => issueTracker, inbox, clock }),
+    triage: createTriage({ extraction, projects: () => issueTracker, clock, tenants }),
+    planner: createPlanner({ issueTracker: async () => issueTracker, clock }),
     parser: createInviteParser({ rawStore, inbox, clock, tenants }),
     mirror: createMirror({ calendar, inbox, clock }),
     scheduler: createScheduler({ availability, calendar, inbox, clock, ids: new SequentialIds("tb"), tenants }),
     emailWorker: createEmailWorker({ rawStore, clock, ids, tenants }),
   };
 
-  const busFor = (...consumers: EventConsumer[]) => new InMemoryBus(store, consumers);
+  const busFor = (...consumers: EventConsumer[]) => new InMemoryBus(store, consumers, inbox);
 
   const event = <T extends Parameters<typeof createEvent>[0]>(type: T, payload: PayloadOf<T>): EventEnvelope<T> =>
     createEvent(type, payload, { clock, ids, tenantId: tenant.tenantId });

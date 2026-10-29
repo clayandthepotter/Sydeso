@@ -1,6 +1,6 @@
 import { causedEventId, createEvent, type AnyEvent, type EventConsumer } from "@desk/domain";
 import { describe, expect, it } from "vitest";
-import { FakeRawStore, FixedClock, InMemoryBus, InMemoryEventStore, SequentialIds } from "../src/index.js";
+import { FakeRawStore, FixedClock, InMemoryBus, InMemoryEventStore, InMemoryInbox, SequentialIds } from "../src/index.js";
 
 const clock = new FixedClock("2026-10-28T13:00:00Z");
 const note = createEvent(
@@ -30,26 +30,26 @@ const echo = (): EventConsumer & { calls: number } => ({
 describe("InMemoryBus", () => {
   it("stores a published event and every event that consumers return", async () => {
     const store = new InMemoryEventStore();
-    const bus = new InMemoryBus(store, [echo()]);
+    const bus = new InMemoryBus(store, [echo()], new InMemoryInbox());
 
     await bus.publish(note);
 
     expect((await store.all()).map((event) => event.type)).toEqual(["NoteCaptured", "ItemsExtracted"]);
   });
 
-  it("delivers a repeat to consumers again, like a queue that delivers at least once", async () => {
+  it("stops a repeat delivery with the inbox", async () => {
     const consumer = echo();
-    const bus = new InMemoryBus(new InMemoryEventStore(), [consumer]);
+    const bus = new InMemoryBus(new InMemoryEventStore(), [consumer], new InMemoryInbox());
 
     await bus.publish(note);
     await bus.publish(note);
 
-    expect(consumer.calls).toBe(2);
+    expect(consumer.calls).toBe(1);
   });
 
   it("delivers only the event types that a consumer declares", async () => {
     const consumer = { ...echo(), consumes: ["InviteParsed"] as const };
-    const bus = new InMemoryBus(new InMemoryEventStore(), [consumer]);
+    const bus = new InMemoryBus(new InMemoryEventStore(), [consumer], new InMemoryInbox());
 
     await bus.publish(note);
 

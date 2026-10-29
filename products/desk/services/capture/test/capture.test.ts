@@ -1,3 +1,4 @@
+import type { AnyEvent } from "@desk/domain";
 import { FakeRawStore, FixedClock, InMemoryEventStore } from "@desk/testing";
 import { describe, expect, it } from "vitest";
 import { InvalidNoteError, createCapture, type NoteView, type NotesReadModel } from "../src/index.js";
@@ -18,7 +19,8 @@ const setup = (tenantId = "tenant-a") => {
   const store = new InMemoryEventStore();
   const notes = new FakeNotes();
   const raw = new FakeRawStore();
-  const capture = createCapture({ tenantId, store, notes, raw, clock: new FixedClock("2026-10-28T13:00:00Z") });
+  const publish = async (events: readonly AnyEvent[]) => Promise.all(events.map((event) => store.append(event)));
+  const capture = createCapture({ tenantId, publish, notes, raw, clock: new FixedClock("2026-10-28T13:00:00Z") });
   return { store, notes, raw, capture };
 };
 

@@ -2,9 +2,9 @@ import {
   createEvent,
   noteCapturedSchema,
   noteEventId,
+  type AnyEvent,
   type AppendResult,
   type Clock,
-  type EventStorePort,
   type RawStorePort,
 } from "@desk/domain";
 
@@ -25,8 +25,11 @@ export interface NotesReadModel {
 
 export interface CaptureDeps {
   readonly tenantId: string;
-  /** The event store for this tenant. */
-  readonly store: EventStorePort;
+  /**
+   * Stores the events and sends them to their subscribers. It returns one result per event.
+   * It sends a duplicate again, so a retry after a failed send reaches triage.
+   */
+  readonly publish: (events: readonly AnyEvent[]) => Promise<readonly AppendResult[]>;
   readonly notes: NotesReadModel;
   readonly raw: RawStorePort;
   readonly clock: Clock;
@@ -75,7 +78,7 @@ export function createCapture(deps: CaptureDeps): CaptureService {
         tenantId: deps.tenantId,
         correlationId: eventId,
       });
-      const outcome = await deps.store.append(event);
+      const [outcome = "duplicate"] = await deps.publish([event]);
       await deps.notes.add({
         noteId: payload.noteId,
         text: payload.text,
