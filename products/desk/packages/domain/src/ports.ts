@@ -1,5 +1,6 @@
 import type { AnyEvent } from "./events/envelope.js";
 import type { EventType } from "./events/catalog.js";
+import type { TenantSettings } from "./tenancy.js";
 import type { DeskCalendar, ExtractedItem, Interval, LinearState, Priority } from "./model.js";
 
 /**
@@ -94,6 +95,15 @@ export interface CalendarPort {
 
 export interface AvailabilityPort {
   busyIntervals(range: Interval): Promise<readonly Interval[]>;
+}
+
+/* Tenants */
+
+/** Finds the settings of a tenant. Consumers read the tenant from the event envelope. */
+export interface TenantDirectoryPort {
+  get(tenantId: string): Promise<TenantSettings | null>;
+  /** Finds the tenant for an inbound address invites+TOKEN@in.sydeso.com. */
+  byInviteToken(token: string): Promise<TenantSettings | null>;
 }
 
 /* Raw storage (R2 desk-raw) */

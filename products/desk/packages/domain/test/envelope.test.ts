@@ -28,10 +28,11 @@ const notePayload = {
 
 describe("createEvent", () => {
   it("fills the envelope from the catalog, the clock, and the ID generator", () => {
-    const event = createEvent("NoteCaptured", notePayload, { clock, ids: ids("evt-1") });
+    const event = createEvent("NoteCaptured", notePayload, { clock, ids: ids("evt-1"), tenantId: "tenant-a" });
 
     expect(event).toEqual({
       id: "evt-1",
+      tenantId: "tenant-a",
       type: "NoteCaptured",
       version: 1,
       occurredAt: "2026-10-28T13:00:00.000Z",
@@ -44,6 +45,7 @@ describe("createEvent", () => {
     const event = createEvent("NoteCaptured", notePayload, {
       clock,
       ids: ids("evt-2"),
+      tenantId: "tenant-a",
       correlationId: "corr-1",
       causationId: "cause-1",
     });
@@ -53,19 +55,19 @@ describe("createEvent", () => {
   });
 
   it("uses an explicit ID before the generator", () => {
-    const event = createEvent("NoteCaptured", notePayload, { clock, ids: ids(), id: "fixed-id" });
+    const event = createEvent("NoteCaptured", notePayload, { clock, ids: ids(), tenantId: "tenant-a", id: "fixed-id" });
 
     expect(event.id).toBe("fixed-id");
   });
 
   it("rejects a payload that does not match the schema", () => {
     expect(() =>
-      createEvent("NoteCaptured", { ...notePayload, text: "" }, { clock, ids: ids("evt-3") }),
+      createEvent("NoteCaptured", { ...notePayload, text: "" }, { clock, ids: ids("evt-3"), tenantId: "tenant-a" }),
     ).toThrow(EventValidationError);
   });
 
   it("returns a frozen envelope", () => {
-    const event = createEvent("NoteCaptured", notePayload, { clock, ids: ids("evt-4") });
+    const event = createEvent("NoteCaptured", notePayload, { clock, ids: ids("evt-4"), tenantId: "tenant-a" });
 
     expect(Object.isFrozen(event)).toBe(true);
     expect(Object.isFrozen(event.payload)).toBe(true);
@@ -75,6 +77,7 @@ describe("createEvent", () => {
 describe("parseEvent", () => {
   const valid = {
     id: "evt-1",
+    tenantId: "tenant-a",
     type: "NoteCaptured",
     version: 1,
     occurredAt: "2026-10-28T13:00:00.000Z",
@@ -90,7 +93,7 @@ describe("parseEvent", () => {
   });
 
   it("survives a JSON round trip", () => {
-    const event = createEvent("NoteCaptured", notePayload, { clock, ids: ids("evt-9") });
+    const event = createEvent("NoteCaptured", notePayload, { clock, ids: ids("evt-9"), tenantId: "tenant-a" });
     const result = parseEvent(JSON.parse(JSON.stringify(event)));
 
     expect(result).toEqual({ ok: true, event });
@@ -98,6 +101,7 @@ describe("parseEvent", () => {
 
   it.each([
     ["a missing ID", { ...valid, id: "" }, "id"],
+    ["a missing tenant", { ...valid, tenantId: undefined }, "tenantId"],
     ["an unknown type", { ...valid, type: "NoteDeleted" }, "type"],
     ["an unsupported version", { ...valid, version: 99 }, "version"],
     ["a bad timestamp", { ...valid, occurredAt: "yesterday" }, "occurredAt"],
@@ -127,6 +131,7 @@ describe("EVENT_CATALOG", () => {
     );
 
     expect(byContext).toEqual({
+      identity: ["TenantCreated"],
       capture: ["NoteCaptured"],
       ingestion: ["InviteReceived", "InviteParsed", "InviteRejected"],
       triage: ["ItemsExtracted", "ItemRouted", "ItemNeedsReview"],

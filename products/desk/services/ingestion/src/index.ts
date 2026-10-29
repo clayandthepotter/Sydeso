@@ -2,7 +2,7 @@ import {
   NotBuiltError,
   type AnyEvent,
   type Clock,
-  type DeskConfig,
+  type TenantDirectoryPort,
   type EventConsumer,
   type IdGenerator,
   type InboxPort,
@@ -22,15 +22,15 @@ export interface EmailWorkerDeps {
   readonly rawStore: RawStorePort;
   readonly clock: Clock;
   readonly ids: IdGenerator;
-  readonly config: Pick<DeskConfig, "allowedSenders">;
+  readonly tenants: TenantDirectoryPort;
 }
 
 export interface EmailWorker {
-  /** Returns InviteReceived for an allowed sender, or InviteRejected. */
+  /** Returns InviteReceived for a sender that the tenant allows, or InviteRejected. */
   receive(email: InboundEmail): Promise<readonly AnyEvent[]>;
 }
 
-/** The Email Worker for invites@in.sydeso.com. */
+/** The Email Worker for invites+TOKEN@in.sydeso.com. The token finds the tenant. */
 export function createEmailWorker(_deps: EmailWorkerDeps): EmailWorker {
   return {
     async receive() {
@@ -52,7 +52,7 @@ export interface InviteParserDeps {
   readonly rawStore: RawStorePort;
   readonly inbox: InboxPort;
   readonly clock: Clock;
-  readonly config: Pick<DeskConfig, "timeZone">;
+  readonly tenants: TenantDirectoryPort;
 }
 
 /** Reads InviteReceived. Publishes InviteParsed, or InviteRejected on a parse failure. */

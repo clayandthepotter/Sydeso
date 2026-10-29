@@ -3,7 +3,7 @@ import {
   type AvailabilityPort,
   type CalendarPort,
   type Clock,
-  type DeskConfig,
+  type TenantDirectoryPort,
   type EventConsumer,
   type EventEnvelope,
   type IdGenerator,
@@ -36,7 +36,7 @@ export interface SchedulerDeps {
   readonly inbox: InboxPort;
   readonly clock: Clock;
   readonly ids: IdGenerator;
-  readonly config: Pick<DeskConfig, "timeZone">;
+  readonly tenants: TenantDirectoryPort;
 }
 
 export interface Scheduler extends EventConsumer {

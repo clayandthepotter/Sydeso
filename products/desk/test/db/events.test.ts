@@ -6,8 +6,8 @@ import { describe, expect, it } from "vitest";
 
 const insertEvent = (id: string) =>
   env.DB.prepare(
-    `INSERT OR IGNORE INTO events (id, type, version, occurred_at, source, payload)
-     VALUES (?, 'NoteCaptured', 1, '2026-10-28T13:00:00.000Z', 'capture', ?)`,
+    `INSERT OR IGNORE INTO events (id, tenant_id, type, version, occurred_at, source, payload)
+     VALUES (?, 'tenant-a', 'NoteCaptured', 1, '2026-10-28T13:00:00.000Z', 'capture', ?)`,
   ).bind(id, JSON.stringify({ noteId: "note-1", text: "call the bank" }));
 
 describe("events table", () => {
@@ -46,11 +46,20 @@ describe("events table", () => {
     await expect(env.DB.prepare("DELETE FROM events WHERE id = 'evt-del'").run()).rejects.toThrow(/append only/);
   });
 
-  it("rejects a payload that is not JSON", async () => {
+  it("requires a tenant", async () => {
     await expect(
       env.DB.prepare(
         `INSERT INTO events (id, type, version, occurred_at, source, payload)
-         VALUES ('evt-x', 'NoteCaptured', 1, '2026-10-28T13:00:00.000Z', 'capture', 'not json')`,
+         VALUES ('evt-nt', 'NoteCaptured', 1, '2026-10-28T13:00:00.000Z', 'capture', '{}')`,
+      ).run(),
+    ).rejects.toThrow(/NOT NULL/);
+  });
+
+  it("rejects a payload that is not JSON", async () => {
+    await expect(
+      env.DB.prepare(
+        `INSERT INTO events (id, tenant_id, type, version, occurred_at, source, payload)
+         VALUES ('evt-x', 'tenant-a', 'NoteCaptured', 1, '2026-10-28T13:00:00.000Z', 'capture', 'not json')`,
       ).run(),
     ).rejects.toThrow();
   });
@@ -76,34 +85,52 @@ describe("read models", () => {
     ).all<{ name: string }>();
 
     expect(rows.results.map((row) => row.name)).toEqual(
-      expect.arrayContaining(["events", "items", "mirror_events", "notes", "processed_events", "review_queue", "time_blocks"]),
+      expect.arrayContaining([
+        "auth_challenges",
+        "events",
+        "invites",
+        "items",
+        "mirror_events",
+        "notes",
+        "passkeys",
+        "processed_events",
+        "review_queue",
+        "sessions",
+        "tenants",
+        "time_blocks",
+        "users",
+      ]),
     );
   });
 
-  it("keeps one mirror event per iCalUID", async () => {
-    const upsert = (sequence: number, start: string) =>
+  it("keeps one mirror event per tenant and iCalUID", async () => {
+    const upsert = (sequence: number, start: string, tenant = "tenant-a") =>
       env.DB.prepare(
-        `INSERT INTO mirror_events (ical_uid, sequence, calendar_event_id, title, start_at, end_at, last_event_id)
-         VALUES ('uid-1', ?, 'gcal-1', 'Busy', ?, ?, ?)
-         ON CONFLICT (ical_uid) DO UPDATE SET
+        `INSERT INTO mirror_events (tenant_id, ical_uid, sequence, calendar_event_id, title, start_at, end_at, last_event_id)
+         VALUES (?, 'uid-1', ?, 'gcal-1', 'Busy', ?, ?, ?)
+         ON CONFLICT (tenant_id, ical_uid) DO UPDATE SET
            sequence = excluded.sequence, start_at = excluded.start_at, end_at = excluded.end_at,
            last_event_id = excluded.last_event_id
          WHERE excluded.sequence > mirror_events.sequence`,
-      ).bind(sequence, start, start, `evt-${sequence}`);
+      ).bind(tenant, sequence, start, start, `evt-${tenant}-${sequence}`);
 
     await upsert(0, "2026-10-30T10:00:00-04:00").run();
     await upsert(1, "2026-10-30T11:00:00-04:00").run();
     await upsert(0, "2026-10-30T09:00:00-04:00").run();
+    await upsert(0, "2026-10-30T08:00:00-04:00", "tenant-b").run();
 
-    const rows = await env.DB.prepare("SELECT sequence, start_at FROM mirror_events").all();
-    expect(rows.results).toEqual([{ sequence: 1, start_at: "2026-10-30T11:00:00-04:00" }]);
+    const rows = await env.DB.prepare("SELECT tenant_id, sequence, start_at FROM mirror_events ORDER BY tenant_id").all();
+    expect(rows.results).toEqual([
+      { tenant_id: "tenant-a", sequence: 1, start_at: "2026-10-30T11:00:00-04:00" },
+      { tenant_id: "tenant-b", sequence: 0, start_at: "2026-10-30T08:00:00-04:00" },
+    ]);
   });
 
   it("allows only the known time block statuses", async () => {
     await expect(
       env.DB.prepare(
-        `INSERT INTO time_blocks (time_block_id, item_id, start_at, end_at, status, last_event_id)
-         VALUES ('tb-1', 'item-1', '2026-10-30T10:00:00-04:00', '2026-10-30T11:00:00-04:00', 'maybe', 'evt-1')`,
+        `INSERT INTO time_blocks (tenant_id, time_block_id, item_id, start_at, end_at, status, last_event_id)
+         VALUES ('tenant-a', 'tb-1', 'item-1', '2026-10-30T10:00:00-04:00', '2026-10-30T11:00:00-04:00', 'maybe', 'evt-1')`,
       ).run(),
     ).rejects.toThrow();
   });

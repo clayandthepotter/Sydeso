@@ -7,6 +7,8 @@ import { EVENT_CATALOG, isEventType, type EventType, type PayloadOf } from "./ca
 /** The envelope that wraps every event. Events are immutable. */
 export interface EventEnvelope<T extends EventType = EventType> {
   readonly id: string;
+  /** The tenant that owns the event. One person is one tenant. */
+  readonly tenantId: string;
   readonly type: T;
   readonly version: number;
   /** UTC instant in ISO 8601 format. */
@@ -33,6 +35,7 @@ export class EventValidationError extends Error {
 export interface CreateEventOptions {
   readonly clock: Clock;
   readonly ids: IdGenerator;
+  readonly tenantId: string;
   /** Use this ID instead of a new one. Consumers use it to derive stable IDs. */
   readonly id?: string;
   readonly correlationId?: string;
@@ -41,6 +44,7 @@ export interface CreateEventOptions {
 
 const envelopeShape = z.object({
   id: idSchema,
+  tenantId: idSchema,
   type: z.string(),
   version: z.number().int().positive(),
   occurredAt: z.iso.datetime({ offset: true }),
@@ -73,9 +77,11 @@ export function createEvent<T extends EventType>(
   const entry = EVENT_CATALOG[type];
   const parsed = entry.schema.safeParse(payload);
   if (!parsed.success) throw new EventValidationError(formatIssues("payload", parsed.error));
+  if (options.tenantId.length === 0) throw new EventValidationError(["tenantId: must not be empty"]);
 
   const event = {
     id: options.id ?? options.ids.next(),
+    tenantId: options.tenantId,
     type,
     version: entry.version,
     occurredAt: options.clock.now().toISOString(),
@@ -113,6 +119,7 @@ export function parseEvent(input: unknown): ParseEventResult {
 
   const event = {
     id: raw.id,
+    tenantId: raw.tenantId,
     type: raw.type,
     version: raw.version,
     occurredAt: raw.occurredAt,

@@ -10,6 +10,15 @@ import {
   prioritySchema,
 } from "../model.js";
 
+/* Identity */
+
+export const tenantCreatedSchema = z.object({
+  userId: idSchema,
+  email: z.email(),
+  displayName: z.string().min(1),
+  timeZone: z.string().min(1),
+});
+
 /* Capture */
 
 export const noteCapturedSchema = z.object({
@@ -155,6 +164,7 @@ const entry = <S extends z.ZodType>(source: BoundedContext, version: number, sch
  * Contexts share these events only. They never share tables.
  */
 export const EVENT_CATALOG = {
+  TenantCreated: entry("identity", 1, tenantCreatedSchema),
   NoteCaptured: entry("capture", 1, noteCapturedSchema),
   InviteReceived: entry("ingestion", 1, inviteReceivedSchema),
   InviteParsed: entry("ingestion", 1, inviteParsedSchema),

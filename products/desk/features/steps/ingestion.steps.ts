@@ -20,7 +20,7 @@ describeFeature(feature, ({ Scenario }) => {
       expect(fixture.ics).toContain("TZID=Eastern Standard Time");
     });
     When("it is parsed", () => {
-      result = parseInvite(fixture.ics, world.config.timeZone);
+      result = parseInvite(fixture.ics, world.tenant.timeZone);
     });
     Then("the event shows at the correct La Paz time", () => {
       expect(fixture.expected.outcome).toBe("parsed");
@@ -35,13 +35,14 @@ describeFeature(feature, ({ Scenario }) => {
 
     Given("an email from an address not on the allow list", () => {
       world = createWorld();
+      // The sender is allowed for another tenant only. That must not help.
       email = {
         messageId: "<msg-1@elsewhere.example>",
         from: "someone@elsewhere.example",
-        to: "invites@in.sydeso.com",
+        to: `invites+${world.tenant.inviteAddressToken}@in.sydeso.com`,
         raw: loadInviteFixture("request-basic").ics,
       };
-      expect(world.config.allowedSenders).not.toContain(email.from);
+      expect(world.tenant.allowedSenders).not.toContain(email.from);
     });
     When("the Email Worker runs", async () => {
       published = await world.emailWorker.receive(email);

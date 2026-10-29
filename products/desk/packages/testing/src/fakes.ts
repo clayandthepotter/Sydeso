@@ -19,6 +19,8 @@ import {
   type IssueRef,
   type IssueTrackerPort,
   type RawStorePort,
+  type TenantDirectoryPort,
+  type TenantSettings,
 } from "@desk/domain";
 
 /** Returns scripted items for a note text. Unknown text gives no items. */
@@ -164,5 +166,17 @@ export class FakeRawStore implements RawStorePort {
 
   async get(key: string): Promise<string | null> {
     return this.objects.get(key) ?? null;
+  }
+}
+
+export class FakeTenantDirectory implements TenantDirectoryPort {
+  constructor(private readonly tenants: readonly TenantSettings[]) {}
+
+  async get(tenantId: string): Promise<TenantSettings | null> {
+    return this.tenants.find((tenant) => tenant.tenantId === tenantId) ?? null;
+  }
+
+  async byInviteToken(token: string): Promise<TenantSettings | null> {
+    return this.tenants.find((tenant) => tenant.inviteAddressToken === token) ?? null;
   }
 }

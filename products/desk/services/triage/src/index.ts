@@ -1,7 +1,7 @@
 import {
   NotBuiltError,
   type Clock,
-  type DeskConfig,
+  type TenantDirectoryPort,
   type EventConsumer,
   type ExtractionPort,
   type InboxPort,
@@ -13,7 +13,7 @@ export interface TriageDeps {
   readonly projects: ProjectDirectoryPort;
   readonly inbox: InboxPort;
   readonly clock: Clock;
-  readonly config: Pick<DeskConfig, "timeZone" | "confidenceThreshold">;
+  readonly tenants: TenantDirectoryPort;
 }
 
 /**

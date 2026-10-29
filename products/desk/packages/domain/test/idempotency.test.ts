@@ -15,7 +15,7 @@ const note = (id: string, noteId = "note-1"): AnyEvent =>
   createEvent(
     "NoteCaptured",
     { noteId, text: "call the bank", capturedAt: "2026-10-28T09:00:00.000-04:00" },
-    { clock, ids: { next: () => id } },
+    { clock, ids: { next: () => id }, tenantId: "tenant-a" },
   );
 
 describe("appendOnce", () => {

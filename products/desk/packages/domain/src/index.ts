@@ -1,4 +1,4 @@
-export * from "./config.js";
+export * from "./tenancy.js";
 export * from "./contexts.js";
 export * from "./errors.js";
 export * from "./model.js";

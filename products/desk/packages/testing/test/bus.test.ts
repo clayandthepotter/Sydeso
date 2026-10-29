@@ -6,7 +6,7 @@ const clock = new FixedClock("2026-10-28T13:00:00Z");
 const note = createEvent(
   "NoteCaptured",
   { noteId: "n1", text: "call the bank", capturedAt: "2026-10-28T09:00:00-04:00" },
-  { clock, ids: new SequentialIds("evt") },
+  { clock, ids: new SequentialIds("evt"), tenantId: "tenant-a" },
 );
 
 /** A consumer that publishes one ItemsExtracted per note. It is not idempotent on purpose. */
@@ -21,7 +21,7 @@ const echo = (): EventConsumer & { calls: number } => ({
       createEvent(
         "ItemsExtracted",
         { noteId: event.payload.noteId, items: [] },
-        { clock, ids: new SequentialIds("x"), id: causedEventId(event.id, "ItemsExtracted"), causationId: event.id },
+        { clock, ids: new SequentialIds("x"), tenantId: event.tenantId, id: causedEventId(event.id, "ItemsExtracted"), causationId: event.id },
       ),
     ];
   },

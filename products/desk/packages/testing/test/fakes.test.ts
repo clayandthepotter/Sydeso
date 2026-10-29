@@ -5,6 +5,7 @@ import {
   FakeCalendar,
   FakeExtraction,
   FakeIssueTracker,
+  FakeTenantDirectory,
   FixedClock,
   InMemoryEventStore,
   InMemoryInbox,
@@ -124,7 +125,7 @@ describe("InMemoryEventStore", () => {
     const event = createEvent(
       "NoteCaptured",
       { noteId: "n1", text: "call the bank", capturedAt: "2026-10-28T09:00:00-04:00" },
-      { clock: new FixedClock("2026-10-28T13:00:00Z"), ids: new SequentialIds("evt") },
+      { clock: new FixedClock("2026-10-28T13:00:00Z"), ids: new SequentialIds("evt"), tenantId: "tenant-a" },
     );
 
     expect(await store.append(event)).toBe("appended");
@@ -141,5 +142,23 @@ describe("InMemoryInbox", () => {
     expect(await inbox.markProcessed("desk-triage", "evt-1")).toBe(true);
     expect(await inbox.markProcessed("desk-triage", "evt-1")).toBe(false);
     expect(await inbox.markProcessed("desk-planner", "evt-1")).toBe(true);
+  });
+});
+
+describe("FakeTenantDirectory", () => {
+  const tenant = {
+    tenantId: "tenant-a",
+    timeZone: "America/La_Paz",
+    confidenceThreshold: 0.7,
+    allowedSenders: [],
+    inviteAddressToken: "k7m2q9",
+  };
+
+  it("finds a tenant by ID and by invite token", async () => {
+    const directory = new FakeTenantDirectory([tenant]);
+
+    expect(await directory.get("tenant-a")).toBe(tenant);
+    expect(await directory.byInviteToken("k7m2q9")).toBe(tenant);
+    expect(await directory.byInviteToken("other")).toBeNull();
   });
 });
