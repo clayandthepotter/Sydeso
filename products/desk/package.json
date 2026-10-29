@@ -12,7 +12,8 @@
     "test:db": "vitest run --project workers",
     "test:features": "vitest run --project features",
     "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json && tsc -p apps/web/tsconfig.json && tsc -p apps/web/tsconfig.sw.json",
+    "build": "pnpm --filter @desk/web build"
   },
   "devDependencies": {
     "@amiceli/vitest-cucumber": "8.0.0",

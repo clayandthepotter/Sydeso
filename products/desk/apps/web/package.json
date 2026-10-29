@@ -10,5 +10,11 @@
   "dependencies": {
     "@desk/domain": "workspace:*",
     "@simplewebauthn/browser": "13.3.0"
+  },
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
   }
 }

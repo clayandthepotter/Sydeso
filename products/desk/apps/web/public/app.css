@@ -1,0 +1,296 @@
+/* Desk. Tokens follow the Sydeso product UI guide. */
+:root {
+  --bg: #0a0a0a;
+  --surface: #121212;
+  --surface-2: #181818;
+  --surface-3: #202020;
+  --ink: #ededea;
+  --ink-2: #b6b6b0;
+  --muted: #86867f;
+  --faint: #5a5a55;
+  --line: rgba(237, 237, 234, 0.08);
+  --line-strong: rgba(237, 237, 234, 0.16);
+  --accent: #c4ff00;
+  --accent-ink: #0a0a0a;
+  --accent-soft: rgba(196, 255, 0, 0.12);
+  --danger: #ff4a2a;
+  --danger-soft: rgba(255, 74, 42, 0.14);
+  --warn: #ffb02e;
+  --warn-soft: rgba(255, 176, 46, 0.14);
+  --radius: 6px;
+  --font: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.5 var(--font);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+main {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 600;
+  margin: 24px 0 8px;
+}
+
+h2 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 28px 0 8px;
+}
+
+.loading,
+.lede,
+.fine {
+  color: var(--ink-2);
+}
+
+.fine {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.brand img {
+  border-radius: 6px;
+}
+
+.auth {
+  padding-top: 12vh;
+}
+
+.auth .primary {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.stack {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+input,
+textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 16px; /* 16px stops iOS from zooming on focus. */
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 112px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+button[disabled] {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.secondary {
+  background: var(--surface-2);
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--ink-2);
+  border-color: var(--line);
+  min-height: 36px;
+  font-size: 13px;
+}
+
+.link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  padding: 0;
+  min-height: 0;
+  text-decoration: underline;
+}
+
+.desk header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.desk header .brand {
+  margin-right: auto;
+}
+
+.chip,
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.chip::before,
+.state::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ok {
+  color: var(--accent);
+  border-color: var(--accent-soft);
+}
+
+.warn {
+  color: var(--warn);
+  border-color: var(--warn-soft);
+}
+
+.capture {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notice {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+
+.notice.error {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+}
+
+.notice.info {
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+}
+
+.notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.notes li {
+  padding: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.notes li:first-child {
+  border-top: none;
+}
+
+.notes .text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.notes .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.notes .state {
+  border: none;
+  padding: 0;
+}
+
+.notes .empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 24px 12px;
+}

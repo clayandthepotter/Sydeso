@@ -16,5 +16,8 @@
     "features/**/*.ts",
     "vitest.config.ts",
     "test/**/*.ts"
+  ],
+  "exclude": [
+    "apps/web/src/browser/**"
   ]
 }
