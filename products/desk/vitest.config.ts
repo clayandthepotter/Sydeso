@@ -39,6 +39,7 @@ export default defineConfig({
         test: {
           name: "db",
           include: ["test/db/**/*.test.ts"],
+          setupFiles: ["test/db/apply-migrations.ts"],
         },
       },
     ],

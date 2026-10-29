@@ -12,7 +12,7 @@
     "test:db": "vitest run --project db",
     "test:features": "vitest run --project features",
     "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json && tsc -p test/db/tsconfig.json"
   },
   "devDependencies": {
     "@amiceli/vitest-cucumber": "8.0.0",
