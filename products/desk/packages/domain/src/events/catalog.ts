@@ -60,12 +60,10 @@ export const itemsExtractedSchema = z.object({
   items: z.array(itemSchema),
 });
 
+/** Carries the full item, so consumers need no other context's tables. */
 export const itemRoutedSchema = z.object({
-  itemId: idSchema,
-  noteId: idSchema,
-  project: z.string().min(1),
+  item: itemSchema.extend({ project: z.string().min(1) }),
   state: linearStateSchema,
-  priority: prioritySchema,
 });
 
 export const reviewSourceSchema = z.discriminatedUnion("kind", [

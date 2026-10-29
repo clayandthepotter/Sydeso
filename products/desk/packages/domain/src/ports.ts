@@ -62,8 +62,12 @@ export interface IssueQuery {
   readonly priority?: Priority;
 }
 
-export interface IssueTrackerPort {
+/** The Linear projects that triage can route to. */
+export interface ProjectDirectoryPort {
   listProjects(): Promise<readonly string[]>;
+}
+
+export interface IssueTrackerPort extends ProjectDirectoryPort {
   createIssue(draft: IssueDraft): Promise<IssueRef>;
   updateIssue(issueId: string, changes: IssueChanges): Promise<void>;
   countIssues(query: IssueQuery): Promise<number>;
@@ -92,6 +96,13 @@ export interface AvailabilityPort {
   busyIntervals(range: Interval): Promise<readonly Interval[]>;
 }
 
+/* Raw storage (R2 desk-raw) */
+
+export interface RawStorePort {
+  put(key: string, body: string): Promise<void>;
+  get(key: string): Promise<string | null>;
+}
+
 /* Event store (D1 desk-events) */
 
 export type AppendResult = "appended" | "duplicate";
@@ -107,4 +118,14 @@ export interface EventStorePort {
 export interface InboxPort {
   /** Returns true the first time, and false for a repeat delivery. */
   markProcessed(consumer: string, eventId: string): Promise<boolean>;
+}
+
+/**
+ * A context that reacts to events. A queue consumer Worker wraps it.
+ * It returns the events it publishes. One message per step keeps CPU time small.
+ */
+export interface EventConsumer {
+  readonly name: string;
+  readonly consumes: readonly EventType[];
+  handle(event: AnyEvent): Promise<readonly AnyEvent[]>;
 }

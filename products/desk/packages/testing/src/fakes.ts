@@ -18,6 +18,7 @@ import {
   type IssueQuery,
   type IssueRef,
   type IssueTrackerPort,
+  type RawStorePort,
 } from "@desk/domain";
 
 /** Returns scripted items for a note text. Unknown text gives no items. */
@@ -150,5 +151,18 @@ export class InMemoryInbox implements InboxPort {
     if (this.seen.has(key)) return false;
     this.seen.add(key);
     return true;
+  }
+}
+
+/** An in memory R2 bucket. */
+export class FakeRawStore implements RawStorePort {
+  readonly objects = new Map<string, string>();
+
+  async put(key: string, body: string): Promise<void> {
+    this.objects.set(key, body);
+  }
+
+  async get(key: string): Promise<string | null> {
+    return this.objects.get(key) ?? null;
   }
 }
