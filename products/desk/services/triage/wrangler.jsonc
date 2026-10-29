@@ -1,0 +1,33 @@
+{
+  // desk-triage. Reads desk-triage-inbox. Extracts items with Claude and routes them.
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "desk-triage",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "d1_databases": [
+    { "binding": "DB", "database_name": "desk-events", "database_id": "32c0de8b-d44a-413c-a30d-e65246d13974" }
+  ],
+  "queues": {
+    "consumers": [
+      {
+        "queue": "desk-triage-inbox",
+        "max_batch_size": 5,
+        "max_batch_timeout": 2,
+        "max_retries": 5,
+        "dead_letter_queue": "desk-triage-dlq"
+      }
+    ],
+    "producers": [{ "binding": "PLANNER_QUEUE", "queue": "desk-planner-inbox" }]
+  },
+  "vars": {
+    "AI_GATEWAY_URL": "https://gateway.ai.cloudflare.com/v1/a1661db9c7fddbc59324385493deb453/desk-ai/anthropic",
+    "CLAUDE_MODEL": "claude-opus-5-5",
+    "CLAUDE_EFFORT": "low",
+    "CLAUDE_FALLBACKS": "on"
+  },
+  // Secret: ANTHROPIC_API_KEY (wrangler secret put ANTHROPIC_API_KEY)
+  "observability": { "enabled": true }
+}

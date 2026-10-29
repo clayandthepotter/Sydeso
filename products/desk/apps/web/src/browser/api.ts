@@ -6,11 +6,35 @@ export interface User {
   readonly timeZone: string;
 }
 
+export interface TriageItem {
+  readonly itemId: string;
+  readonly action: string;
+  readonly project: string | null;
+  readonly dueDate: string | null;
+  readonly priority: "P1" | "P2" | "P3";
+  readonly status: "extracted" | "routed" | "needs_review" | "created";
+  readonly state: "Today" | "Next" | "Later" | null;
+  readonly issueKey: string | null;
+  readonly reviewReason: string | null;
+}
+
+export interface NoteTriage {
+  readonly items: readonly TriageItem[];
+  readonly noteReview: string | null;
+}
+
 export interface ServerNote {
   readonly noteId: string;
   readonly text: string;
   readonly capturedAt: string;
+  readonly triage: NoteTriage | null;
 }
+
+export type LinearStatus = { connected: false } | { connected: true; teamName: string };
+
+export type LinearConnectResult =
+  | { kind: "choose_team"; teams: Array<{ id: string; name: string }> }
+  | { kind: "connected"; teamName: string; projects: string[]; missingStates: string[] };
 
 export class ApiError extends Error {
   constructor(
@@ -21,7 +45,7 @@ export class ApiError extends Error {
   }
 }
 
-async function call<T>(method: "GET" | "POST", path: string, body?: unknown): Promise<T> {
+async function call<T>(method: "GET" | "POST" | "DELETE", path: string, body?: unknown): Promise<T> {
   const response = await fetch(path, {
     method,
     credentials: "same-origin",
@@ -43,6 +67,11 @@ export const api = {
   loginVerify: (challengeId: string, response: unknown) =>
     call<{ user: User }>("POST", "/api/auth/login/verify", { challengeId, response }),
   logout: () => call<{ ok: true }>("POST", "/api/auth/logout", {}),
+  linearStatus: () => call<LinearStatus>("GET", "/api/integrations/linear"),
+  linearConnect: (apiKey: string, teamId?: string) =>
+    call<LinearConnectResult>("POST", "/api/integrations/linear", { apiKey, ...(teamId && { teamId }) }),
+  linearRefresh: () => call<LinearConnectResult>("POST", "/api/integrations/linear/refresh", {}),
+  linearDisconnect: () => call<LinearStatus>("DELETE", "/api/integrations/linear"),
 };
 
 /** Text for each error code from the API. */
@@ -55,4 +84,9 @@ export const ERROR_TEXT: Record<string, string> = {
   invalid_input: "Check the fields and try again.",
   rate_limited: "Too many attempts. Wait one minute and try again.",
   signed_out: "Your session ended. Sign in again.",
+  linear_invalid_key: "Linear did not accept this API key. Check the key and try again.",
+  linear_no_teams: "This Linear key has no teams.",
+  linear_unknown_team: "That team is not available for this key.",
+  linear_not_connected: "Connect Linear first.",
+  linear_error: "Linear did not answer. Try again.",
 };

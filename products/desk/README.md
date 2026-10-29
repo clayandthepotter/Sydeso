@@ -14,10 +14,18 @@ Live at https://desk.sydeso.com. Sign-up is invite only.
 |---|---|---|
 | 1 | Repo, events, migrations, fixtures, scenarios | Done |
 | 2 | PWA offline note box and sync, invite sign-up, passkey sign-in | Done, deployed |
-| 3 | Triage and Linear routing | Not started |
+| 3 | Triage and Linear routing | Built and tested. Waits for deploy. |
 | 4 | Invite forwarding and the mirror calendar | Not started |
 | 5 | Time block proposals and the morning brief | Not started |
 | 6 | Tauri shell | Not started |
+
+## Connect Linear (step 3)
+
+1. In Linear, make the workflow states **Today**, **Next**, and **Later** in your team.
+2. In Linear, open Settings, then Security & access, then Personal API keys. Make a key.
+3. In Desk, tap **Linear**, paste the key, and tap **Connect Linear**.
+
+Desk then sends each note to Claude. Each item goes to a Linear project, or to review if Desk is not sure.
 
 ## Install on a phone
 

@@ -175,7 +175,7 @@ The starting scenarios are in `features/`.
 
 1. Repo, event schema, D1 migrations, fixtures, failing scenarios. **Done.**
 2. PWA with offline note box and sync, invite sign-up, passkey sign-in. **Done. Live at https://desk.sydeso.com.**
-3. Triage and Linear routing. Claude on the server, through AI Gateway.
+3. Triage and Linear routing. Claude on the server, through AI Gateway. **Built and tested. Waits for deploy.**
 4. Calendar: connect Google Calendar, a meeting note for each event, the morning brief, and the corporate invite mirror.
 5. Time block proposals, confirmed by the user.
 6. Desk for Windows: Tauri shell, quick capture hotkey, and bot-free meeting capture with transcription. Meeting action items go to triage.

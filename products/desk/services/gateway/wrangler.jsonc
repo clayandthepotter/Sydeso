@@ -23,6 +23,13 @@
     }
   ],
   "r2_buckets": [{ "binding": "RAW", "bucket_name": "desk-raw" }],
+  "queues": {
+    "producers": [
+      { "binding": "TRIAGE_QUEUE", "queue": "desk-triage-inbox" },
+      { "binding": "PLANNER_QUEUE", "queue": "desk-planner-inbox" }
+    ]
+  },
+  // Secret: DESK_SECRETS_KEY. 32 random bytes in base64. The same value as on desk-planner.
   "ratelimits": [{ "name": "AUTH_RATE_LIMITER", "namespace_id": "1701", "simple": { "limit": 30, "period": 60 } }],
   "vars": {
     "APP_ORIGIN": "https://desk.sydeso.com",

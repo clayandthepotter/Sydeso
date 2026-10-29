@@ -294,3 +294,57 @@ button[disabled] {
   text-align: center;
   padding: 24px 12px;
 }
+
+.items,
+.projects {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
+.item-action {
+  overflow-wrap: anywhere;
+}
+
+.item-state {
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.item-state.ok {
+  color: var(--accent);
+}
+
+.item-state.warn,
+.triage.warn {
+  color: var(--warn);
+}
+
+.muted,
+.triage.muted {
+  color: var(--muted);
+}
+
+.triage {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.projects li {
+  font-size: 14px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}

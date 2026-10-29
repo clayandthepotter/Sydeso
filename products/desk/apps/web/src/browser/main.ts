@@ -1,6 +1,6 @@
 import { browserSupportsWebAuthn, startAuthentication, startRegistration } from "@simplewebauthn/browser";
 import { createNoteBox, EmptyNoteError, type LocalNote, type NoteBox } from "../note-box.js";
-import { api, ApiError, ERROR_TEXT, type User } from "./api.js";
+import { api, ApiError, ERROR_TEXT, type LinearConnectResult, type NoteTriage, type TriageItem, type User } from "./api.js";
 import { BrowserConnectivity } from "./connectivity.js";
 import { IndexedDbNoteStore } from "./idb.js";
 import { HttpSyncTransport } from "./transport.js";
@@ -9,6 +9,10 @@ const USER_KEY = "desk.user";
 const DEVICE_KEY = "desk.deviceId";
 const MAX_NOTE_LENGTH = 20_000;
 const RETRY_MS = 15_000;
+/** How often to ask for triage results while a synced note has none. */
+const TRIAGE_POLL_MS = 8_000;
+/** Stop asking after this long. Triage normally takes a few seconds. */
+const TRIAGE_WAIT_MS = 3 * 60_000;
 
 /* Small DOM helpers. Text always goes in with textContent. */
 
@@ -262,11 +266,76 @@ function timeLabel(capturedAt: string, timeZone: string) {
   }).format(new Date(capturedAt));
 }
 
+/** The triage result of each note, from the last server list. */
+const triageByNote = new Map<string, NoteTriage>();
+
 async function mergeServerNotes(store: IndexedDbNoteStore) {
   const { notes } = await api.notes();
   for (const note of notes) {
-    if (!(await store.get(note.noteId))) await store.put({ ...note, syncState: "synced" });
+    if (note.triage) triageByNote.set(note.noteId, note.triage);
+    if (!(await store.get(note.noteId))) {
+      await store.put({ noteId: note.noteId, text: note.text, capturedAt: note.capturedAt, syncState: "synced" });
+    }
   }
+}
+
+const REVIEW_TEXT: Record<string, string> = {
+  low_confidence: "Needs review: Desk is not sure about this item",
+  no_project: "Needs review: no matching Linear project",
+  extraction_refused: "Needs review: the model did not read this note",
+};
+
+const STATE_TEXT = (item: TriageItem) => (item.state ? ` · ${item.state}` : "");
+
+function itemLine(item: TriageItem) {
+  const text =
+    item.status === "created"
+      ? `${item.issueKey ?? "Linear"}${STATE_TEXT(item)}`
+      : item.status === "needs_review"
+        ? (REVIEW_TEXT[item.reviewReason ?? ""] ?? "Needs review")
+        : item.status === "routed"
+          ? `Waiting for Linear${STATE_TEXT(item)}`
+          : "Triaging";
+  const kind = item.status === "created" ? "ok" : item.status === "needs_review" ? "warn" : "muted";
+  return h(
+    "li",
+    {},
+    h("span", { class: "item-action" }, item.action),
+    h("span", { class: `item-state ${kind}` }, text),
+  );
+}
+
+function triageBlock(note: LocalNote) {
+  if (note.syncState !== "synced") return null;
+  const triage = triageByNote.get(note.noteId);
+  if (!triage) {
+    const age = Date.now() - Date.parse(note.capturedAt);
+    return age < TRIAGE_WAIT_MS ? h("p", { class: "triage muted" }, "Triaging") : null;
+  }
+  if (triage.noteReview) return h("p", { class: "triage warn" }, REVIEW_TEXT[triage.noteReview] ?? "Needs review");
+  if (triage.items.length === 0) return h("p", { class: "triage muted" }, "No tasks found");
+  return h("ul", { class: "items" }, ...triage.items.map(itemLine));
+}
+
+/** Asks for triage results while a recent synced note has none. */
+let polling: ReturnType<typeof setTimeout> | null = null;
+function pollTriage(store: IndexedDbNoteStore) {
+  if (polling) return;
+  const tick = async () => {
+    polling = null;
+    if (!navigator.onLine || document.visibilityState !== "visible") return;
+    const waiting = (await store.list()).some(
+      (note) =>
+        note.syncState === "synced" &&
+        !triageByNote.has(note.noteId) &&
+        Date.now() - Date.parse(note.capturedAt) < TRIAGE_WAIT_MS,
+    );
+    if (!waiting) return;
+    await mergeServerNotes(store).catch(() => undefined);
+    await rerender();
+    polling = setTimeout(() => void tick(), TRIAGE_POLL_MS);
+  };
+  polling = setTimeout(() => void tick(), TRIAGE_POLL_MS);
 }
 
 function notesView(user: User) {
@@ -322,6 +391,7 @@ function notesView(user: User) {
               "li",
               {},
               h("p", { class: "text" }, note.text),
+              triageBlock(note),
               h(
                 "p",
                 { class: "meta" },
@@ -353,7 +423,10 @@ function notesView(user: User) {
     }
   });
 
-  rerender = render;
+  rerender = async () => {
+    await render();
+    pollTriage(store);
+  };
 
   const signOut = async () => {
     const pending = (await box.list()).filter((note) => note.syncState === "pending").length;
@@ -373,6 +446,7 @@ function notesView(user: User) {
         {},
         brand(),
         chip,
+        h("button", { type: "button", class: "ghost", onclick: () => linearView(user) }, "Linear"),
         h("button", { type: "button", class: "ghost", onclick: () => void signOut(), title: `Signed in as ${user.email}` }, "Sign out"),
       ),
       banner,
@@ -394,13 +468,105 @@ function notesView(user: User) {
     ),
   );
 
-  void render();
+  void rerender();
   if (navigator.onLine) {
     void box.sync();
     mergeServerNotes(store)
-      .then(render)
+      .then(rerender)
       .catch(() => undefined);
   }
+}
+
+/* Linear settings */
+
+function linearView(user: User) {
+  rerender = async () => undefined;
+  const status = h("div", { class: "slot" });
+  const body = h("div", { class: "stack" });
+  const back = h("button", { type: "button", class: "ghost", onclick: () => notesView(user) }, "Back to notes");
+
+  const showResult = (result: LinearConnectResult) => {
+    body.replaceChildren();
+    if (result.kind === "choose_team") {
+      body.append(h("p", { class: "lede" }, "Choose the Linear team for Desk."));
+      return result;
+    }
+    body.append(
+      h("p", { class: "lede" }, `Connected to ${result.teamName}. Desk can route to ${result.projects.length} projects.`),
+      result.projects.length === 0
+        ? h("p", { class: "notice info" }, "The team has no projects. Add projects in Linear, then refresh.")
+        : h("ul", { class: "projects" }, ...result.projects.map((name) => h("li", {}, name))),
+    );
+    if (result.missingStates.length > 0) {
+      body.append(
+        h(
+          "p",
+          { class: "notice info" },
+          `Add these workflow states to the team in Linear: ${result.missingStates.join(", ")}. Then tap Refresh. Desk keeps new items until then.`,
+        ),
+      );
+    }
+    body.append(
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "secondary", onclick: () => void run(() => api.linearRefresh()) }, "Refresh"),
+        h("button", {
+          type: "button",
+          class: "ghost",
+          onclick: async () => {
+            await api.linearDisconnect().catch(() => undefined);
+            linearView(user);
+          },
+        }, "Disconnect"),
+      ),
+    );
+    return result;
+  };
+
+  const run = async (action: () => Promise<LinearConnectResult>) => {
+    status.replaceChildren();
+    try {
+      return showResult(await action());
+    } catch (error) {
+      status.append(notice(errorText(error)));
+      return null;
+    }
+  };
+
+  const connectForm = () => {
+    const key = h("input", { type: "password", name: "apiKey", autocomplete: "off", required: true, spellcheck: "false" });
+    const form = h(
+      "form",
+      {
+        class: "stack",
+        onsubmit: async (event: Event) => {
+          event.preventDefault();
+          const result = await run(() => api.linearConnect(key.value));
+          if (result?.kind === "choose_team") {
+            body.append(
+              ...result.teams.map((team) =>
+                h("button", { type: "button", class: "secondary", onclick: () => void run(() => api.linearConnect(key.value, team.id)) }, team.name),
+              ),
+            );
+          }
+        },
+      },
+      h("p", { class: "lede" }, "Desk creates your work items in Linear. Your Linear team needs the workflow states Today, Next, and Later."),
+      h("p", { class: "fine" }, "In Linear, open Settings, then Security & access, then Personal API keys. Make a key and paste it here. Desk stores it encrypted."),
+      h("label", {}, h("span", {}, "Linear API key"), key),
+      h("button", { type: "submit", class: "primary" }, "Connect Linear"),
+    );
+    body.replaceChildren(form);
+  };
+
+  show(h("main", { class: "desk" }, h("header", {}, brand(), back), h("h1", {}, "Linear"), body, status));
+
+  api
+    .linearStatus()
+    .then((linear) => {
+      if (linear.connected) void run(() => api.linearRefresh());
+      else connectForm();
+    })
+    .catch((error) => status.append(notice(errorText(error))));
 }
 
 function signedIn(user: User) {
