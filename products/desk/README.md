@@ -1,6 +1,6 @@
 # Desk
 
-Desk is a personal capture and planning app for one user. It runs on Cloudflare.
+Desk is a capture and planning app by Sydeso. It runs on Cloudflare. It is multi-tenant: one person is one tenant.
 
 You type notes into one box. An agent extracts work items, routes them to Linear projects, and proposes time blocks on your calendar. You confirm each block with one tap. Desk also mirrors forwarded corporate invites to Google Calendar and gives a morning brief.
 
@@ -8,17 +8,25 @@ See `HANDOFF.md` for the full design and the rules.
 
 ## Status
 
-Build step 1 of 6 is done: the repo, the event schema, the D1 migrations, the fixtures, and the failing scenarios.
-The services are stubs. Nothing is deployed.
+Live at https://desk.sydeso.com. Sign-up is invite only.
 
 | Step | Scope | Status |
 |---|---|---|
 | 1 | Repo, events, migrations, fixtures, scenarios | Done |
-| 2 | PWA offline note box and sync (Capture) | Not started |
+| 2 | PWA offline note box and sync, invite sign-up, passkey sign-in | Done, deployed |
 | 3 | Triage and Linear routing | Not started |
 | 4 | Invite forwarding and the mirror calendar | Not started |
 | 5 | Time block proposals and the morning brief | Not started |
 | 6 | Tauri shell | Not started |
+
+## Install on a phone
+
+1. Open the invite link on the phone. Enter your email and name. Tap **Continue**, then **Create passkey**.
+2. iPhone (Safari): tap **Share**, then **Add to Home Screen**.
+3. Android (Chrome): tap the menu, then **Install app** or **Add to Home screen**.
+4. Open Desk from the home screen. Next time, tap **Sign in with a passkey**.
+
+To test offline: turn on airplane mode, open Desk, and save a note. The note shows "On this device". Turn off airplane mode. The note changes to "Synced".
 
 ## How events flow
 
@@ -61,13 +69,14 @@ pnpm install
 | Command | What it runs |
 |---|---|
 | `pnpm test` | All test projects |
-| `pnpm test:domain` | Unit tests for `packages/domain` and `packages/testing` |
-| `pnpm test:db` | D1 migration tests in the Workers runtime (Miniflare) |
+| `pnpm test:domain` | Unit tests for domain, testing, the PWA note box, and capture |
+| `pnpm test:db` | D1 migration and desk-api tests in the Workers runtime (Miniflare) |
 | `pnpm test:features` | The Gherkin scenarios in `features/` |
 | `pnpm test:watch` | All projects in watch mode |
-| `pnpm typecheck` | TypeScript for Node code and for Workers code |
+| `pnpm typecheck` | TypeScript for Node, Workers, browser, and service worker code |
+| `pnpm build` | Builds the PWA into `apps/web/dist` |
 
-Expected result today: the domain, testing, and db projects pass. Each scenario fails with `NotBuiltError`, because its service is not built yet. Later steps in a failing scenario can also fail, because the earlier step did not run.
+Expected result today: the domain, testing, app, and workers projects pass. The offline capture scenario passes. Each scenario fails with `NotBuiltError`, because its service is not built yet. Later steps in a failing scenario can also fail, because the earlier step did not run.
 
 ## Layout
 
@@ -101,6 +110,50 @@ test/db/            Workers runtime tests for the migrations.
 - **Ports.** `ExtractionPort`, `IssueTrackerPort`, `CalendarPort`, `AvailabilityPort`, `Clock`, `IdGenerator`, `EventStorePort`, `InboxPort`, and `RawStorePort`. Real adapters come with each build step.
 - **Config.** `DeskConfig` holds the time zone, the confidence threshold, and the allowed senders. Workers read the values from environment variables. The code has no defaults.
 
-## Before deploy
+## Run locally
 
-Do not deploy yet. Confirm the items in `HANDOFF.md` under "Items to confirm with the user before deploy".
+```bash
+pnpm build
+cd services/gateway
+printf 'APP_ORIGIN=http://localhost:8787\nRP_ID=localhost\n' > .dev.vars
+npx wrangler d1 migrations apply desk-events --local
+npx wrangler dev --port 8787 --local-upstream localhost:8787
+```
+
+`--local-upstream` keeps the Origin header at localhost. Without it, the Origin check rejects each request.
+
+Make a local invite, then run the browser test with a virtual passkey:
+
+```bash
+node scripts/create-invite.mjs --local --origin http://localhost:8787
+node apps/web/e2e/phone-flow.cjs "<join link>" /tmp
+```
+
+## Deploy
+
+Ask the user first. The resources are `desk-api` (Worker), `desk-events` (D1), and `desk-raw` (R2).
+
+```bash
+pnpm build
+cd services/gateway
+npx wrangler d1 migrations apply desk-events --remote
+npx wrangler deploy
+```
+
+Move `.dev.vars` away before `wrangler deploy`, or it can change local only values.
+
+## Invites
+
+```bash
+node scripts/create-invite.mjs --days 7 --note "who it is for"
+node scripts/create-invite.mjs --email person@example.com   # only this email can use it
+```
+
+An invite works once. The database keeps only its SHA-256 hash.
+
+## Not done yet
+
+- Email one-time codes as a sign-in fallback. This needs a mail sender.
+- Account recovery. If you lose all passkeys, make a new invite for now.
+- More than one passkey per account.
+- Realtime sync between devices (Durable Object). Today the list loads from the server when the app opens.

@@ -163,12 +163,15 @@ Feature Request -> Artifact -> Workflow Run -> Transition -> Job -> Runner -> Ou
 Desk is a personal capture and planning app on Cloudflare. It is a separate pnpm workspace in `products/desk`. See `products/desk/HANDOFF.md`.
 
 - [x] Step 1: repo, event schema, D1 migrations, fixtures, and failing scenarios.
-- [ ] Step 2: PWA with offline note box and sync (Capture).
+- [x] Step 2: PWA with offline note box and sync (Capture). Live at https://desk.sydeso.com.
+- [x] Multi-tenant identity: invite sign-up, passkey sign-in, sessions, tenant isolation.
+- [ ] Email one-time code sign-in fallback (needs a mail sender).
+- [ ] Account recovery and more than one passkey per account.
 - [ ] Step 3: Triage and Linear routing.
 - [ ] Step 4: Invite forwarding: Email Worker, parser, and mirror calendar.
 - [ ] Step 5: Time block proposals and the morning brief.
 - [ ] Step 6: Tauri shell.
-- [ ] Before deploy: confirm the zone, the `in.sydeso.com` MX records, the forwarding policy, the Outlook rule, and the `desk.sydeso.com` name with the user.
+- [ ] Before step 4: confirm the `in.sydeso.com` MX records, the forwarding policy, and the Outlook rule with the user.
 
 ## Phase 1: Real App Foundation
 

@@ -6,7 +6,8 @@ Read `HANDOFF.md` first. It has the goal, the locked decisions, and the rules.
 
 - Desk is a separate pnpm workspace. Run every command in `products/desk`.
 - Do not touch other Sydeso resources. Prefix every Cloudflare resource with `desk-`.
-- Never deploy. Never change DNS, Email Routing, or Access policies. Ask the user first.
+- Ask the user before each deploy, DNS change, Email Routing change, or Access change.
+- Every event and every row has a tenant ID. Every query filters on it. Test isolation with two tenants.
 - Tests first. Write or change a scenario or unit test, see it fail, then write the code.
 - Domain logic in `packages/domain` is pure. No I/O. No `Date.now()`. Use the `Clock` and `IdGenerator` ports.
 - Contexts share events only. A context never reads another context's tables.
@@ -22,7 +23,8 @@ Read `HANDOFF.md` first. It has the goal, the locked decisions, and the rules.
 pnpm install
 pnpm test           # all projects
 pnpm test:domain    # domain and testing packages
-pnpm test:db        # D1 migrations in the Workers runtime
+pnpm test:db        # D1 migrations and desk-api in the Workers runtime
 pnpm test:features  # Gherkin scenarios
 pnpm typecheck
+pnpm build          # builds the PWA into apps/web/dist
 ```

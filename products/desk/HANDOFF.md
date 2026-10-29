@@ -13,7 +13,7 @@ Desk must also:
 
 ## Locked decisions
 
-- One user. One tenant. Time zone: America/La_Paz (UTC-04:00).
+- Multi-tenant from day one (changed on 2026-10-29). One person is one tenant. Each tenant has its own time zone, Linear, Google Calendar, and invite address. The first tenant is Clayton, in America/La_Paz (UTC-04:00).
 - Platform: Cloudflare only. The account is paid. Domain: `sydeso.com`.
 - Client: one web app. It is installed as a PWA on Windows and phone.
 - Windows wrapper: Tauri. It adds only a global hotkey, tray icon, autostart, and single instance. The wrapper has no business logic. Build it last.
@@ -22,7 +22,7 @@ Desk must also:
 - Corporate calendars cannot be subscribed or published (company security). The only way in is forwarded invites. Mirror them to a "Corporate Mirror" Google calendar. The unified calendar subscribes to that calendar.
 - The agent writes time blocks to its own "Desk Focus Blocks" Google calendar. The unified calendar subscribes to it.
 - LLM: Claude API, called through Cloudflare AI Gateway.
-- Auth: Cloudflare Access. Allow only the user's email.
+- Auth (changed on 2026-10-29): Desk owns its accounts in D1. Sign-up is invite only. Sign-in uses a passkey. An email one-time code comes later, when Desk has a mail sender. Cloudflare Access is not used.
 
 ## Name and isolation rules
 
@@ -39,7 +39,7 @@ Rules for Desk:
 - App and API host: `desk.sydeso.com`. Do not use `api.sydeso.com` or `app.sydeso.com`.
 - Inbound email host: `in.sydeso.com`. Addresses: `invites@in.sydeso.com` and `notes@in.sydeso.com`.
 - Never enable Email Routing on the root domain. It replaces MX records and can stop existing mail.
-- Use a separate Access policy for `desk.sydeso.com`.
+- Inbound invite addresses are per tenant: `invites+TOKEN@in.sydeso.com`. Each tenant sets its allowed corporate senders.
 
 ## Items to confirm with the user before deploy
 
@@ -88,15 +88,16 @@ store raw in R2                             |
 | Morning brief and shutdown prompt | Cron Triggers |
 | App hosting | Workers static assets |
 | LLM calls | AI Gateway |
-| Auth | Cloudflare Access |
+| Auth | Identity context in `desk-api`: invites, passkeys (WebAuthn), sessions in D1 |
 | OAuth tokens (Google, Linear) | Worker secrets. KV or Durable Object for refresh state. Create a new `desk-` namespace. Do not use `INBOX`. |
 
 ## Domain model (DDD)
 
-Five bounded contexts. Each is its own Worker. Contexts share events only. They never share tables.
+Six bounded contexts. Identity owns tenants, users, and sessions. Each context is its own Worker when it has a queue consumer. Identity and Capture run inside `desk-api` for now. Contexts share events only. They never share tables.
 
 | Context | Owns | Publishes |
 |---|---|---|
+| Identity | Tenants, users, passkeys, sessions, invites | `TenantCreated` |
 | Capture | Raw notes. Notes are immutable. | `NoteCaptured` |
 | Ingestion | Raw forwarded emails and parsed invites | `InviteReceived`, `InviteParsed`, `InviteRejected` |
 | Triage | Extraction and routing | `ItemsExtracted`, `ItemRouted`, `ItemNeedsReview` |
@@ -110,6 +111,7 @@ Ubiquitous language: Note, Item, Work Item, Time Block, Mirror Event, Review Que
 ## Rules the system must keep
 
 - The event log is append only. Build read models from it.
+- Every event and every row has a tenant ID. Every query filters on it.
 - Every event has an ID. Every consumer is idempotent on that ID. Queues deliver at least once.
 - Notes get their ID on the client. The server ignores duplicate IDs.
 - Never guess silently. An item below the confidence threshold goes to the Review Queue.
@@ -119,7 +121,7 @@ Ubiquitous language: Note, Item, Work Item, Time Block, Mirror Event, Review Que
 - Invite dedupe key: the iCalUID. A higher SEQUENCE replaces the old event. METHOD CANCEL removes the mirror event. Parse failures go to the Review Queue.
 - Mirror only time, duration, and a short title (or "Busy"). Never copy confidential invite details. Mark mirror events as Busy.
 - Convert invite time zones to America/La_Paz.
-- The Email Worker accepts mail only from the user's corporate address. Reject all other senders and write `InviteRejected`.
+- The Email Worker finds the tenant from the address token. It accepts mail only from that tenant's allowed senders. Reject all other senders and write `InviteRejected`.
 - Keep each Worker step small (CPU limits). One queue message per step.
 
 ## Testing approach
@@ -137,7 +139,7 @@ The starting scenarios are in `features/`.
 ## Build order
 
 1. Repo, event schema, D1 migrations, fixtures, failing scenarios. **Done.**
-2. PWA with offline note box and sync (Capture).
+2. PWA with offline note box and sync (Capture), plus invite sign-up and passkey sign-in. **Done. Live at https://desk.sydeso.com.**
 3. Triage and Linear routing.
 4. Invite forwarding: Email Worker, parser, mirror calendar.
 5. Time block proposals and the morning brief.

@@ -45,8 +45,11 @@ jobs:
 
       # The Gherkin scenarios fail on purpose until each service is built.
       # Add `pnpm test:features` here when all scenarios pass.
-      - name: Domain and testing unit tests
+      - name: Unit tests
         run: pnpm test:domain
 
-      - name: D1 migration tests
+      - name: Workers runtime tests
         run: pnpm test:db
+
+      - name: Build the PWA
+        run: pnpm build

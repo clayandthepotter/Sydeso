@@ -18,7 +18,7 @@
     {
       "binding": "DB",
       "database_name": "desk-events",
-      "database_id": "DESK_EVENTS_DATABASE_ID",
+      "database_id": "32c0de8b-d44a-413c-a30d-e65246d13974",
       "migrations_dir": "../../migrations"
     }
   ],
