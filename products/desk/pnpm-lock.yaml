@@ -17,6 +17,33 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^5.20261001.0
         version: 5.20261029.1
+      '@desk/capture':
+        specifier: workspace:*
+        version: link:services/capture
+      '@desk/domain':
+        specifier: workspace:*
+        version: link:packages/domain
+      '@desk/gateway':
+        specifier: workspace:*
+        version: link:services/gateway
+      '@desk/ingestion':
+        specifier: workspace:*
+        version: link:services/ingestion
+      '@desk/planning':
+        specifier: workspace:*
+        version: link:services/planning
+      '@desk/scheduling':
+        specifier: workspace:*
+        version: link:services/scheduling
+      '@desk/testing':
+        specifier: workspace:*
+        version: link:packages/testing
+      '@desk/triage':
+        specifier: workspace:*
+        version: link:services/triage
+      '@desk/web':
+        specifier: workspace:*
+        version: link:apps/web
       '@types/node':
         specifier: ^22.10.2
         version: 22.20.5
