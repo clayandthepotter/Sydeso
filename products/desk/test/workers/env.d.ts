@@ -4,6 +4,7 @@ declare global {
   namespace Cloudflare {
     interface Env {
       DB: D1Database;
+      RAW: R2Bucket;
       TEST_MIGRATIONS: D1Migration[];
     }
   }

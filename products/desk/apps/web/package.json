@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "description": "Desk PWA. Offline note box and sync queue.",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@desk/domain": "workspace:*" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@desk/domain": "workspace:*",
+    "@simplewebauthn/browser": "13.3.0"
+  }
 }

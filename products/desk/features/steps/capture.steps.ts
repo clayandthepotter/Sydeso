@@ -1,9 +1,8 @@
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { USER_TIME_ZONE } from "@desk/domain";
-import { FixedClock, SequentialIds } from "@desk/testing";
+import { FakeConnectivity, FakeLocalNoteStore, FakeSyncTransport, FixedClock, SequentialIds } from "@desk/testing";
 import { createNoteBox, type LocalNote, type NoteBox } from "@desk/web";
 import { expect } from "vitest";
-import { FakeConnectivity, FakeLocalNoteStore, FakeSyncTransport } from "../support/web.js";
 import { SCENARIO_NOW } from "../support/world.js";
 
 const feature = await loadFeature("../capture.feature");

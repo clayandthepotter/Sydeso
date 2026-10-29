@@ -20,6 +20,13 @@ export default defineConfig({
       },
       {
         test: {
+          name: "app",
+          environment: "node",
+          include: ["apps/web/test/**/*.test.ts", "services/*/test/**/*.test.ts"],
+        },
+      },
+      {
+        test: {
           name: "features",
           environment: "node",
           include: ["features/steps/**/*.steps.ts"],
@@ -32,14 +39,15 @@ export default defineConfig({
               compatibilityDate: "2026-10-01",
               compatibilityFlags: ["nodejs_compat"],
               d1Databases: { DB: "desk-events" },
+              r2Buckets: ["RAW"],
               bindings: { TEST_MIGRATIONS: await readD1Migrations("migrations") },
             },
           })),
         ],
         test: {
-          name: "db",
-          include: ["test/db/**/*.test.ts"],
-          setupFiles: ["test/db/apply-migrations.ts"],
+          name: "workers",
+          include: ["test/workers/**/*.test.ts"],
+          setupFiles: ["test/workers/apply-migrations.ts"],
         },
       },
     ],

@@ -4,6 +4,13 @@
   "private": true,
   "type": "module",
   "description": "Fake adapters and fixture helpers for Desk tests.",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@desk/domain": "workspace:*" }
+  "exports": {
+    ".": "./src/index.ts",
+    "./passkeys": "./src/passkeys.ts"
+  },
+  "dependencies": {
+    "@desk/domain": "workspace:*",
+    "@desk/web": "workspace:*",
+    "@desk/identity": "workspace:*"
+  }
 }

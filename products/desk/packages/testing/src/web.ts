@@ -16,11 +16,15 @@ export class FakeLocalNoteStore implements LocalNoteStore {
 
 export class FakeSyncTransport implements SyncTransport {
   readonly sent: LocalNote[] = [];
+  /** The next sends fail with this error, one per entry. */
+  readonly failures: Error[] = [];
 
   constructor(private readonly connectivity: Connectivity) {}
 
   async send(note: LocalNote): Promise<void> {
     if (!this.connectivity.isOnline()) throw new Error("Network is offline");
+    const failure = this.failures.shift();
+    if (failure) throw failure;
     this.sent.push(note);
   }
 }
@@ -34,7 +38,7 @@ export class FakeConnectivity implements Connectivity {
     return this.online;
   }
 
-  onOnline(listener: () => void): void {
+  onOnline(listener: () => unknown): void {
     this.listeners.push(listener);
   }
 

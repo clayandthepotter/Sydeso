@@ -1,0 +1,9 @@
+{
+  "name": "@desk/cloudflare",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare adapters for Desk ports: D1 event store, D1 inbox, R2 raw store.",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@desk/domain": "workspace:*" }
+}

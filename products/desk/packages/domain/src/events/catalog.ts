@@ -23,10 +23,10 @@ export const tenantCreatedSchema = z.object({
 
 export const noteCapturedSchema = z.object({
   /** The client sets this ID. The server ignores a duplicate. */
-  noteId: idSchema,
-  text: z.string().min(1),
+  noteId: z.string().min(1).max(64),
+  text: z.string().trim().min(1).max(20_000),
   capturedAt: instantSchema,
-  deviceId: idSchema.optional(),
+  deviceId: z.string().min(1).max(64).optional(),
 });
 
 /* Ingestion */

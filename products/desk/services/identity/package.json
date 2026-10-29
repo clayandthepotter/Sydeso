@@ -1,0 +1,15 @@
+{
+  "name": "@desk/identity",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Desk identity context. Tenants, users, passkeys, sessions, and invites.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@desk/domain": "workspace:*",
+    "@simplewebauthn/server": "13.3.3",
+    "zod": "^4.1.0"
+  }
+}

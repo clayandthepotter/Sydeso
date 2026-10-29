@@ -8,19 +8,21 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "test:domain": "vitest run --project domain --project testing",
-    "test:db": "vitest run --project db",
+    "test:domain": "vitest run --project domain --project testing --project app",
+    "test:db": "vitest run --project workers",
     "test:features": "vitest run --project features",
     "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.json && tsc -p test/db/tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "@amiceli/vitest-cucumber": "8.0.0",
     "@cloudflare/vitest-plugin": "1.4.10",
     "@cloudflare/workers-types": "^5.20261001.0",
     "@desk/capture": "workspace:*",
+    "@desk/cloudflare": "workspace:*",
     "@desk/domain": "workspace:*",
     "@desk/gateway": "workspace:*",
+    "@desk/identity": "workspace:*",
     "@desk/ingestion": "workspace:*",
     "@desk/planning": "workspace:*",
     "@desk/scheduling": "workspace:*",
@@ -28,6 +30,7 @@
     "@desk/triage": "workspace:*",
     "@desk/web": "workspace:*",
     "@types/node": "^22.10.2",
+    "esbuild": "0.28.2",
     "typescript": "^5.7.2",
     "vitest": "5.0.5",
     "wrangler": "4.155.0"
