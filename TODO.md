@@ -171,6 +171,10 @@ Desk is a personal capture and planning app on Cloudflare. It is a separate pnpm
 - [ ] Add the Claude API key to desk-triage (user, in the Cloudflare dashboard).
 - [ ] Linear OAuth instead of personal API keys, before other people use Desk.
 - [ ] A way to triage again: notes saved before step 3, and items in review.
+- [ ] Editable notes that sync between devices (document model, local copy, live sync, merge).
+- [ ] Desktop app shell with the prototype layout: sidebar timeline, tabs, Today, Review.
+- [ ] Built-in Kanban board for personal tasks with configurable statuses.
+- [ ] More work tools behind IssueTrackerPort: Jira, Asana, ClickUp, GitHub Issues.
 - [ ] Step 4: Calendar, meeting notes, morning brief, and the corporate invite mirror.
 - [ ] Step 5: Time block proposals.
 - [ ] Step 6: Desk for Windows with bot-free meeting capture.

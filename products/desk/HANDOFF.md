@@ -14,6 +14,13 @@ Decisions from the user:
 3. Build path C: Desk stays the planning brain on Cloudflare. The Tauri desktop app captures meetings. Reuse MIT parts of anarlog where they fit, with credit. Never copy from anarlog's `enterprise/` folder.
 4. Desk is a product for many people, with free and paid plans.
 
+More decisions (2026-10-30), from the prototype at https://claude.ai/artifact/EbaWCii42jjvcNfuiW5Qes:
+
+5. Desk for Windows is the main client. Its layout follows anarlog: a sidebar with a timeline, tabs, and a note with Memos, Summary, and Transcript.
+6. Notes sync between the desktop and the phone, like Obsidian or Simplenote. A note is a document that the user edits on any device. Each device keeps a full local copy and works offline. Changes reach the other devices within seconds. Concurrent edits merge, and no edit is lost.
+7. Tasks: a built-in Kanban board for personal tasks, with statuses that the user configures. Work tasks go to project tools through `IssueTrackerPort`: Linear first, then other common tools such as Jira, Asana, ClickUp, and GitHub Issues.
+8. Look: the dev.sydeso.com light theme. Geist for all text, ink #141413 on #F7F7F4, and lime #C4FF00 as the accent.
+
 ```mermaid
 flowchart LR
   subgraph Win["Desk for Windows (Tauri)"]
