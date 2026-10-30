@@ -9,7 +9,8 @@ export type IdentityErrorCode =
   | "email_taken"
   | "challenge_expired"
   | "verification_failed"
-  | "unknown_passkey";
+  | "unknown_passkey"
+  | "link_invalid";
 
 export class IdentityError extends Error {
   override readonly name = "IdentityError";
@@ -23,6 +24,7 @@ export interface IdentitySettings {
   readonly sessionTtlDays: number;
   readonly challengeTtlMinutes: number;
   readonly defaultConfidenceThreshold: number;
+  readonly deviceLinkTtlMinutes: number;
 }
 
 export interface IdentityDeps {
@@ -72,6 +74,8 @@ const registerPayloadSchema = z.object({
   timeZone: z.string(),
   webauthnUserId: z.string(),
 });
+
+const devicePayloadSchema = z.object({ codeHash: z.string(), userId: z.string() });
 
 const addMinutes = (date: Date, minutes: number) => new Date(date.getTime() + minutes * 60_000).toISOString();
 
@@ -170,7 +174,9 @@ export function createIdentity(deps: IdentityDeps) {
     /** Step 2 of sign-up. Verifies the passkey, then makes the tenant, the user, and a session in one batch. */
     async finishRegistration(input: { challengeId: unknown; response: unknown; userAgent: string | null }): Promise<NewSession> {
       const row = await takeChallenge("register", input.challengeId);
-      const payload = registerPayloadSchema.parse(JSON.parse(row.payload));
+      const parsedPayload = registerPayloadSchema.safeParse(JSON.parse(row.payload));
+      if (!parsedPayload.success) throw new IdentityError("invite_invalid");
+      const payload = parsedPayload.data;
       const passkey = await verifier.verifyRegistration({ response: input.response, challenge: row.challenge });
       if (!passkey) throw new IdentityError("verification_failed");
 
@@ -306,6 +312,104 @@ export function createIdentity(deps: IdentityDeps) {
           .bind(verified.newCounter, now().toISOString(), credentialId),
         session.statement,
       ]);
+      return { token: session.token, expiresAt: session.expiresAt, principal };
+    },
+
+    /** Makes a one use link that adds a passkey on another device to this account. */
+    async createDeviceLink(userId: string): Promise<{ code: string; expiresAt: string }> {
+      const code = randomToken(24);
+      const expiresAt = addMinutes(now(), settings.deviceLinkTtlMinutes);
+      await db
+        .prepare("INSERT INTO device_links (code_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)")
+        .bind(await sha256Hex(code), userId, now().toISOString(), expiresAt)
+        .run();
+      return { code, expiresAt };
+    },
+
+    /** Step 1 on the new device. Checks the link and returns WebAuthn options for the same account. */
+    async startDeviceRegistration(input: { code: unknown }) {
+      if (typeof input.code !== "string" || input.code.length < 8 || input.code.length > 128) {
+        throw new IdentityError("link_invalid");
+      }
+      const codeHash = await sha256Hex(input.code);
+      const user = await db
+        .prepare(
+          `SELECT u.user_id, u.email, u.display_name, u.webauthn_user_id
+           FROM device_links d JOIN users u ON u.user_id = d.user_id
+           WHERE d.code_hash = ? AND d.used_at IS NULL AND d.expires_at > ?`,
+        )
+        .bind(codeHash, now().toISOString())
+        .first<{ user_id: string; email: string; display_name: string; webauthn_user_id: string }>();
+      if (!user) throw new IdentityError("link_invalid");
+      const existing = await db
+        .prepare("SELECT credential_id FROM passkeys WHERE user_id = ?")
+        .bind(user.user_id)
+        .all<{ credential_id: string }>();
+      const { options, challenge } = await verifier.registrationOptions({
+        webauthnUserId: user.webauthn_user_id,
+        userName: user.email,
+        displayName: user.display_name,
+        excludeCredentialIds: existing.results.map((row) => row.credential_id),
+      });
+      const challengeId = await saveChallenge("register", challenge, { codeHash, userId: user.user_id, device: true });
+      return { challengeId, options };
+    },
+
+    /** Step 2 on the new device. Uses the link once, adds the passkey, and starts a session. */
+    async finishDeviceRegistration(input: { challengeId: unknown; response: unknown; userAgent: string | null }): Promise<NewSession> {
+      const row = await takeChallenge("register", input.challengeId);
+      const parsed = devicePayloadSchema.safeParse(JSON.parse(row.payload));
+      if (!parsed.success) throw new IdentityError("link_invalid");
+      const { codeHash, userId } = parsed.data;
+      const passkey = await verifier.verifyRegistration({ response: input.response, challenge: row.challenge });
+      if (!passkey) throw new IdentityError("verification_failed");
+
+      const principalRow = await db
+        .prepare(
+          `SELECT u.user_id, u.tenant_id, u.email, u.display_name, t.time_zone
+           FROM users u JOIN tenants t ON t.tenant_id = u.tenant_id WHERE u.user_id = ?`,
+        )
+        .bind(userId)
+        .first<PrincipalRow>();
+      if (!principalRow) throw new IdentityError("link_invalid");
+      const principal = toPrincipal(principalRow);
+
+      const at = now().toISOString();
+      const marker = String(input.challengeId);
+      const session = await sessionStatement(principal, input.userAgent);
+      // The passkey and the session are added only if this request used the link. D1 runs a batch as one transaction.
+      const used = "EXISTS (SELECT 1 FROM device_links WHERE code_hash = ? AND used_by = ?)";
+      const results = await db.batch([
+        db
+          .prepare("UPDATE device_links SET used_at = ?, used_by = ? WHERE code_hash = ? AND used_at IS NULL AND expires_at > ?")
+          .bind(at, marker, codeHash, at),
+        db
+          .prepare(
+            `INSERT OR IGNORE INTO passkeys (credential_id, user_id, public_key, counter, transports, device_type, backed_up, created_at)
+             SELECT ?, ?, ?, ?, ?, ?, ?, ? WHERE ${used}`,
+          )
+          .bind(
+            passkey.credentialId,
+            userId,
+            passkey.publicKey,
+            passkey.counter,
+            JSON.stringify(passkey.transports),
+            passkey.deviceType,
+            passkey.backedUp ? 1 : 0,
+            at,
+            codeHash,
+            marker,
+          ),
+        db
+          .prepare(
+            `INSERT INTO sessions (token_hash, user_id, tenant_id, created_at, expires_at, user_agent)
+             SELECT token_hash, user_id, tenant_id, created_at, expires_at, user_agent
+             FROM (SELECT ? AS token_hash, ? AS user_id, ? AS tenant_id, ? AS created_at, ? AS expires_at, ? AS user_agent)
+             WHERE ${used}`,
+          )
+          .bind(await sha256Hex(session.token), userId, principal.tenantId, at, session.expiresAt, input.userAgent, codeHash, marker),
+      ]);
+      if (results[2]?.meta.changes !== 1) throw new IdentityError("link_invalid");
       return { token: session.token, expiresAt: session.expiresAt, principal };
     },
 

@@ -34,6 +34,7 @@ const appEnv: AppEnv = {
   SESSION_TTL_DAYS: "30",
   CHALLENGE_TTL_MINUTES: "5",
   DEFAULT_CONFIDENCE_THRESHOLD: "0.7",
+  DEVICE_LINK_TTL_MINUTES: "15",
 };
 
 const app = createApp({ env: appEnv, clock, verifier: new FakePasskeyVerifier() });

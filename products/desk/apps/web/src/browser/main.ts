@@ -1,4 +1,5 @@
 import { browserSupportsWebAuthn, startAuthentication, startRegistration } from "@simplewebauthn/browser";
+import qrcode from "qrcode-generator";
 import { createNoteBox, EmptyNoteError, type LocalNote, type NoteBox } from "../note-box.js";
 import { api, ApiError, ERROR_TEXT, type LinearConnectResult, type NoteTriage, type TriageItem, type User } from "./api.js";
 import { BrowserConnectivity } from "./connectivity.js";
@@ -137,6 +138,11 @@ function signInView(message?: string) {
       browserSupportsWebAuthn() ? button : notice("This browser does not support passkeys. Use a current browser."),
       status,
       h("p", { class: "fine" }, "New to Desk? Open the invite link that you got."),
+      h(
+        "p",
+        { class: "fine" },
+        "New device? On a device where you are signed in, tap Add device and scan the code. A passkey made with a Windows PIN works only on that computer.",
+      ),
     ),
   );
 }
@@ -213,6 +219,106 @@ function joinView(inviteCode: string) {
       h("p", { class: "lede" }, "Make your account. Desk uses a passkey. There is no password."),
       browserSupportsWebAuthn() ? form : notice("This browser does not support passkeys. Use a current browser."),
       steps,
+      status,
+    ),
+  );
+}
+
+/* Add a device */
+
+/** On a signed-in device: show a QR code and a link for the new device. */
+function addDeviceView(user: User) {
+  rerender = async () => undefined;
+  const status = h("div", { class: "slot" });
+  const body = h("div", { class: "stack" });
+  const back = h("button", { type: "button", class: "ghost", onclick: () => notesView(user) }, "Back to notes");
+  show(h("main", { class: "desk" }, h("header", {}, brand(), back), h("h1", {}, "Add a device"), body, status));
+
+  const make = async () => {
+    status.replaceChildren();
+    body.replaceChildren(h("p", { class: "lede" }, "Making a link"));
+    try {
+      const { url, expiresAt } = await api.deviceLink();
+      const qr = qrcode(0, "M");
+      qr.addData(url);
+      qr.make();
+      const until = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date(expiresAt));
+      const copy = h(
+        "button",
+        {
+          type: "button",
+          class: "secondary",
+          onclick: async () => {
+            try {
+              await navigator.clipboard.writeText(url);
+              copy.textContent = "Link copied";
+            } catch {
+              copy.textContent = "Copy did not work. Scan the code.";
+            }
+          },
+        },
+        "Copy link",
+      );
+      body.replaceChildren(
+        h("p", { class: "lede" }, "On your other device, scan this code with the camera. Then create a passkey there."),
+        h("img", { class: "qr", src: qr.createDataURL(6, 2), alt: "QR code for the device link", width: "240", height: "240" }),
+        h("p", { class: "fine" }, `The link works one time, until ${until}.`),
+        h("div", { class: "row" }, copy, h("button", { type: "button", class: "ghost", onclick: () => void make() }, "New link")),
+      );
+    } catch (error) {
+      body.replaceChildren();
+      status.append(notice(errorText(error)));
+    }
+  };
+  void make();
+}
+
+/** On the new device: make a passkey for the existing account. */
+function linkDeviceView(code: string) {
+  const status = h("div", { class: "slot" });
+  let pending: Promise<{ challengeId: string; options: unknown }> | null = null;
+  // Get the options before the tap. Safari needs the passkey call to start from the tap.
+  const prefetch = () => {
+    pending = api.deviceOptions(code);
+    pending.catch((error) => {
+      status.replaceChildren(notice(errorText(error)));
+    });
+  };
+  prefetch();
+
+  const button = h(
+    "button",
+    {
+      class: "primary",
+      type: "button",
+      onclick: async () => {
+        status.replaceChildren();
+        button.toggleAttribute("disabled", true);
+        try {
+          const { challengeId, options } = await (pending ?? api.deviceOptions(code));
+          const response = await startRegistration({ optionsJSON: options as never });
+          const { user } = await api.deviceVerify(challengeId, response);
+          history.replaceState(null, "", "/");
+          signedIn(user);
+        } catch (error) {
+          status.append(notice(errorText(error)));
+          if (!(error instanceof ApiError && error.code === "link_invalid")) prefetch();
+        } finally {
+          button.toggleAttribute("disabled", false);
+        }
+      },
+    },
+    "Create passkey on this device",
+  );
+
+  show(
+    h(
+      "main",
+      { class: "auth" },
+      brand(),
+      h("h1", {}, "Add this device"),
+      h("p", { class: "lede" }, "This device gets its own passkey for your Desk account. You sign in with Face ID, a fingerprint, or your screen lock."),
+      browserSupportsWebAuthn() ? button : notice("This browser does not support passkeys. Use a current browser."),
       status,
     ),
   );
@@ -446,6 +552,7 @@ function notesView(user: User) {
         {},
         brand(),
         chip,
+        h("button", { type: "button", class: "ghost", onclick: () => addDeviceView(user) }, "Add device"),
         h("button", { type: "button", class: "ghost", onclick: () => linearView(user) }, "Linear"),
         h("button", { type: "button", class: "ghost", onclick: () => void signOut(), title: `Signed in as ${user.email}` }, "Sign out"),
       ),
@@ -578,6 +685,10 @@ function signedIn(user: User) {
 
 async function start() {
   const url = new URL(location.href);
+  if (url.pathname === "/link") {
+    const code = url.searchParams.get("code") ?? "";
+    if (code) return linkDeviceView(code);
+  }
   if (url.pathname === "/join") {
     const code = url.searchParams.get("code") ?? "";
     if (code) return joinView(code);

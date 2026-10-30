@@ -32,7 +32,13 @@ export interface PasskeyOptions {
 
 /** WebAuthn. The real adapter uses SimpleWebAuthn. Tests use a fake. */
 export interface PasskeyVerifierPort {
-  registrationOptions(input: { webauthnUserId: string; userName: string; displayName: string }): Promise<PasskeyOptions>;
+  registrationOptions(input: {
+    webauthnUserId: string;
+    userName: string;
+    displayName: string;
+    /** Passkeys the account has. The device does not make a second one for the same authenticator. */
+    excludeCredentialIds?: readonly string[];
+  }): Promise<PasskeyOptions>;
   verifyRegistration(input: { response: unknown; challenge: string }): Promise<NewPasskey | null>;
   authenticationOptions(): Promise<PasskeyOptions>;
   /** The credential ID in a sign-in response, before verification. */
@@ -68,7 +74,12 @@ type Transport = NonNullable<RegistrationResponseJSON["response"]["transports"]>
 export class SimpleWebAuthnVerifier implements PasskeyVerifierPort {
   constructor(private readonly rp: RelyingParty) {}
 
-  async registrationOptions(input: { webauthnUserId: string; userName: string; displayName: string }) {
+  async registrationOptions(input: {
+    webauthnUserId: string;
+    userName: string;
+    displayName: string;
+    excludeCredentialIds?: readonly string[];
+  }) {
     const options = await generateRegistrationOptions({
       rpName: this.rp.rpName,
       rpID: this.rp.rpId,
@@ -76,6 +87,7 @@ export class SimpleWebAuthnVerifier implements PasskeyVerifierPort {
       userName: input.userName,
       userDisplayName: input.displayName,
       attestationType: "none",
+      excludeCredentials: (input.excludeCredentialIds ?? []).map((id) => ({ id })),
       authenticatorSelection: { residentKey: "required", userVerification: "preferred" },
     });
     return { options, challenge: options.challenge };

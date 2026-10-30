@@ -348,3 +348,17 @@ button[disabled] {
   border: 1px solid var(--line);
   border-radius: 4px;
 }
+
+.qr {
+  width: 240px;
+  height: 240px;
+  image-rendering: pixelated;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px;
+  justify-self: center;
+}
+
+.desk header {
+  flex-wrap: wrap;
+}

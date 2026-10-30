@@ -31,6 +31,7 @@ export interface AppEnv {
   readonly SESSION_TTL_DAYS: string;
   readonly CHALLENGE_TTL_MINUTES: string;
   readonly DEFAULT_CONFIDENCE_THRESHOLD: string;
+  readonly DEVICE_LINK_TTL_MINUTES: string;
   readonly AUTH_RATE_LIMITER?: RateLimit;
   readonly TRIAGE_QUEUE: Queue;
   readonly PLANNER_QUEUE: Queue;
@@ -53,6 +54,7 @@ const IDENTITY_STATUS: Record<IdentityErrorCode, number> = {
   challenge_expired: 400,
   verification_failed: 401,
   unknown_passkey: 401,
+  link_invalid: 403,
 };
 
 const numberVar = (value: string, name: string) => {
@@ -78,6 +80,7 @@ export function createApp(deps: AppDeps) {
       sessionTtlDays: numberVar(env.SESSION_TTL_DAYS, "SESSION_TTL_DAYS"),
       challengeTtlMinutes: numberVar(env.CHALLENGE_TTL_MINUTES, "CHALLENGE_TTL_MINUTES"),
       defaultConfidenceThreshold: numberVar(env.DEFAULT_CONFIDENCE_THRESHOLD, "DEFAULT_CONFIDENCE_THRESHOLD"),
+      deviceLinkTtlMinutes: numberVar(env.DEVICE_LINK_TTL_MINUTES, "DEVICE_LINK_TTL_MINUTES"),
     },
   });
 
@@ -146,6 +149,27 @@ export function createApp(deps: AppDeps) {
       const body = (await readJson(request)) as Record<string, unknown>;
       return signedIn(
         await identity.finishLogin({
+          challengeId: body.challengeId,
+          response: body.response,
+          userAgent: request.headers.get("User-Agent"),
+        }),
+      );
+    },
+    "POST /api/devices/link": (request) =>
+      withSession(request, async (principal) => {
+        const { code, expiresAt } = await identity.createDeviceLink(principal.userId);
+        const url = new URL("/link", env.APP_ORIGIN);
+        url.searchParams.set("code", code);
+        return json({ url: url.toString(), expiresAt });
+      }),
+    "POST /api/auth/device/options": async (request) => {
+      const body = (await readJson(request)) as Record<string, unknown>;
+      return json(await identity.startDeviceRegistration({ code: body.code }));
+    },
+    "POST /api/auth/device/verify": async (request) => {
+      const body = (await readJson(request)) as Record<string, unknown>;
+      return signedIn(
+        await identity.finishDeviceRegistration({
           challengeId: body.challengeId,
           response: body.response,
           userAgent: request.headers.get("User-Agent"),

@@ -63,6 +63,10 @@ export const api = {
     call<{ challengeId: string; options: unknown }>("POST", "/api/auth/register/options", input),
   registerVerify: (challengeId: string, response: unknown) =>
     call<{ user: User }>("POST", "/api/auth/register/verify", { challengeId, response }),
+  deviceLink: () => call<{ url: string; expiresAt: string }>("POST", "/api/devices/link", {}),
+  deviceOptions: (code: string) => call<{ challengeId: string; options: unknown }>("POST", "/api/auth/device/options", { code }),
+  deviceVerify: (challengeId: string, response: unknown) =>
+    call<{ user: User }>("POST", "/api/auth/device/verify", { challengeId, response }),
   loginOptions: () => call<{ challengeId: string; options: unknown }>("POST", "/api/auth/login/options", {}),
   loginVerify: (challengeId: string, response: unknown) =>
     call<{ user: User }>("POST", "/api/auth/login/verify", { challengeId, response }),
@@ -82,6 +86,7 @@ export const ERROR_TEXT: Record<string, string> = {
   verification_failed: "The passkey was not accepted. Try again.",
   unknown_passkey: "Desk does not know this passkey. Use the passkey that you made for Desk.",
   invalid_input: "Check the fields and try again.",
+  link_invalid: "This device link does not work. It can be used or expired. Make a new link on a signed-in device.",
   rate_limited: "Too many attempts. Wait one minute and try again.",
   signed_out: "Your session ended. Sign in again.",
   linear_invalid_key: "Linear did not accept this API key. Check the key and try again.",

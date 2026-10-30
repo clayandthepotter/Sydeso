@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@desk/domain": "workspace:*",
-    "@simplewebauthn/browser": "13.3.0"
+    "@simplewebauthn/browser": "13.3.0",
+    "qrcode-generator": "2.0.4"
   },
   "scripts": {
     "build": "node build.mjs"
