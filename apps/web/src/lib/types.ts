@@ -102,6 +102,8 @@ export interface WorkflowTransition {
   reason: string | null;
   metadata: unknown;
   createdAt: string;
+  /** The person's or runner's name, on the request detail. */
+  triggeredByName?: string | null;
 }
 
 export interface Job {
@@ -129,6 +131,8 @@ export interface WorkflowRun {
   remediationCount: number;
   startedAt: string;
   completedAt: string | null;
+  /** When the run entered its current state, on the request list. */
+  stateEnteredAt?: string;
 }
 
 export interface Artifact {

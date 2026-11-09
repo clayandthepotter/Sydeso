@@ -13,7 +13,7 @@ import {
   RunnerType,
   WorkflowState,
 } from "@prisma/client";
-import { defaultWorkflowRules, hasRequiredCapabilities } from "@sydeso/domain";
+import { defaultWorkflowRules, hasRequiredCapabilities, resumeStateOf } from "@sydeso/domain";
 import { createHash, randomBytes } from "node:crypto";
 
 import { ArtifactsService } from "../artifacts/artifacts.service";
@@ -111,16 +111,25 @@ export class CoreLoopService {
   }
 
   async listFeatures(projectId: string) {
-    return this.prisma.feature.findMany({
+    const features = await this.prisma.feature.findMany({
       where: { projectId },
       orderBy: { createdAt: "desc" },
       include: {
         workflowRuns: {
           orderBy: { startedAt: "desc" },
           take: 1,
+          include: { transitions: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } } },
         },
       },
     });
+    // Each run says when it entered its current state, so lists can time the step without a second request.
+    return features.map(feature => ({
+      ...feature,
+      workflowRuns: feature.workflowRuns.map(({ transitions, ...run }) => ({
+        ...run,
+        stateEnteredAt: transitions[0]?.createdAt ?? run.startedAt,
+      })),
+    }));
   }
 
   async getFeature(featureId: string) {
@@ -142,7 +151,26 @@ export class CoreLoopService {
       throw new NotFoundException("Feature not found");
     }
 
-    return feature;
+    // Name whoever moved the run: people by their name, runners by theirs.
+    const transitions = feature.workflowRuns.flatMap(run => run.transitions);
+    const ids = (type: ActorType) =>
+      Array.from(new Set(transitions.filter(t => t.triggeredByType === type && t.triggeredById).map(t => t.triggeredById!)));
+    const [users, runners] = await Promise.all([
+      this.prisma.user.findMany({ where: { id: { in: ids(ActorType.user) } }, select: { id: true, name: true } }),
+      this.prisma.runner.findMany({ where: { id: { in: ids(ActorType.runner) } }, select: { id: true, name: true } }),
+    ]);
+    const names = new Map([...users, ...runners].map(entry => [entry.id, entry.name]));
+
+    return {
+      ...feature,
+      workflowRuns: feature.workflowRuns.map(run => ({
+        ...run,
+        transitions: run.transitions.map(t => ({
+          ...t,
+          triggeredByName: t.triggeredById ? (names.get(t.triggeredById) ?? null) : null,
+        })),
+      })),
+    };
   }
 
   async getWorkflowRun(workflowRunId: string) {
@@ -171,6 +199,36 @@ export class CoreLoopService {
     reason?: string;
   }) {
     return this.prisma.$transaction(tx => this.transitionWorkflowRunTx(tx, input));
+  }
+
+  /**
+   * Close a request: the run keeps its state and its record, stops being active, and no longer
+   * accepts transitions. Queued jobs are cancelled.
+   */
+  async closeWorkflowRun(input: { workflowRunId: string; actorId: string; reason?: string }) {
+    return this.prisma.$transaction(async tx => {
+      const run = await tx.workflowRun.findUnique({ where: { id: input.workflowRunId } });
+      if (!run) throw new NotFoundException("Workflow run not found");
+      if (run.status === "closed") throw new BadRequestException("This request is already closed");
+
+      await this.cancelPendingJobs(tx, run.id);
+      const closed = await tx.workflowRun.update({
+        where: { id: run.id },
+        data: { status: "closed", completedAt: new Date() },
+      });
+      await this.audit.record(tx, {
+        organizationId: run.organizationId,
+        actorType: ActorType.user,
+        actorId: input.actorId,
+        action: "workflow.closed",
+        entityType: "workflow_run",
+        entityId: run.id,
+        before: { status: run.status, state: run.currentState },
+        after: { status: "closed", state: run.currentState },
+        metadata: input.reason ? { reason: input.reason } : undefined,
+      });
+      return closed;
+    });
   }
 
   async listArtifactsForFeature(featureId: string) {
@@ -455,12 +513,16 @@ export class CoreLoopService {
         },
       });
 
-      const nextTransition = await this.advanceAfterJobCompletion(tx, {
-        jobState: job.state,
-        workflowRunId: job.workflowRunId,
-        runnerId: runner.id,
-        status: input.status,
-      });
+      // The run moved on while the job ran (stopped, closed): keep the job's record, advance nothing.
+      const stale = job.workflowRun.status === "closed" || job.workflowRun.currentState !== job.state;
+      const nextTransition = stale
+        ? null
+        : await this.advanceAfterJobCompletion(tx, {
+            jobState: job.state,
+            workflowRunId: job.workflowRunId,
+            runnerId: runner.id,
+            status: input.status,
+          });
 
       await tx.runner.update({
         where: { id: runner.id },
@@ -530,6 +592,24 @@ export class CoreLoopService {
       throw new NotFoundException("Workflow run not found");
     }
 
+    if (run.status === "closed") {
+      throw new BadRequestException("This request was closed");
+    }
+
+    // A run in Needs you goes back only to the step it stopped at.
+    if (run.currentState === WorkflowState.escalated) {
+      const history = await tx.workflowTransition.findMany({
+        where: { workflowRunId: run.id },
+        select: { fromState: true, toState: true, createdAt: true },
+      });
+      const resume = resumeStateOf(history);
+      if (resume !== input.toState) {
+        throw new BadRequestException(
+          resume ? `This request can only start again from ${resume}` : "This request cannot start again",
+        );
+      }
+    }
+
     const rule = defaultWorkflowRules.find(
       candidate => candidate.from === run.currentState && candidate.to === input.toState,
     );
@@ -588,6 +668,11 @@ export class CoreLoopService {
       after: { state: input.toState },
       metadata: { transitionId: transition.id },
     });
+
+    // Stopping a run withdraws the work that had not started yet.
+    if (input.toState === WorkflowState.escalated) {
+      await this.cancelPendingJobs(tx, run.id);
+    }
 
     let job = null;
 
@@ -676,6 +761,14 @@ export class CoreLoopService {
       actorType: ActorType.runner,
       actorId: input.runnerId,
       reason: `Runner failed ${input.jobState} job`,
+    });
+  }
+
+  /** Cancel a run's jobs that no runner has claimed. Claimed jobs finish and are then ignored. */
+  private async cancelPendingJobs(tx: TransactionClient, workflowRunId: string) {
+    await tx.job.updateMany({
+      where: { workflowRunId, status: JobStatus.queued },
+      data: { status: JobStatus.cancelled, completedAt: new Date() },
     });
   }
 

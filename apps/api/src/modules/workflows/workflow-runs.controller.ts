@@ -1,6 +1,11 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { ActorType } from "@prisma/client";
-import { transitionWorkflowRunSchema, type TransitionWorkflowRunInput } from "@sydeso/api-contracts";
+import {
+  closeWorkflowRunSchema,
+  transitionWorkflowRunSchema,
+  type CloseWorkflowRunInput,
+  type TransitionWorkflowRunInput,
+} from "@sydeso/api-contracts";
 
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { AccessService } from "../access/access.service";
@@ -39,5 +44,17 @@ export class WorkflowRunsController {
       actorId: user.id,
       reason: body.reason,
     });
+  }
+
+  /** Close a request. It keeps its record and leaves every list of active work. */
+  @Post(":workflowRunId/close")
+  async close(
+    @CurrentUser() user: SessionUser,
+    @Param("workflowRunId") workflowRunId: string,
+    @Body(new ZodValidationPipe(closeWorkflowRunSchema)) body: CloseWorkflowRunInput,
+  ) {
+    const organizationId = await this.access.organizationOfWorkflowRun(workflowRunId);
+    await this.access.require(user.id, organizationId, "workflow.cancel");
+    return this.coreLoop.closeWorkflowRun({ workflowRunId, actorId: user.id, reason: body.reason });
   }
 }

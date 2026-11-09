@@ -8,7 +8,7 @@ import { StateGlyph } from "../../components/state-glyph";
 import { Timer } from "../../components/timer";
 import { api } from "../../lib/api";
 import { listAllProjects } from "../../lib/catalog";
-import { stepStartedAt } from "../../lib/inbox";
+import { isClosed, stepStartedAt } from "../../lib/inbox";
 import { formatDateTime, formatRelative } from "../../lib/format";
 import type { FeatureWithLatestRun } from "../../lib/types";
 import { inboxGroup, inboxGroupLabels, stateLabels, type InboxGroup } from "../../lib/workflow";
@@ -20,6 +20,7 @@ interface InboxRow {
   projectId: string;
   projectName: string;
   state: WorkflowState;
+  closed: boolean;
   group: InboxGroup;
   /** When the current state began, as closely as the list endpoint tells it. */
   since: string;
@@ -31,17 +32,19 @@ const recentWindowMs = 14 * 24 * 60 * 60 * 1000;
 export default async function HomePage() {
   const projects = await listAllProjects();
   const lists = await Promise.all(projects.map(entry => api.listFeatures(entry.project.id)));
-  const stepStarts = await stepStartedAt(lists.flat());
+  const stepStarts = stepStartedAt(lists.flat());
   const rows: InboxRow[] = projects.flatMap((entry, index) =>
     lists[index].map(request => {
       const run = request.workflowRuns[0];
       const state = run?.currentState ?? request.status;
+      const closed = isClosed(request);
       return {
         request,
         projectId: entry.project.id,
         projectName: entry.project.name,
         state,
-        group: inboxGroup(state),
+        closed,
+        group: closed ? ("recent" as const) : inboxGroup(state),
         since: stepStarts.get(request.id) ?? run?.completedAt ?? run?.startedAt ?? request.createdAt,
       };
     }),
@@ -140,7 +143,7 @@ export default async function HomePage() {
                     {showProject && <span className="muted"> · {row.projectName}</span>}
                   </span>
                   <span className="row__meta">
-                    <span className={row.group === "waiting" ? "" : "muted"}>{stateLabels[row.state]}</span>
+                    <span className={row.group === "waiting" ? "" : "muted"}>{row.closed ? "Closed" : stateLabels[row.state]}</span>
                     {row.group === "progress" ? (
                       <Timer since={row.since} />
                     ) : (

@@ -112,10 +112,11 @@ User process map first, then the UI is reworked against it: `docs/product/user-p
 - [x] User vocabulary: Request, Document, Machine; status labels; Architect, Developer, Tester; routes renamed with redirects. (Planning and Approve plan land with the engine states.)
 - [x] New request as one text area; the title is the first line. (Trial line lands with the trial.)
 - [x] Progress as a simple left-to-right line of circles; product restyled to the redesigned sydeso.com.
-- [ ] Needs you: cause above the session is done; actions need the engine exits below.
-- [ ] Engine: exits from Needs you (Try again, Start again from a step, Close request).
-- [ ] Engine: who decided, by name, on transitions.
-- [ ] Engine: when the current step began, on the list endpoint.
+- [x] Needs you: the cause above the session with Try again / Start again from the step it stopped at, and Close request.
+- [x] Engine: exits from Needs you go back only to the step the run stopped at; Close keeps the record and refuses further moves; stopping cancels queued jobs; a job that finishes after its run moved on is recorded without advancing it.
+- [x] Engine: who decided, by name, on transitions ("You" for the viewer).
+- [x] Engine: when the current step began, on the list endpoint.
+- [ ] Approve anyway on failing tests, behind the project setting (needs the project settings).
 - [ ] Engine: Research, PRD and PRD approval states; Researcher and Planner agents; design approval as a project setting.
 - [ ] Engine: live activity stream per job.
 - [ ] Sign-up flows into repository connection and the first request; default hierarchy and managed machine provisioned silently.

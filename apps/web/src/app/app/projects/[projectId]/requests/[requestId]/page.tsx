@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ArtifactForm } from "../../../../../../components/artifact-forms";
 import { CopyLink } from "../../../../../../components/copy-link";
-import { HeaderMenu } from "../../../../../../components/decision-row";
+import { DecisionRow, HeaderMenu } from "../../../../../../components/decision-row";
 import { Fold } from "../../../../../../components/fold";
 import { Icon } from "../../../../../../components/icons";
 import { JsonView } from "../../../../../../components/json-view";
@@ -17,7 +17,8 @@ import { formatDateTime, formatRelative } from "../../../../../../lib/format";
 import { can } from "../../../../../../lib/roles";
 import { buildSession, currentEntry, escalationCause } from "../../../../../../lib/run-session";
 import type { Artifact } from "../../../../../../lib/types";
-import { decisionsFor, stateLabels, stateLines, workingStates } from "../../../../../../lib/workflow";
+import { decisionsFor, stateLabels, stateLines, workingStates, type Decision } from "../../../../../../lib/workflow";
+import { resumeStateOf } from "@sydeso/domain";
 
 export const metadata = { title: "Request" };
 
@@ -40,13 +41,30 @@ export default async function RequestPage({ params }: { params: Promise<{ projec
   }
   if (request.projectId !== projectId) notFound();
 
-  const [organization, project] = await Promise.all([api.getOrganization(request.organizationId), api.getProject(projectId)]);
+  const [organization, project, me] = await Promise.all([
+    api.getOrganization(request.organizationId),
+    api.getProject(projectId),
+    api.me(),
+  ]);
   const canAddDocument = can(organization.role, "artifact.create");
   const run = request.workflowRuns[0];
   const state = run?.currentState ?? request.status;
   const visited = run ? Array.from(new Set(run.transitions.map(transition => transition.toState))) : [];
-  const blocks = run ? buildSession(run, request.artifacts, project.maxRemediationIterations) : [];
-  const decisions = run ? decisionsFor(state) : { primary: [], overflow: [] };
+  const closed = run?.status === "closed";
+  const blocks = run ? buildSession(run, request.artifacts, project.maxRemediationIterations, me?.user.id) : [];
+  const entryNow = run ? currentEntry(run) : null;
+  const allowed = (decision: Decision) =>
+    decision.kind === "close" ? can(organization.role, "workflow.cancel") : can(organization.role, "workflow.transition") || can(organization.role, "approval.approve");
+  const raw =
+    run && !closed
+      ? decisionsFor(state, {
+          resume: resumeStateOf(run.transitions),
+          byPerson: entryNow?.triggeredByType === "user",
+        })
+      : { primary: [], overflow: [] };
+  const decisions = { primary: raw.primary.filter(allowed), overflow: raw.overflow.filter(allowed) };
+  const needsDecisions = state === "escalated" ? decisions : { primary: [], overflow: [] };
+  const sessionDecisions = state === "escalated" ? { primary: [], overflow: [] } : decisions;
   const design = latestOfType(request.artifacts, "design_package");
   const report = latestOfType(request.artifacts, "qa_report");
   const code = latestOfType(request.artifacts, "implementation_package");
@@ -58,7 +76,8 @@ export default async function RequestPage({ params }: { params: Promise<{ projec
     ],
   };
   const current = run ? blocks.find(block => block.current) : undefined;
-  const running = run ? workingStates.includes(state) && current?.job?.status !== "failed" && current?.job?.status !== "cancelled" : false;
+  const running =
+    run && !closed ? workingStates.includes(state) && current?.job?.status !== "failed" && current?.job?.status !== "cancelled" : false;
   const entry = run ? currentEntry(run) : null;
   const failedJob = run ? run.jobs.filter(job => job.status === "failed").sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0] : undefined;
   const documentHref = (id: string) => `/app/projects/${projectId}/documents/${id}`;
@@ -70,9 +89,9 @@ export default async function RequestPage({ params }: { params: Promise<{ projec
           <h1 className="display">{request.title}</h1>
           <p className="status-line">
             <StateGlyph state={state} />
-            <span>{stateLabels[state]}</span>
+            <span>{closed ? "Closed" : stateLabels[state]}</span>
             {running && current && <Timer since={current.startedAt} />}
-            <span className="muted">{stateLines[state]}</span>
+            <span className="muted">{closed ? `Closed ${formatRelative(run?.completedAt)}. It keeps its record.` : stateLines[state]}</span>
           </p>
         </div>
         <div className="page__actions">
@@ -80,7 +99,7 @@ export default async function RequestPage({ params }: { params: Promise<{ projec
             workflowRunId={run?.id ?? ""}
             requestId={request.id}
             projectId={projectId}
-            decisions={run && decisions.primary.length === 0 ? decisions.overflow : []}
+            decisions={run && sessionDecisions.primary.length === 0 ? sessionDecisions.overflow : []}
           >
             <CopyLink />
             {project.repositoryUrl && (
@@ -96,17 +115,26 @@ export default async function RequestPage({ params }: { params: Promise<{ projec
 
       {run && <RunTrace currentState={state} visited={visited} />}
 
-      {run && state === "escalated" && (
+      {run && state === "escalated" && !closed && (
         <section className="needs" aria-label="Needs you">
           <p className="needs__cause">
             <Icon name="alert" size={16} />
-            <span>{escalationCause(run)}</span>
+            <span>{escalationCause(run, me?.user.id)}</span>
           </p>
           {(Boolean(failedJob?.error) || hasKeys(entry?.metadata)) && (
             <Fold label="Raw detail">
               {failedJob?.error ? <JsonView value={failedJob.error} /> : null}
               {hasKeys(entry?.metadata) ? <JsonView value={entry?.metadata} /> : null}
             </Fold>
+          )}
+          {needsDecisions.primary.length > 0 && (
+            <DecisionRow
+              workflowRunId={run.id}
+              requestId={request.id}
+              projectId={projectId}
+              primary={needsDecisions.primary}
+              overflow={needsDecisions.overflow}
+            />
           )}
         </section>
       )}
@@ -119,7 +147,7 @@ export default async function RequestPage({ params }: { params: Promise<{ projec
               projectId={projectId}
               requestId={request.id}
               workflowRunId={run.id}
-              decisions={decisions}
+              decisions={sessionDecisions}
               evidence={evidence}
             />
           ) : (

@@ -40,8 +40,13 @@ function errorSummary(error: unknown) {
   return "Failed";
 }
 
-function actorOf(transition: WorkflowTransition) {
-  if (transition.triggeredByType === "user") return "You";
+/** "You" for the viewer, the person's name for anyone else, the machine's name for a runner. */
+function actorOf(transition: WorkflowTransition, viewerId?: string) {
+  if (transition.triggeredByType === "user") {
+    if (viewerId && transition.triggeredById === viewerId) return "You";
+    return transition.triggeredByName ?? "Someone";
+  }
+  if (transition.triggeredByType === "runner") return transition.triggeredByName ? `Machine ${transition.triggeredByName}` : "Machine";
   if (transition.triggeredByType === "agent") return "Agent";
   return "System";
 }
@@ -51,7 +56,7 @@ function actorOf(transition: WorkflowTransition) {
  * order. Jobs are matched to the block whose state they serve and that opened before they were
  * created. Documents are matched by the job that produced them, else by the window of time.
  */
-export function buildSession(run: Run, artifacts: Artifact[], maxFixAttempts: number): SessionBlock[] {
+export function buildSession(run: Run, artifacts: Artifact[], maxFixAttempts: number, viewerId?: string): SessionBlock[] {
   const transitions = [...run.transitions].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const jobs = [...run.jobs].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const usedJobs = new Set<string>();
@@ -120,12 +125,12 @@ export function buildSession(run: Run, artifacts: Artifact[], maxFixAttempts: nu
       }
     } else if (humanGates.includes(state)) {
       kind = "gate";
-      actor = left ? actorOf(left) : "Waiting for you";
+      actor = left ? actorOf(left, viewerId) : "Waiting for you";
       step = left ? decisionLabel(left.fromState, left.toState) : stateLabels[state];
       documents.forEach(document => lines.push({ at: document.createdAt, text: `Added ${document.title}` }));
     } else if (state === "ready" || state === "released" || state === "escalated") {
       kind = "end";
-      actor = actorOf(entered);
+      actor = actorOf(entered, viewerId);
       step = state === "escalated" ? (entered.fromState && workingStates.includes(entered.fromState) ? "Stopped" : "Escalated") : stateLabels[state];
       if (entered.reason && entered.reason !== step && entered.reason !== "Stopped" && entered.reason !== "Escalated") {
         lines.push({ at: entered.createdAt, text: entered.reason, tone: "muted" });
@@ -133,7 +138,7 @@ export function buildSession(run: Run, artifacts: Artifact[], maxFixAttempts: nu
       endedAt = entered.createdAt;
     } else {
       kind = "human";
-      actor = actorOf(entered);
+      actor = actorOf(entered, viewerId);
       step = index === 0 ? "Submitted" : stateLabels[state];
       if (entered.reason && index > 0) lines.push({ at: entered.createdAt, text: entered.reason, tone: "muted" });
       documents.forEach(document => lines.push({ at: document.createdAt, text: `Added ${document.title}` }));
@@ -152,13 +157,14 @@ export function currentEntry(run: Run) {
 }
 
 /** The cause line for Needs you, in one of the fixed forms. */
-export function escalationCause(run: Run) {
+export function escalationCause(run: Run, viewerId?: string) {
   const entry = currentEntry(run);
   if (!entry) return "Stopped";
   const fromWorking = entry.fromState && workingStates.includes(entry.fromState);
   const failed = run.jobs.filter(job => job.status === "failed").sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
   if (entry.triggeredByType === "user") {
-    const verb = fromWorking ? "Stopped" : "Escalated";
+    const who = viewerId && entry.triggeredById === viewerId ? "you" : (entry.triggeredByName ?? "someone");
+    const verb = `${fromWorking ? "Stopped" : "Escalated"} by ${who}`;
     return entry.reason && entry.reason !== "Stopped" && entry.reason !== "Escalated" ? `${verb}: ${entry.reason}` : verb;
   }
   if (entry.reason) return entry.reason;
