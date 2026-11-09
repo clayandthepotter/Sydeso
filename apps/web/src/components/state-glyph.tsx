@@ -11,12 +11,12 @@ import { stateLabels } from "../lib/workflow";
 const glyphs: Record<WorkflowState, { icon: IconName; tone: string }> = {
   backlog: { icon: "circle", tone: "var(--muted)" },
   design: { icon: "circle-dot", tone: "var(--ink-2)" },
-  design_approval: { icon: "circle-half", tone: "var(--accent)" },
+  design_approval: { icon: "circle-half", tone: "var(--signal)" },
   development: { icon: "circle-half", tone: "var(--ink-2)" },
   automated_qa: { icon: "circle-half", tone: "var(--ink-2)" },
-  manual_review: { icon: "circle-half", tone: "var(--accent)" },
-  ready: { icon: "circle-check", tone: "var(--ink)" },
-  released: { icon: "circle-check", tone: "var(--accent)" },
+  manual_review: { icon: "circle-half", tone: "var(--signal)" },
+  ready: { icon: "circle-check", tone: "var(--ink-2)" },
+  released: { icon: "circle-check", tone: "var(--ink)" },
   escalated: { icon: "alert", tone: "var(--danger)" },
 };
 
