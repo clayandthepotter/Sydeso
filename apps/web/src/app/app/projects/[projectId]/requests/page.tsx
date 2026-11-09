@@ -19,7 +19,7 @@ export default async function RequestsPage({
 }) {
   const [{ projectId }, { view }] = await Promise.all([params, searchParams]);
   const requests = await api.listFeatures(projectId);
-  const stepStarts = await stepStartedAt(requests);
+  const stepStarts = stepStartedAt(requests);
   const board = view === "board";
   const stateOf = (request: (typeof requests)[number]) => request.workflowRuns[0]?.currentState ?? request.status;
   const groups = boardStates.map(state => ({ state, requests: requests.filter(request => stateOf(request) === state) }));
@@ -94,8 +94,9 @@ export default async function RequestsPage({
                       <StateGlyph state={state} />
                       <span className="row__title">{request.title}</span>
                       <span className="row__meta">
+                        {run?.status === "closed" && <span className="muted">Closed</span>}
                         {run && run.remediationCount > 0 && <span className="muted">Fix attempts {run.remediationCount}</span>}
-                        {workingStates.includes(state) ? (
+                        {workingStates.includes(state) && run?.status !== "closed" ? (
                           <Timer since={since} />
                         ) : (
                           <span className="muted" title={formatDateTime(since)}>

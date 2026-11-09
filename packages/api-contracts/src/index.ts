@@ -77,6 +77,10 @@ export const transitionWorkflowRunSchema = z.object({
   reason: z.string().trim().max(2000).optional(),
 });
 
+export const closeWorkflowRunSchema = z.object({
+  reason: z.string().trim().max(2000).optional(),
+});
+
 // ---------------------------------------------------------------- artifacts
 
 export const artifactTypeSchema = z.enum([
@@ -151,6 +155,7 @@ export type InviteMemberInput = z.infer<typeof inviteMemberSchema>;
 export type UpdateMemberRoleInput = z.infer<typeof updateMemberRoleSchema>;
 export type CreateFeatureInput = z.infer<typeof createFeatureSchema>;
 export type TransitionWorkflowRunInput = z.infer<typeof transitionWorkflowRunSchema>;
+export type CloseWorkflowRunInput = z.infer<typeof closeWorkflowRunSchema>;
 export type CreateArtifactInput = z.infer<typeof createArtifactSchema>;
 export type UploadArtifactQuery = z.infer<typeof uploadArtifactQuerySchema>;
 export type RegisterRunnerInput = z.infer<typeof registerRunnerSchema>;

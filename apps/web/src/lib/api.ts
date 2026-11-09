@@ -158,6 +158,8 @@ export const api = {
   getFeature: (featureId: string) => request<FeatureDetail>(`/features/${featureId}`),
   transitionWorkflowRun: (workflowRunId: string, input: { toState: WorkflowState; reason?: string }) =>
     request<WorkflowRun>(`/workflow-runs/${workflowRunId}/transitions`, json(input)),
+  closeWorkflowRun: (workflowRunId: string, input: { reason?: string } = {}) =>
+    request<WorkflowRun>(`/workflow-runs/${workflowRunId}/close`, json(input)),
 
   listProjectArtifacts: (projectId: string) => request<ArtifactWithFeature[]>(`/projects/${projectId}/artifacts`),
   getArtifact: (artifactId: string) => request<ArtifactDetail>(`/artifacts/${artifactId}`),

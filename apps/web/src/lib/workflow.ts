@@ -76,7 +76,7 @@ export function transitionsFrom(state: WorkflowState): WorkflowTransitionRule[] 
   return defaultWorkflowRules.filter(rule => rule.from === state);
 }
 
-export type DecisionKind = "approve" | "reject" | "start" | "stop" | "escalate" | "regenerate" | "release";
+export type DecisionKind = "approve" | "reject" | "start" | "stop" | "escalate" | "regenerate" | "release" | "resume" | "close";
 
 export interface Decision {
   to: WorkflowState;
@@ -95,7 +95,11 @@ export interface Decision {
  * The decision row for a state: at most two primary buttons of equal weight, the rest in the
  * overflow. Only decisions the engine's rules allow are returned.
  */
-export function decisionsFor(state: WorkflowState): { primary: Decision[]; overflow: Decision[] } {
+export function decisionsFor(
+  state: WorkflowState,
+  /** For Needs you: the step it stopped at, and whether a person stopped it. */
+  needs?: { resume: WorkflowState | null; byPerson: boolean },
+): { primary: Decision[]; overflow: Decision[] } {
   const rules = transitionsFrom(state);
   const rule = (to: WorkflowState) => rules.find(candidate => candidate.to === to);
   const primary: Decision[] = [];
@@ -129,6 +133,17 @@ export function decisionsFor(state: WorkflowState): { primary: Decision[]; overf
     case "ready":
       add(overflow, { to: "released", label: "Mark released", kind: "release" });
       break;
+    case "escalated":
+      if (needs?.resume) {
+        add(primary, {
+          to: needs.resume,
+          label: needs.byPerson ? `Start again from ${stateLabels[needs.resume]}` : "Try again",
+          kind: "resume",
+        });
+      }
+      // Closing is not a transition; the state stays as it is.
+      primary.push({ to: "escalated", label: "Close request", kind: "close", consequence: "Final. A new request starts over." });
+      break;
     default:
       break;
   }
@@ -143,6 +158,7 @@ export function decisionLabel(from: WorkflowState | null, to: WorkflowState) {
   if (from === "design_approval" && to === "design") return "Asked for changes";
   if (from === "manual_review" && to === "ready") return "Approved";
   if (from === "manual_review" && to === "development") return "Asked for changes";
+  if (from === "escalated") return "Started again";
   if (to === "released") return "Released";
   return `Moved to ${stateLabels[to]}`;
 }

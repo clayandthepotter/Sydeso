@@ -103,6 +103,7 @@ const defaultReasons: Record<string, string> = {
   escalate: "Escalated",
   regenerate: "Regenerate",
   start: "Started",
+  resume: "Started again",
 };
 
 /** A decision from the decision row: "toState|kind", with the note as the reason when given. */
@@ -116,10 +117,14 @@ export async function transitionAction(_prev: ActionState, formData: FormData): 
   const note = text(formData, "reason");
   if (kind === "reject" && !note) return { error: "A note is required to reject" };
   try {
-    await api.transitionWorkflowRun(workflowRunId, {
-      toState: parsed.data,
-      reason: note || defaultReasons[kind ?? ""] || undefined,
-    });
+    if (kind === "close") {
+      await api.closeWorkflowRun(workflowRunId, { reason: note || undefined });
+    } else {
+      await api.transitionWorkflowRun(workflowRunId, {
+        toState: parsed.data,
+        reason: note || defaultReasons[kind ?? ""] || undefined,
+      });
+    }
   } catch (error) {
     return { error: messageOf(error) };
   }
