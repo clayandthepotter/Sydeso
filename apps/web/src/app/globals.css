@@ -1679,107 +1679,132 @@ a.row:hover {
   top: calc(var(--topbar) + 1.5rem);
 }
 
-.trace {
-  padding: 0.75rem 0.75rem 0.25rem;
-  background-color: var(--surface);
-  background-image: radial-gradient(var(--line-strong) 1px, transparent 1.5px);
-  background-size: 28px 28px;
-  background-position: 14px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-l);
+/* ---- progress steps: a line with a circle per stage ---- */
+
+.steps {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: start;
+  margin: 0;
+  padding: 0.5rem 0 0.75rem;
+  list-style: none;
 }
 
-.trace svg {
+.step {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+/* the line runs from the previous circle's centre to this one's */
+.step + .step::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  right: 50%;
   width: 100%;
-  height: auto;
-  display: block;
+  height: 2px;
+  background: var(--line-strong);
+  z-index: 0;
 }
 
-.trace__bed,
-.trace__live {
-  fill: none;
-  stroke-linejoin: miter;
-  stroke-linecap: square;
+.step--done + .step::before,
+.step--done + .step--current::before,
+.step--done + .step--alert::before {
+  background: var(--accent);
 }
 
-.trace__bed {
-  stroke: var(--surface-3);
-  stroke-width: 12;
+.step__dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--line-strong);
+  color: var(--accent-ink);
 }
 
-.trace__live {
-  stroke: var(--accent);
-  stroke-width: 5;
+.step--done .step__dot {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
-.trace__live--alert {
-  stroke: var(--danger);
+.step--current .step__dot {
+  border-color: var(--accent);
 }
 
-.trace .node__pad {
-  fill: var(--bg);
-  stroke: var(--line-strong);
-  stroke-width: 1.5;
+.step--current .step__dot::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: step-pulse 1.6s ease-in-out infinite;
 }
 
-.trace .node__core {
-  fill: var(--surface-3);
+.step--alert .step__dot {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
 }
 
-.trace .node.is-on .node__pad {
-  stroke: var(--accent);
-}
-
-.trace .node.is-on .node__core {
-  fill: var(--accent);
-}
-
-.trace .node.is-current .node__core {
-  animation: blink 900ms steps(2, start) infinite;
-}
-
-.trace .node--alert.is-on .node__pad {
-  stroke: var(--danger);
-}
-
-.trace .node--alert.is-on .node__core {
-  fill: var(--danger);
-}
-
-.trace text {
-  font-family: var(--font-mono);
+.step__bang {
   font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.step__label {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0 0.25rem;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+.step--done .step__label {
+  color: var(--ink-2);
+}
+
+.step--current .step__label {
+  color: var(--ink);
   font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  fill: var(--muted);
-  paint-order: stroke fill;
-  stroke: var(--surface);
-  stroke-width: 5px;
-  stroke-linejoin: round;
 }
 
-.trace .node.is-on text {
-  fill: var(--ink-2);
+.step--alert .step__label {
+  color: var(--ink);
+  font-weight: 500;
 }
 
-.trace .node.is-current text {
-  fill: var(--ink);
+.step__note {
+  color: var(--danger);
+  font-weight: 500;
 }
 
-.trace .node--alert.is-on text {
-  fill: var(--danger);
-}
-
-@keyframes blink {
-  to {
-    fill: var(--bg);
+@keyframes step-pulse {
+  50% {
+    opacity: 0.35;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .trace .node.is-current .node__core {
+  .step--current .step__dot::after {
     animation: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .steps {
+    overflow-x: auto;
+    grid-auto-columns: minmax(72px, 1fr);
   }
 }
 

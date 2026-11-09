@@ -25,10 +25,10 @@ Where `docs/brand/visual-branding-guide.md` and this guide differ for product sc
 - Light by default, dark by choice. The ground is `#f7f7f4`; the system setting switches to the site's dark tokens.
   Hierarchy comes from three surfaces and two line weights, not from colour.
 - Ink is the strong colour. `--accent` is the theme's contrast colour (ink on light, near-white on dark): the primary
-  button, the live trace, focus.
+  button, done progress steps, focus.
 - Lime is a signal, not a theme. It is the mark, the selection, the dot on a column waiting for a person, and (as the
   darker `--signal`) the glyph of a gate. It is never a fill behind text and never decorates.
-- Sentence case, Geist, small. Product text is 13px. Mono capitals appear only in the run trace, as on the site.
+- Sentence case, Geist, small. Product text is 13px. No mono capitals in the product.
 - Rows, not cards. Lists are rows of a fixed height with a status glyph, a title and right-aligned metadata. Cards are
   for the board only.
 - Nothing jumps. Motion is 140 to 180 ms and only on hover, focus and open/close.
@@ -44,14 +44,14 @@ All colours are CSS custom properties on `:root` in `apps/web/src/app/globals.cs
 | `--bg-side` | `#f0f0eb` | `#0c0c0b` | Sidebar and topbar |
 | `--surface` | `#fcfcfa` | `#161615` | Panels, inputs, menus |
 | `--surface-2` | `#ecece7` | `#1b1b1a` | Hover on rows and nav, group headers |
-| `--surface-3` | `#e2e2dc` | `#242422` | Selected or pressed, the trace bed |
+| `--surface-3` | `#e2e2dc` | `#242422` | Selected or pressed |
 | `--ink` | `#141413` | `#f3f3ef` | Primary text |
 | `--ink-2` | `#3d3d39` | `#c9c9c3` | Secondary text, row metadata |
 | `--muted` | `#5d5d57` | `#a2a29b` | Labels, placeholders, helper text |
 | `--faint` | `#8c8c85` | `#6c6c66` | Disabled text, icons at rest |
 | `--line` | ink at 10% | near-white at 10% | Row dividers, panel borders |
 | `--line-strong` | ink at 22% | near-white at 22% | Input borders, outline buttons |
-| `--accent` | `#141413` | `#f3f3ef` | Primary button, live trace, focus ring |
+| `--accent` | `#141413` | `#f3f3ef` | Primary button, done progress steps, focus ring |
 | `--accent-ink` | `#f7f7f4` | `#111110` | Text on the accent |
 | `--lime` | `#c4ff00` | `#c4ff00` | The mark, the selection, gate dots |
 | `--signal` | `#4f6b00` | `#c4ff00` | Gate glyphs (lime that reads on the ground) |
@@ -74,7 +74,6 @@ Rules:
 | Section title | Geist | 13px / 1.4 | 500 | Sentence |
 | Label, group header | Geist | 12px / 1.4 | 500, `--muted` | Sentence |
 | Identifier, hash, code, JSON, timer | Geist Mono | 12px / 1.55 | 400 | As-is |
-| Run trace labels | Geist Mono | 11px, tracking 0.06em | 500 | Upper |
 
 Rules:
 
@@ -84,7 +83,7 @@ Rules:
 ## Spacing and shape
 
 - Base unit 4px. Component padding 8 or 12. Section gaps 16 or 24. Page gutter 24.
-- Radii: 6px keys and small marks, 8px inputs and menu items, 14px panels, rows containers, the trace and menus.
+- Radii: 6px keys and small marks, 8px inputs and menu items, 14px panels, rows containers and menus.
   Buttons, badges and segmented controls are pills.
 - Row heights: list rows 36px, sidebar items 28px, table rows 40px, inputs and buttons 32px (28px compact).
 - Borders are 1px `--line`; inputs and focused panels use `--line-strong`.
@@ -140,11 +139,13 @@ Geist 12px 500, sentence case, pill, 20px tall, 1px border. Workflow states use 
 human gates use `--signal-soft` with `--ink`; escalated uses `--danger-soft` and `--danger`; released is `--accent`
 filled. Live chips carry a 6px pulsing dot before the text.
 
-### Run trace
+### Progress steps
 
-As on sydeso.com: a 12px bed in `--surface-3`, a 5px live line in `--accent`, 24px square pads with a 9px core that
-fills when the step has been reached and blinks on the current step, Geist Mono capitals for labels, on a 28px dot grid
-inside a 14px panel. Needs you hangs below the line and lights in `--danger`, its branch dropping off the last lit pad.
+A plain left-to-right line with one 20px circle per stage and the stage name below in 12px sentence case. Done
+stages are filled `--accent` with a check, and the line behind them is `--accent`; the current stage is an `--accent`
+ring with a gently pulsing dot; stages ahead are hollow `--line-strong` rings on a `--line-strong` line. When the
+request needs a person, the stage it stopped at turns `--danger` with a "!" and "Needs you" under its name. No panel
+around it. On narrow screens the line scrolls sideways.
 
 ### Panels
 
@@ -185,7 +186,7 @@ Keyboard shortcuts are shown as 20px keys on `--surface-2` with a 6px radius, in
 - Hover and focus: 140 ms, colour only; a pressed button scales to 98%.
 - Menus, popovers, the command bar: 180 ms fade and 4px rise.
 - Page transitions: none.
-- Respect `prefers-reduced-motion`: pulses and the trace blink stop, rises become fades.
+- Respect `prefers-reduced-motion`: pulses stop, rises become fades.
 
 ## Accessibility
 
@@ -198,6 +199,6 @@ Keyboard shortcuts are shown as 20px keys on `--surface-2` with a 6px radius, in
 
 - New components take their colours, type and spacing from the tokens above; a literal colour in a component is a
   review blocker.
-- A pull request that adds an uppercase label outside the run trace explains why in its description.
+- A pull request that adds an uppercase label explains why in its description.
 - The design-lock generator and generated project guides stay separate from this guide; they describe a client's
   product, not Sydeso's.
