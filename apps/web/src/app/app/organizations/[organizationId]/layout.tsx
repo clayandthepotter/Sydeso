@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { AppShell, type NavItem } from "../../../../components/app-shell";
+import { AppShell, sydesoGroup, type NavItem } from "../../../../components/app-shell";
 import { api, ApiError } from "../../../../lib/api";
 import { can, roleLabel } from "../../../../lib/roles";
 
@@ -25,25 +25,16 @@ export default async function OrganizationLayout({
   const items: NavItem[] = [
     { href: base, label: "Projects", icon: "project", exact: true },
     { href: `${base}/members`, label: "Members", icon: "members" },
-    ...(can(organization.role, "runner.read") ? [{ href: `${base}/runners`, label: "Runners", icon: "runner" as const }] : []),
+    ...(can(organization.role, "runner.read") ? [{ href: `${base}/machines`, label: "Machines", icon: "runner" as const }] : []),
     ...(can(organization.role, "audit.read") ? [{ href: `${base}/audit`, label: "Audit log", icon: "audit" as const }] : []),
   ];
 
   return (
     <AppShell
-      organizationId={organizationId}
+      switchLabel={organization.name}
       context={{ kind: roleLabel(organization.role), name: organization.name }}
-      groups={[
-        { label: "Organization", items },
-        {
-          label: "Sydeso",
-          items: [
-            { href: "/app", label: "Organizations", icon: "organization", exact: true },
-            { href: "/app/design-lock", label: "Design lock", icon: "design" },
-          ],
-        },
-      ]}
-      crumbs={[{ href: "/app", label: "Organizations" }, { href: base, label: organization.name }]}
+      groups={[{ label: "Organization", items }, sydesoGroup]}
+      crumbs={[{ href: "/app", label: "Home" }, { href: "/app/organizations", label: "Organizations" }, { href: base, label: organization.name }]}
     >
       {children}
     </AppShell>

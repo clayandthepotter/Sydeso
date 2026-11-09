@@ -1,9 +1,9 @@
 # Sydeso Product UI Guide
 
-Version: 1.0.0
+Version: 2.0.0
 Status: Active
 Owner: Product Design
-Last Updated: 2026-10-26
+Last Updated: 2026-11-09
 Applies to: `apps/web` (the product at app.sydeso.com)
 
 ---
@@ -11,94 +11,93 @@ Applies to: `apps/web` (the product at app.sydeso.com)
 ## Purpose
 
 The marketing site sells. The product is used all day. This guide takes the marketing palette and type and turns
-them into a system for daily work: quiet surfaces, compact rows, one accent used sparingly, and chrome that gets out
-of the way. The reference for density and interaction is Linear; the reference for colour and type is sydeso.com.
+them into a system for daily work: quiet surfaces, compact rows, one strong colour, and chrome that gets out of the
+way. The reference for density and interaction is Linear; the reference for colour, type and shape is sydeso.com.
+
+2.0 follows the site redesign of November 2026: light by default on a warm off-white, Geist and Geist Mono, pill
+buttons in ink, larger radii, and lime reduced to a small signal. Dark mode follows the viewer's system setting and
+uses the site's `.theme-dark` values.
 
 Where `docs/brand/visual-branding-guide.md` and this guide differ for product screens, this guide wins.
 
 ## Principles
 
-- One black, many greys. The ground is near-black; hierarchy comes from four lifted surfaces and two line weights,
-  not from colour.
-- Lime is a signal, not a theme. It marks the primary action, the focused control, the current location and live
-  state. It is never a background for text blocks and never decorates.
-- Sentence case, Archivo, small. Product text is 13px. Uppercase mono is reserved for the few places it carries
-  information: identifiers, hashes, keyboard keys and state chips.
+- Light by default, dark by choice. The ground is `#f7f7f4`; the system setting switches to the site's dark tokens.
+  Hierarchy comes from three surfaces and two line weights, not from colour.
+- Ink is the strong colour. `--accent` is the theme's contrast colour (ink on light, near-white on dark): the primary
+  button, done progress steps, focus.
+- Lime is a signal, not a theme. It is the mark, the selection, the dot on a column waiting for a person, and (as the
+  darker `--signal`) the glyph of a gate. It is never a fill behind text and never decorates.
+- Sentence case, Geist, small. Product text is 13px. No mono capitals in the product.
 - Rows, not cards. Lists are rows of a fixed height with a status glyph, a title and right-aligned metadata. Cards are
   for the board only.
-- Edges are straight. The chamfered corner is the marketing site's. The product uses small, consistent radii.
-- Nothing jumps. Motion is 120 to 160 ms and only on hover, focus and open/close.
+- Nothing jumps. Motion is 140 to 180 ms and only on hover, focus and open/close.
 
 ## Colour tokens
 
-All colours are CSS custom properties on `:root` in `apps/web/src/app/globals.css`. Components never use literal
-colours.
+All colours are CSS custom properties on `:root` in `apps/web/src/app/globals.css`, redefined under
+`prefers-color-scheme: dark`. Components never use literal colours.
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `--bg` | `#0a0a0a` | Page ground |
-| `--bg-side` | `#0d0d0d` | Sidebar and topbar |
-| `--surface` | `#121212` | Panels, inputs, menus |
-| `--surface-2` | `#181818` | Hover on rows and nav |
-| `--surface-3` | `#202020` | Selected or pressed |
-| `--ink` | `#ededea` | Primary text |
-| `--ink-2` | `#b6b6b0` | Secondary text, row metadata |
-| `--muted` | `#86867f` | Labels, placeholders, helper text |
-| `--faint` | `#5a5a55` | Disabled text, icons at rest |
-| `--line` | `rgba(237, 237, 234, 0.08)` | Row dividers, panel borders |
-| `--line-strong` | `rgba(237, 237, 234, 0.16)` | Input borders, focused panels |
-| `--accent` | `#c4ff00` | Primary button, focus ring, current nav, live state |
-| `--accent-ink` | `#0a0a0a` | Text on the accent |
-| `--accent-soft` | `rgba(196, 255, 0, 0.12)` | Selected rows, accent chips |
-| `--danger` | `#ff4a2a` | Errors, escalation, destructive actions |
-| `--danger-soft` | `rgba(255, 74, 42, 0.14)` | Error notices, danger chips |
-| `--warn` | `#ffb02e` | Attention that is not an error: pending review, stale runner |
-| `--warn-soft` | `rgba(255, 176, 46, 0.14)` | Warn chips |
+| Token | Light | Dark | Use |
+| --- | --- | --- | --- |
+| `--bg` | `#f7f7f4` | `#111110` | Page ground |
+| `--bg-side` | `#f0f0eb` | `#0c0c0b` | Sidebar and topbar |
+| `--surface` | `#fcfcfa` | `#161615` | Panels, inputs, menus |
+| `--surface-2` | `#ecece7` | `#1b1b1a` | Hover on rows and nav, group headers |
+| `--surface-3` | `#e2e2dc` | `#242422` | Selected or pressed |
+| `--ink` | `#141413` | `#f3f3ef` | Primary text |
+| `--ink-2` | `#3d3d39` | `#c9c9c3` | Secondary text, row metadata |
+| `--muted` | `#5d5d57` | `#a2a29b` | Labels, placeholders, helper text |
+| `--faint` | `#8c8c85` | `#6c6c66` | Disabled text, icons at rest |
+| `--line` | ink at 10% | near-white at 10% | Row dividers, panel borders |
+| `--line-strong` | ink at 22% | near-white at 22% | Input borders, outline buttons |
+| `--accent` | `#141413` | `#f3f3ef` | Primary button, done progress steps, focus ring |
+| `--accent-ink` | `#f7f7f4` | `#111110` | Text on the accent |
+| `--lime` | `#c4ff00` | `#c4ff00` | The mark, the selection, gate dots |
+| `--signal` | `#4f6b00` | `#c4ff00` | Gate glyphs (lime that reads on the ground) |
+| `--signal-soft` | lime at 32% | lime at 14% | Gate chips, the one-time token notice |
+| `--danger` | `#c2381c` | `#ff6a4d` | Errors, escalation, destructive actions |
+| `--warn` | `#9a5b00` | `#ffb02e` | Attention that is not an error |
 
 Rules:
 
-- Lime text on a dark surface is for links in their hover state, the current nav item and live indicators only.
-  Body copy is never lime.
-- A screen has at most one filled lime button. Everything else is ghost or outline.
+- A screen has at most one filled ink button. Everything else is outline or ghost.
 - Status colour is always paired with a glyph or a word; colour never carries meaning alone.
 
 ## Typography
 
 | Role | Face | Size / line | Weight | Case |
 | --- | --- | --- | --- | --- |
-| Body, rows, forms | Archivo | 13px / 1.5 | 400 | Sentence |
-| Long text (descriptions, artifact prose) | Archivo | 14px / 1.6 | 400 | Sentence |
-| Page title | Archivo | 18px / 1.25 | 600 | Sentence |
-| Section title | Archivo | 13px / 1.4 | 600 | Sentence |
-| Table header, field label | Archivo | 12px / 1.4 | 500, `--muted` | Sentence |
-| Identifier, hash, key, state chip | Azeret Mono | 11px / 1 | 500, tracking 0.04em | Upper for chips and keys, as-is for IDs |
-| Code, JSON | Azeret Mono | 12px / 1.55 | 400 | As-is |
+| Body, rows, forms | Geist | 13px / 1.5 | 400 | Sentence |
+| Long text (requests, document prose) | Geist | 14px / 1.6 | 400 | Sentence |
+| Page title | Geist | 22px / 1.2, tracking -0.025em | 500 | Sentence |
+| Section title | Geist | 13px / 1.4 | 500 | Sentence |
+| Label, group header | Geist | 12px / 1.4 | 500, `--muted` | Sentence |
+| Identifier, hash, code, JSON, timer | Geist Mono | 12px / 1.55 | 400 | As-is |
 
 Rules:
 
-- Archivo is used at its normal width in the product. The stretched display cut (`font-stretch: 125%`, uppercase) is
-  reserved for the wordmark in the sidebar and the sign-in page.
-- Mono caps appear in four places: state and status chips, keyboard shortcut keys, the actor type on audit rows, and
-  the sidebar section labels. Nowhere else.
+- The `.mono` class is a small sentence-case label, as on the site; it is no longer monospace or capitals.
 - No text is smaller than 11px.
 
 ## Spacing and shape
 
 - Base unit 4px. Component padding 8 or 12. Section gaps 16 or 24. Page gutter 24.
-- Radii: 4px chips and keys, 6px buttons and inputs, 8px panels and menus. Nothing larger.
+- Radii: 6px keys and small marks, 8px inputs and menu items, 14px panels, rows containers and menus.
+  Buttons, badges and segmented controls are pills.
 - Row heights: list rows 36px, sidebar items 28px, table rows 40px, inputs and buttons 32px (28px compact).
 - Borders are 1px `--line`; inputs and focused panels use `--line-strong`.
-- Shadows only on floating layers (menus, popovers, dialogs): `0 8px 24px rgba(0, 0, 0, 0.5)`.
+- Shadows only on floating layers (menus, popovers, dialogs): `--shadow`, the site's soft two-layer shadow.
 
 ## Shell
 
-- Sidebar 240px, `--bg-side`, 1px `--line` on the right. Top: the mark and the organization name as a switcher
-  (chevron, opens a menu of organizations). Then a primary button "New feature" and a search button that opens the
-  command bar. Then grouped navigation: 28px rows, a 16px icon, label, and an optional count on the right. The current
-  item has `--surface-3` background and `--ink` text; nothing else is lime. Group labels are 11px mono caps in
+- Sidebar 240px, `--bg-side`, 1px `--line` on the right. Top: the lime mark and the current project as a switcher
+  (chevron, opens a menu of projects grouped by organization). Then the primary ink pill "New request" and a search
+  button that opens the command bar. Then grouped navigation: 28px rows, a 16px icon, label, and an optional count on
+  the right. The current item has `--surface-3` background and `--ink` text. Group labels are 12px sentence case in
   `--muted`. The bottom holds the signed-in user (name, email, sign out) and the API host.
-- Topbar 44px, `--bg-side`, 1px `--line` below. Left: breadcrumb in 13px Archivo, separators in `--faint`. Right:
-  page actions as 28px ghost buttons.
+- Topbar 48px, `--bg-side`, 1px `--line` below. Left: breadcrumb in 13px Geist, separators in `--faint`. Right:
+  page actions as icon buttons.
 - Content area: `--bg`, 24px padding, max width 1280px for forms and detail, full width for lists and the board.
 - Under 900px the sidebar collapses to a top bar with a menu button; content keeps its gutters.
 
@@ -108,17 +107,18 @@ Rules:
 
 | Variant | Fill | Border | Text | Use |
 | --- | --- | --- | --- | --- |
-| Primary | `--accent` | none | `--accent-ink` 500 | One per screen: create, approve |
-| Secondary | `--surface-2` | `--line-strong` | `--ink` | Most actions |
+| Primary | `--accent` (ink) | none | `--accent-ink` 500 | One per screen: New request, Sign in |
+| Secondary | none | `--line-strong`, `--ink` on hover | `--ink` | Most actions, Approve and Reject |
 | Ghost | none | none | `--ink-2`, `--ink` on hover | Topbar actions, icon buttons |
 | Danger | `--danger-soft` | `--danger` at 40% | `--danger` | Remove, escalate, revoke |
 
-32px tall, 12px horizontal padding, 6px radius, 13px Archivo 500. Hover lifts the fill one step (`--surface-2` to
-`--surface-3`; the primary darkens 6%). Disabled is 50% opacity. Focus is a 2px `--accent` ring offset 2px.
+32px tall, 12px horizontal padding, pill radius, 13px Geist 500. Hover fills `--surface-2` and darkens the border to
+ink; the primary lightens to `--accent-hover`. Pressed scales to 98%. Disabled is 50% opacity. Focus is a 2px
+`--accent` ring offset 2px. The site's ↗ arrow is for links that leave the product only.
 
 ### Inputs
 
-32px tall, `--surface`, 1px `--line-strong`, 6px radius, 13px text, 10px horizontal padding. Placeholder `--muted`.
+32px tall, `--surface`, 1px `--line-strong`, 8px radius, 13px text, 10px horizontal padding. Placeholder `--muted`.
 Focus swaps the border for `--accent`. Invalid swaps it for `--danger`. Labels sit above in 12px `--muted`. Textareas
 are 4 rows by default. Selects keep the native control with a chevron glyph.
 
@@ -135,13 +135,21 @@ hover `--surface-2`. Numeric and date columns right-align. Wide tables scroll in
 
 ### State chips
 
-Mono caps 11px, 4px radius, 2px 6px padding, 1px border. Workflow states use `--line-strong` and `--ink-2`;
-human gates use `--accent-soft` and `--accent`; escalated uses `--danger-soft` and `--danger`; released uses
-`--accent` filled. Live chips carry a 6px pulsing dot before the text.
+Geist 12px 500, sentence case, pill, 20px tall, 1px border. Workflow states use `--line-strong` and `--ink-2`;
+human gates use `--signal-soft` with `--ink`; escalated uses `--danger-soft` and `--danger`; released is `--accent`
+filled. Live chips carry a 6px pulsing dot before the text.
+
+### Progress steps
+
+A plain left-to-right line with one 20px circle per stage and the stage name below in 12px sentence case. Done
+stages are filled `--accent` with a check, and the line behind them is `--accent`; the current stage is an `--accent`
+ring with a gently pulsing dot; stages ahead are hollow `--line-strong` rings on a `--line-strong` line. When the
+request needs a person, the stage it stopped at turns `--danger` with a "!" and "Needs you" under its name. No panel
+around it. On narrow screens the line scrolls sideways.
 
 ### Panels
 
-`--surface`, 1px `--line`, 8px radius. Header 40px with a 13px 600 title on the left and metadata on the right,
+`--surface`, 1px `--line`, 14px radius. Header 40px with a 13px 500 title on the left and metadata on the right,
 divided by 1px `--line`. Body padding 16px. Panels do not nest.
 
 ### Properties panel
@@ -171,12 +179,12 @@ A row-height line of `--muted` text with one link, inside the list's container. 
 
 ### Keys
 
-Keyboard shortcuts are shown as 20px mono caps keys on `--surface-2` with a 4px radius, in tooltips and menus.
+Keyboard shortcuts are shown as 20px keys on `--surface-2` with a 6px radius, in tooltips and menus.
 
 ## Motion
 
-- Hover and focus: 120 ms, colour only.
-- Menus, popovers, the command bar: 160 ms fade and 4px rise.
+- Hover and focus: 140 ms, colour only; a pressed button scales to 98%.
+- Menus, popovers, the command bar: 180 ms fade and 4px rise.
 - Page transitions: none.
 - Respect `prefers-reduced-motion`: pulses stop, rises become fades.
 
@@ -191,6 +199,6 @@ Keyboard shortcuts are shown as 20px mono caps keys on `--surface-2` with a 4px 
 
 - New components take their colours, type and spacing from the tokens above; a literal colour in a component is a
   review blocker.
-- A pull request that adds an uppercase label outside the four allowed places explains why in its description.
+- A pull request that adds an uppercase label explains why in its description.
 - The design-lock generator and generated project guides stay separate from this guide; they describe a client's
   product, not Sydeso's.

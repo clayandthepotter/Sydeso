@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { signOutAction } from "../app/auth-actions";
 import { api, apiBaseUrl } from "../lib/api";
+import { listAllProjects } from "../lib/catalog";
 import { CommandBar, CommandButton, type Command } from "./command-bar";
 import { Icon, type IconName } from "./icons";
 import { Mark } from "./mark";
@@ -41,12 +42,13 @@ function initials(name: string) {
 }
 
 /**
- * The frame around every product page: a sidebar with the organization switcher, the primary
- * action, the command bar and grouped navigation; a topbar with the breadcrumb and page actions.
+ * The frame around every product page: a sidebar with the project switcher, the primary action,
+ * the command bar and grouped navigation; a topbar with the breadcrumb and page actions.
  */
 export async function AppShell({
   groups,
-  organizationId,
+  projectId,
+  switchLabel,
   context,
   crumbs,
   primary,
@@ -54,16 +56,19 @@ export async function AppShell({
   children,
 }: {
   groups: NavGroup[];
-  /** The organization the page belongs to; selects it in the switcher. */
-  organizationId?: string;
+  /** The project the page belongs to; selects it in the switcher. */
+  projectId?: string;
+  /** What the switcher shows when no project is selected. */
+  switchLabel?: string;
   context?: { kind: string; name: string };
   crumbs: Crumb[];
   primary?: PrimaryAction;
   actions?: ReactNode;
   children: ReactNode;
 }) {
-  const [me, organizations] = await Promise.all([api.me(), api.listOrganizations()]);
-  const current = organizations.find(organization => organization.id === organizationId);
+  const [me, projects] = await Promise.all([api.me(), listAllProjects()]);
+  const current = projects.find(entry => entry.project.id === projectId);
+  const organizations = Array.from(new Map(projects.map(entry => [entry.organization.id, entry.organization])).values());
   const apiHost = (() => {
     try {
       return new URL(apiBaseUrl()).host;
@@ -71,40 +76,54 @@ export async function AppShell({
       return apiBaseUrl();
     }
   })();
-  const commands: Command[] = groups.flatMap(group =>
-    group.items.map(item => ({ href: item.href, label: item.label, group: group.label, icon: item.icon })),
-  );
+  const commands: Command[] = [
+    ...groups.flatMap(group => group.items.map(item => ({ href: item.href, label: item.label, group: group.label, icon: item.icon }))),
+    ...projects
+      .filter(entry => entry.project.id !== projectId)
+      .map(entry => ({ href: `/app/projects/${entry.project.id}/requests`, label: entry.project.name, group: "Projects", icon: "project" as const })),
+  ];
 
   return (
     <div className="shell">
       <aside className="sidebar">
         <details className="switch">
-          <summary className="switch__btn" aria-label="Switch organization">
+          <summary className="switch__btn" aria-label="Switch project">
             <span className="switch__mark">
               <Mark size={14} />
             </span>
-            <span>{current?.name ?? "Sydeso"}</span>
+            <span>{current?.project.name ?? switchLabel ?? "All projects"}</span>
             <Icon name="chevron-down" size={14} />
           </summary>
           <div className="switch__menu" role="menu">
-            <p className="menu__label mono">Organizations</p>
+            <Link className="menu__item" role="menuitem" href="/app" aria-current={!projectId && !switchLabel ? "true" : undefined}>
+              <Icon name="menu" />
+              <span>All projects</span>
+              {!projectId && !switchLabel && <Icon name="check" size={14} />}
+            </Link>
             {organizations.map(organization => (
-              <Link
-                key={organization.id}
-                className="menu__item"
-                role="menuitem"
-                href={`/app/organizations/${organization.id}`}
-                aria-current={organization.id === organizationId ? "true" : undefined}
-              >
-                <Icon name="organization" />
-                <span>{organization.name}</span>
-                {organization.id === organizationId && <Icon name="check" size={14} />}
-              </Link>
+              <div key={organization.id}>
+                <p className="menu__label mono">{organization.name}</p>
+                {projects
+                  .filter(entry => entry.organization.id === organization.id)
+                  .map(entry => (
+                    <Link
+                      key={entry.project.id}
+                      className="menu__item"
+                      role="menuitem"
+                      href={`/app/projects/${entry.project.id}/requests`}
+                      aria-current={entry.project.id === projectId ? "true" : undefined}
+                    >
+                      <Icon name="project" />
+                      <span>{entry.project.name}</span>
+                      {entry.project.id === projectId && <Icon name="check" size={14} />}
+                    </Link>
+                  ))}
+              </div>
             ))}
             <div className="menu__sep" />
-            <Link className="menu__item" role="menuitem" href="/app">
-              <Icon name="plus" />
-              <span>All organizations</span>
+            <Link className="menu__item" role="menuitem" href="/app/organizations">
+              <Icon name="organization" />
+              <span>Organizations</span>
             </Link>
           </div>
         </details>
@@ -186,3 +205,13 @@ export async function AppShell({
     </div>
   );
 }
+
+/** The navigation shared by every page outside a project. */
+export const sydesoGroup: NavGroup = {
+  label: "Sydeso",
+  items: [
+    { href: "/app", label: "Home", icon: "menu", exact: true },
+    { href: "/app/organizations", label: "Organizations", icon: "organization", exact: true },
+    { href: "/app/design-lock", label: "Design lock", icon: "design" },
+  ],
+};

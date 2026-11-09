@@ -10,10 +10,10 @@ import { api, ApiError } from "../../../../../../lib/api";
 import { formatBytes, formatDateTime, formatRelative } from "../../../../../../lib/format";
 import { shortId, stateLabels } from "../../../../../../lib/workflow";
 
-export const metadata = { title: "Artifact" };
+export const metadata = { title: "Document" };
 
-export default async function ArtifactPage({ params }: { params: Promise<{ projectId: string; artifactId: string }> }) {
-  const { projectId, artifactId } = await params;
+export default async function ArtifactPage({ params }: { params: Promise<{ projectId: string; documentId: string }> }) {
+  const { projectId, documentId } = await params; const artifactId = documentId;
   let artifact;
   try {
     artifact = await api.getArtifact(artifactId);
@@ -24,7 +24,7 @@ export default async function ArtifactPage({ params }: { params: Promise<{ proje
   if (artifact.projectId !== projectId) notFound();
 
   const [versions, lineage] = await Promise.all([api.getArtifactVersions(artifactId), api.getArtifactLineage(artifactId)]);
-  const artifactHref = (id: string) => `/app/projects/${projectId}/artifacts/${id}`;
+  const artifactHref = (id: string) => `/app/projects/${projectId}/documents/${id}`;
   const filename = (artifact.metadata as { filename?: string } | null)?.filename;
   const related = [
     ...lineage.sources.map(item => ({ ...item, relation: "Source" })),
@@ -36,8 +36,8 @@ export default async function ArtifactPage({ params }: { params: Promise<{ proje
       <div className="page__head">
         <div>
           <p className="hint">
-            <Link className="link" href={`/app/projects/${projectId}/artifacts`}>
-              Artifacts
+            <Link className="link" href={`/app/projects/${projectId}/documents`}>
+              Documents
             </Link>{" "}
             / <span className="mono-text">{artifact.type}</span> v{artifact.version}
           </p>
@@ -47,7 +47,7 @@ export default async function ArtifactPage({ params }: { params: Promise<{ proje
           {artifact.workflowRun && <StateBadge state={artifact.workflowRun.currentState} />}
           <a className="btn" href={`/api/artifacts/${artifact.id}/content`} download>
             <Icon name="download" size={14} />
-            Download {artifact.storageKey ? "file" : "JSON"}
+            Download
           </a>
         </div>
       </div>
@@ -107,7 +107,7 @@ export default async function ArtifactPage({ params }: { params: Promise<{ proje
                 <p className="muted">An original. Nothing derives from it yet.</p>
               </div>
             ) : (
-              <div className="rows" role="list" aria-label="Related artifacts">
+              <div className="rows" role="list" aria-label="Related documents">
                 {related.map(item => (
                   <Link className="row" href={artifactHref(item.id)} key={`${item.relation}-${item.id}`} role="listitem">
                     <span className="row__glyph">
@@ -150,9 +150,9 @@ export default async function ArtifactPage({ params }: { params: Promise<{ proje
                 <Prop label="Created">
                   <span title={formatDateTime(artifact.createdAt)}>{formatRelative(artifact.createdAt)}</span>
                 </Prop>
-                <Prop label="Feature">
+                <Prop label="Request">
                   {artifact.feature ? (
-                    <Link className="link" href={`/app/projects/${projectId}/features/${artifact.feature.id}`}>
+                    <Link className="link" href={`/app/projects/${projectId}/requests/${artifact.feature.id}`}>
                       {artifact.feature.title}
                     </Link>
                   ) : (

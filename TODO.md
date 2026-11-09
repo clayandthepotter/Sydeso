@@ -103,6 +103,32 @@ The marketing site lives in the separate `sydeso-site` repository (Astro on Clou
 
 ## Product UI (apps/web)
 
+User process map first, then the UI is reworked against it: `docs/product/user-process-map.md`.
+
+- [x] Review and settle the open questions in the user process map (0.3.0, approved for build).
+- [x] Home as an inbox (Waiting on you, In progress, Not started, Recent) across every project; project switcher in the sidebar; organizations under Settings.
+- [x] Request page as a session: step blocks, agent header, live timers, activity lines, borderless accordions; gates show the document's summary, touches, criteria and flags.
+- [x] Decision row: Approve / Reject at equal weight with a note (required to reject), overflow for Regenerate and Escalate; Stop and Mark released in the page menu.
+- [x] User vocabulary: Request, Document, Machine; status labels; Architect, Developer, Tester; routes renamed with redirects. (Planning and Approve plan land with the engine states.)
+- [x] New request as one text area; the title is the first line. (Trial line lands with the trial.)
+- [x] Progress as a simple left-to-right line of circles; product restyled to the redesigned sydeso.com.
+- [ ] Needs you: cause above the session is done; actions need the engine exits below.
+- [ ] Engine: exits from Needs you (Try again, Start again from a step, Close request).
+- [ ] Engine: who decided, by name, on transitions.
+- [ ] Engine: when the current step began, on the list endpoint.
+- [ ] Engine: Research, PRD and PRD approval states; Researcher and Planner agents; design approval as a project setting.
+- [ ] Engine: live activity stream per job.
+- [ ] Sign-up flows into repository connection and the first request; default hierarchy and managed machine provisioned silently.
+- [ ] Sydeso-hosted repositories for projects without one, with the in-app file view and clone URL.
+- [ ] Project settings: auto-start, require design approval, allow approve with failing tests, fix attempts, repository, preview deployment.
+- [ ] Follow-up requests, linked on both ends.
+- [ ] Live preview at Approve result: project preview deployment, else served from the testing machine.
+- [ ] Trial: 14 days premium on a platform key with a token budget; Add your API key / Choose a plan when it ends.
+- [ ] Automatic release detection from the GitHub merge webhook; Merge button on hosted repositories.
+- [ ] PWA: manifest, service worker, push notifications, badge; email fallback.
+- [ ] Settings gathers Account, Organization, Members, Machines, Audit log.
+- [ ] Later: splitting large requests into children; project context page.
+
 Daily-work redesign (Linear density, Sydeso palette); rules in `docs/brand/product-ui-guide.md`.
 
 - [x] Product UI guide: tokens, type, shell, components.

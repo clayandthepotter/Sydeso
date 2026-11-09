@@ -1,20 +1,20 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Archivo, Azeret_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 
-const archivo = Archivo({
+// The same faces as sydeso.com.
+const geist = Geist({
   subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
+  variable: "--font-geist",
   display: "swap",
 });
 
-const azeret = Azeret_Mono({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
-  variable: "--font-azeret",
+  variable: "--font-geist-mono",
   display: "swap",
 });
 
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${archivo.variable} ${azeret.variable}`}>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
       <body>{children}</body>
     </html>
   );
