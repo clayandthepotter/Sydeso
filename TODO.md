@@ -106,12 +106,16 @@ The marketing site lives in the separate `sydeso-site` repository (Astro on Clou
 User process map first, then the UI is reworked against it: `docs/product/user-process-map.md`.
 
 - [x] Review and settle the open questions in the user process map (0.3.0, approved for build).
-- [ ] Home as an inbox (Waiting on you, In progress, Recent); organizations move to Settings.
-- [ ] Request page as a session: step blocks, activity lines, live timers, borderless accordions.
-- [ ] Decision row: Approve / Reject with note, overflow for Escalate and Regenerate.
-- [ ] User vocabulary and status labels applied everywhere (Request, Machine, Planning, Approve plan).
-- [ ] New request as one text area with the conditional trial and repository lines.
-- [ ] Needs you page section with cause and actions.
+- [x] Home as an inbox (Waiting on you, In progress, Not started, Recent) across every project; project switcher in the sidebar; organizations under Settings.
+- [x] Request page as a session: step blocks, agent header, live timers, activity lines, borderless accordions; gates show the document's summary, touches, criteria and flags.
+- [x] Decision row: Approve / Reject at equal weight with a note (required to reject), overflow for Regenerate and Escalate; Stop and Mark released in the page menu.
+- [x] User vocabulary: Request, Document, Machine; status labels; Architect, Developer, Tester; routes renamed with redirects. (Planning and Approve plan land with the engine states.)
+- [x] New request as one text area; the title is the first line. (Trial line lands with the trial.)
+- [x] Progress as a simple left-to-right line of circles; product restyled to the redesigned sydeso.com.
+- [ ] Needs you: cause above the session is done; actions need the engine exits below.
+- [ ] Engine: exits from Needs you (Try again, Start again from a step, Close request).
+- [ ] Engine: who decided, by name, on transitions.
+- [ ] Engine: when the current step began, on the list endpoint.
 - [ ] Engine: Research, PRD and PRD approval states; Researcher and Planner agents; design approval as a project setting.
 - [ ] Engine: live activity stream per job.
 - [ ] Sign-up flows into repository connection and the first request; default hierarchy and managed machine provisioned silently.
@@ -133,17 +137,6 @@ Daily-work redesign (Linear density, Sydeso palette); rules in `docs/brand/produ
 - [x] Detail pages with a properties panel (feature, artifact).
 - [x] Forms, members, auth pages and the design-lock generator on the new primitives.
 - [ ] Runner and audit tables as rows once there is live data to shape them around.
-
-First pass against `docs/product/user-process-map.md`:
-
-- [x] User vocabulary everywhere: Request, Document, Machine; status labels (Submitted, Designing, Approve design, Building, Testing, Approve result, Ready, Released, Needs you); agents named Architect, Developer, Tester. Routes renamed with redirects from the old paths.
-- [x] Home as the inbox: Waiting on you, In progress, Not started, Recent, across every project; project switcher in the sidebar; organizations under Settings.
-- [x] Request page as a session: one block per step, agent header, live timer, activity lines, borderless accordions; gates show the document's summary, touches, criteria and flags; Needs you block with the cause above the session.
-- [x] Decision row: Approve / Reject at equal weight with a note (required to reject), overflow for Regenerate and Escalate; Stop and Mark released in the page menu.
-- [x] New request as one text area; the title is the first line.
-- [ ] Engine: exits from Needs you (Try again, Start again from a step, Close request). The engine has no transition out of `escalated`, so the Needs you block has no actions yet.
-- [ ] Engine: when the current step began, on the list endpoint. Home and the list fetch each waiting or running request's detail to find it.
-- [ ] Engine: who decided, by name, on transitions; the session shows "You" for every user transition.
 
 - [x] App shell with organization, workspace and project navigation.
 - [x] Organization, workspace and project creation forms against the API.
